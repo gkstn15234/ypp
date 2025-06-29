@@ -1,0 +1,80 @@
+baseURL: 'https://econmingle.com'
+languageCode: 'ko-kr'
+title: '이콘밍글 - 경제뉴스의 새로운 기준'
+defaultContentLanguage: 'ko'
+hasCJKLanguage: true
+
+params:
+  description: '이콘밍글은 시의성 있고 깊이 있는 경제 뉴스를 빠르고 신뢰도 높게 전달하는 경제 전문 미디어입니다.'
+  keywords: '경제뉴스, 증권, 부동산, IT, 국제경제, 금융'
+  author: '주식회사 픽펄스'
+  company: '주식회사 픽펄스'
+  registration: '서울,아55580'
+  address: '서울특별시 구로구 구로동 197-17'
+  phone: '070-8065-3076'
+  email: 'info@econmingle.com'
+  publisher: '김광호'
+  editor: '김광호'
+  youthProtectionOfficer: '김광호'
+
+menu:
+  main:
+    - name: '경제'
+      url: '/economy/'
+      weight: 10
+    - name: '증권'
+      url: '/securities/'
+      weight: 20
+    - name: '부동산'
+      url: '/realestate/'
+      weight: 30
+    - name: 'IT'
+      url: '/it/'
+      weight: 40
+    - name: '국제'
+      url: '/international/'
+      weight: 50
+
+taxonomies:
+  tag: tags
+  category: categories
+  author: authors
+
+outputs:
+  home: ['HTML', 'RSS', 'JSON']
+  page: ['HTML']
+  section: ['HTML', 'RSS']
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    style: github
+    lineNos: true
+
+imaging:
+  resampleFilter: lanczos
+  quality: 95
+  anchor: smart
+
+sitemap:
+  changefreq: daily
+  priority: 0.5
+  filename: sitemap.xml
+
+related:
+  includeNewer: true
+  indices:
+    - name: keywords
+      weight: 100
+    - name: tags
+      weight: 80
+    - name: date
+      weight: 10
+
+paginate: 12
+paginatePath: page
+
+enableRobotsTXT: true
+enableGitInfo: true

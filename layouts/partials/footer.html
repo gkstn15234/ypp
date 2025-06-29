@@ -1,0 +1,73 @@
+<footer class="site-footer">
+    <!-- Newsletter Subscription -->
+    <div class="newsletter-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h3><i class="fas fa-envelope"></i> 이콘밍글 뉴스레터</h3>
+                    <p>매일 아침 가장 중요한 경제 뉴스를 받아보세요</p>
+                </div>
+                <div class="col-md-4">
+                    <form class="newsletter-form">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="이메일 주소">
+                            <button class="btn btn-primary" type="submit">구독</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Footer -->
+    <div class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="footer-brand">
+                        <img src="/images/logo.svg" alt="이콘밍글" class="footer-logo">
+                        <p>복잡하고 어려운 경제 소식을 독자들의 삶과 자연스럽게 어우러지도록 만들겠습니다.</p>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <h5>카테고리</h5>
+                    <ul class="footer-links">
+                        {{ range .Site.Menus.main }}
+                        <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+                        {{ end }}
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>회사 정보</h5>
+                    <ul class="footer-links">
+                        <li><a href="/about/">회사소개</a></li>
+                        <li><a href="/contact/">기사제보 및 문의</a></li>
+                        <li><a href="/editorial-guidelines/">편집 지침</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>정책</h5>
+                    <ul class="footer-links">
+                        <li><a href="/privacy/">개인정보처리방침</a></li>
+                        <li><a href="/youth-protection/">청소년보호정책</a></li>
+                        <li><a href="/terms/">이용약관</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="copyright-info">
+                <p>
+                    {{ .Site.Params.company }} | 제호 : 이콘밍글 | 등록번호 : {{ .Site.Params.registration }} | 등록일 : 2024-08-11 | 발행일 : 2023-11-12<br>
+                    주소 : {{ .Site.Params.address }} | 대표전화 : {{ .Site.Params.phone }}<br>
+                    발행·편집인 : {{ .Site.Params.publisher }} | 청소년보호책임자 : {{ .Site.Params.youthProtectionOfficer }} | 문의 및 제보 : {{ .Site.Params.email }}<br>
+                    Copyright © {{ now.Format "2006" }} {{ .Site.Params.company }}. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

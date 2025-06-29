@@ -1,0 +1,79 @@
+{{ define "main" }}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        {{ $featured := where .Site.RegularPages ".Params.featured" true }}
+        {{ if $featured }}
+        {{ $hero := index $featured 0 }}
+        <div class="hero-article">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="hero-content">
+                        <div class="category-badge-large">{{ $hero.Section | title }}</div>
+                        <h1 class="hero-title">
+                            <a href="{{ $hero.Permalink }}">{{ $hero.Title }}</a>
+                        </h1>
+                        <p class="hero-description">{{ $hero.Description | default $hero.Summary | truncate 200 }}</p>
+                        <div class="hero-meta">
+                            <span class="author">
+                                <i class="fas fa-user"></i> {{ $hero.Params.author }}
+                            </span>
+                            <span class="date">
+                                <i class="fas fa-clock"></i> {{ $hero.Date.Format "1월 2일 15:04" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    {{ if $hero.Params.image }}
+                    <div class="hero-image">
+                        <img src="{{ $hero.Params.image }}" alt="{{ $hero.Title }}" class="img-fluid rounded">
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</section>
+
+<!-- Main Content Grid -->
+<section class="main-content">
+    <div class="container">
+        <!-- Featured Articles Grid -->
+        <div class="featured-grid mb-5">
+            <div class="row">
+                {{ $recent := where .Site.RegularPages ".Section" "!=" "" }}
+                {{ range first 4 (after 1 $recent) }}
+                <div class="col-lg-3 col-md-6 mb-4">
+                    {{ partial "article-card.html" . }}
+                </div>
+                {{ end }}
+            </div>
+        </div>
+
+        <!-- Category Sections -->
+        {{ range .Site.Sections }}
+        {{ if not (in (slice "authors") .Section) }}
+        <section class="category-section mb-5">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-{{ if eq .Section "economy" }}chart-line{{ else if eq .Section "securities" }}chart-bar{{ else if eq .Section "realestate" }}home{{ else if eq .Section "it" }}laptop-code{{ else }}globe{{ end }}"></i>
+                    {{ .Title }}
+                </h2>
+                <a href="{{ .Permalink }}" class="view-all-link">전체보기 <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="row">
+                {{ range first 3 .Pages }}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    {{ partial "article-card.html" . }}
+                </div>
+                {{ end }}
+            </div>
+        </section>
+        {{ end }}
+        {{ end }}
+    </div>
+</section>
+{{ end }}

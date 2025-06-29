@@ -1,0 +1,53 @@
+{{ define "main" }}
+{{ partial "breadcrumb.html" . }}
+
+<section class="list-page">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-{{ if eq .Section "economy" }}chart-line{{ else if eq .Section "securities" }}chart-bar{{ else if eq .Section "realestate" }}home{{ else if eq .Section "it" }}laptop-code{{ else }}globe{{ end }}"></i> {{ .Title }}</h1>
+            {{ if .Description }}
+            <p class="page-description">{{ .Description }}</p>
+            {{ end }}
+        </div>
+
+        <div class="articles-grid">
+            <div class="row">
+                {{ range .Paginator.Pages }}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    {{ partial "article-card.html" . }}
+                </div>
+                {{ end }}
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {{ if gt .Paginator.TotalPages 1 }}
+        <nav class="pagination-nav">
+            <ul class="pagination justify-content-center">
+                {{ if .Paginator.HasPrev }}
+                <li class="page-item">
+                    <a class="page-link" href="{{ .Paginator.Prev.URL }}">
+                        <i class="fas fa-chevron-left"></i> 이전
+                    </a>
+                </li>
+                {{ end }}
+
+                {{ range .Paginator.Pagers }}
+                <li class="page-item {{ if eq . $.Paginator }}active{{ end }}">
+                    <a class="page-link" href="{{ .URL }}">{{ .PageNumber }}</a>
+                </li>
+                {{ end }}
+
+                {{ if .Paginator.HasNext }}
+                <li class="page-item">
+                    <a class="page-link" href="{{ .Paginator.Next.URL }}">
+                        다음 <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+                {{ end }}
+            </ul>
+        </nav>
+        {{ end }}
+    </div>
+</section>
+{{ end }}

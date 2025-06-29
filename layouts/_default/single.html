@@ -1,0 +1,137 @@
+{{ define "main" }}
+{{ partial "breadcrumb.html" . }}
+
+<!-- Reading Progress Bar -->
+<div class="reading-progress">
+    <div class="progress-bar" id="reading-progress"></div>
+</div>
+
+<article class="single-article">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="inside-article">
+                    <!-- Article Header -->
+                    <header class="article-header">
+                        <div class="category-badge">{{ .Section | title }}</div>
+                        <h1 class="gb-headline">{{ .Title }}</h1>
+                        
+                        <div class="byline-date">
+                            <div class="author-info">
+                                {{ if .Params.author }}
+                                By <a href="/authors/{{ .Params.author | urlize }}/" class="author-link">{{ .Params.author }}</a>
+                                {{ end }}
+                            </div>
+                            <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}" class="publish-date">
+                                {{ .Date.Format "2006년 1월 2일 15:04" }}
+                            </time>
+                        </div>
+                        
+                        <!-- Social Share Buttons -->
+                        <div class="social-share">
+                            <button class="share-btn facebook" onclick="shareArticle('facebook')">
+                                <i class="fab fa-facebook-f"></i>
+                            </button>
+                            <button class="share-btn twitter" onclick="shareArticle('twitter')">
+                                <i class="fab fa-twitter"></i>
+                            </button>
+                            <button class="share-btn naver" onclick="shareArticle('naver')">
+                                <i class="fas fa-n"></i>
+                            </button>
+                            <button class="share-btn copy" onclick="shareArticle('copy')">
+                                <i class="fas fa-link"></i>
+                            </button>
+                        </div>
+                    </header>
+
+                    <!-- Key Takeaways Box -->
+                    {{ if .Params.key_points }}
+                    <div class="key-takeaways-box">
+                        <h5><i class="fas fa-key"></i> 핵심 포인트</h5>
+                        <ul>
+                            {{ range .Params.key_points }}
+                            <li><i class="fas fa-check-circle"></i> {{ . }}</li>
+                            {{ end }}
+                        </ul>
+                    </div>
+                    {{ end }}
+
+                    <!-- Article Content -->
+                    <div class="entry-content">
+                        {{ .Content }}
+                        
+                        <!-- Advertisement Area -->
+                        <div class="econad">
+                            <div class="ad-placeholder">
+                                <p class="text-muted text-center">광고 영역</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Article Tags -->
+                    {{ if .Params.tags }}
+                    <div class="article-tags">
+                        <h6><i class="fas fa-tags"></i> 관련 태그</h6>
+                        <div class="tag-list">
+                            {{ range .Params.tags }}
+                            <a href="/tags/{{ . | urlize }}/" class="tag-link">#{{ . }}</a>
+                            {{ end }}
+                        </div>
+                    </div>
+                    {{ end }}
+
+                    <!-- Enhanced Author Box -->
+                    {{ if .Params.author }}
+                    <div class="author-box">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div class="author-avatar">
+                                    <i class="fas fa-user-circle fa-3x"></i>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <h6 class="author-name">{{ .Params.author }}</h6>
+                                <p class="author-bio">{{ .Params.author_bio | default "경제 전문 기자" }}</p>
+                                <div class="author-links">
+                                    <a href="/authors/{{ .Params.author | urlize }}/" class="btn btn-sm btn-outline-primary">
+                                        다른 기사 보기
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
+<!-- Related Articles -->
+<section class="related-articles">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h4><i class="fas fa-newspaper"></i> 관련 기사</h4>
+                <div class="row">
+                    {{ range first 3 (where .Site.RegularPages.ByDate.Reverse ".Section" .Section) }}
+                    {{ if ne .Permalink $.Permalink }}
+                    <div class="col-md-4 mb-3">
+                        {{ partial "article-card.html" . }}
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sticky "Up Next" Component -->
+<div class="up-next-sticky" id="upNext" style="display:none;">
+    <div class="up-next-content">
+        <h6>다음 기사</h6>
+        <div class="next-article" id="nextArticleContent"></div>
+    </div>
+</div>
+{{ end }}
