@@ -1,0 +1,28 @@
+{
+  "name": "hugodiscoverpro-ai-system",
+  "version": "1.0.0",
+  "description": "AI 자동 뉴스 기사 생성 및 발행 시스템",
+  "type": "module",
+  "main": "ai-system/main.js",
+  "scripts": {
+    "start": "node ai-system/main.js",
+    "test": "node ai-system/generate-article.js",
+    "generate": "node ai-system/generate-article.js",
+    "collect-trends": "node ai-system/trend-collector.js",
+    "test-image": "node ai-system/image-collector.js",
+    "dev": "nodemon ai-system/main.js",
+    "schedule": "node ai-system/main.js schedule",
+    "status": "node ai-system/main.js status"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "ai",
+    "news",
+    "hugo",
+    "automation",
+    "content-generation"
+  ],
+  "author": "HugoDiscoverPro AI System",
+  "license": "MIT"
+} 
