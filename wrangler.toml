@@ -10,7 +10,7 @@ cwd = "."
 watch_dir = "."
 
 [[build.environment_variables]]
-HUGO_VERSION = "0.128.0"
+HUGO_VERSION = "0.147.9"
 
 [[build.environment_variables]]
 HUGO_ENV = "production"

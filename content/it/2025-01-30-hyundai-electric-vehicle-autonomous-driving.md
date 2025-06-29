@@ -15,9 +15,7 @@ tags:
 categories:
   - 기술
 author: "econmingle-ai"
-image:
-  url: "https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=600&fit=crop&crop=center"
-  alt: "현대차 전기차 아이오닉 시리즈"
+image: "https://images.unsplash.com/photo-1593941707882-a5bac6861d75?w=800&h=600&fit=crop&crop=center"
 readingTime: "약 4분"
 wordCount: 1200
 ---

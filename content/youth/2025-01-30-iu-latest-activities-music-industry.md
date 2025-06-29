@@ -16,9 +16,7 @@ tags:
 categories:
   - 청년
 author: "econmingle-ai"
-image:
-  url: "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzEyMDFfMjc3%2FMDAxNzAxNDE4NzY5ODQ0.png&type=a340"  
-  alt: "아이유 최근 활동 모습"
+image: "https://images.unsplash.com/photo-1558618644-fbd25c85cd64?w=800&h=600&fit=crop&crop=center"
 readingTime: "약 4분"
 wordCount: 1300
 ---

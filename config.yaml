@@ -1,4 +1,4 @@
-baseURL: ''
+baseURL: '/'
 languageCode: 'ko-kr'
 title: '이콘밍글 - 경제뉴스의 새로운 기준'
 defaultContentLanguage: 'ko'
@@ -77,5 +77,10 @@ pagination:
   pagerSize: 12
   path: page
 
-enableRobotsTXT: false
+enableRobotsTXT: true
 enableGitInfo: true
+
+# Cloudflare Pages 최적화
+uglyURLs: false
+canonifyURLs: true
+relativeURLs: false
