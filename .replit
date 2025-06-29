@@ -2,6 +2,7 @@ modules = ["hugo"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["hugo"]
 
 [workflows]
 runButton = "Project"
@@ -23,3 +24,7 @@ author = "agent"
 task = "shell.exec"
 args = "hugo server --bind 0.0.0.0 --port 5000 --baseURL http://localhost:5000"
 waitForPort = 5000
+
+[[ports]]
+localPort = 5000
+externalPort = 80

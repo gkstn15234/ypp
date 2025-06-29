@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a365d;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3182ce;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="200" height="60" fill="transparent"/>
+  
+  <!-- Logo Icon -->
+  <g transform="translate(10, 12)">
+    <!-- Chart bars representing economic growth -->
+    <rect x="0" y="24" width="4" height="12" fill="url(#logoGradient)" rx="2"/>
+    <rect x="6" y="18" width="4" height="18" fill="url(#logoGradient)" rx="2"/>
+    <rect x="12" y="12" width="4" height="24" fill="url(#logoGradient)" rx="2"/>
+    <rect x="18" y="6" width="4" height="30" fill="url(#logoGradient)" rx="2"/>
+    
+    <!-- Upward arrow -->
+    <path d="M26 20 L30 16 L34 20 M30 16 L30 28" stroke="url(#logoGradient)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="55" y="25" font-family="'Noto Sans KR', sans-serif" font-size="18" font-weight="700" fill="#1a365d">이콘밍글</text>
+  <text x="55" y="42" font-family="'Noto Sans KR', sans-serif" font-size="10" font-weight="400" fill="#718096">경제뉴스의 새로운 기준</text>
+  
+  <!-- English subtitle -->
+  <text x="55" y="52" font-family="'Noto Sans KR', sans-serif" font-size="8" font-weight="300" fill="#a0aec0">ECONMINGLE</text>
+</svg>

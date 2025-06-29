@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Categories - 이콘밍글 - 경제뉴스의 새로운 기준</title>
+    <link>http://localhost:5000/categories/</link>
+    <description>이콘밍글은 시의성 있고 깊이 있는 경제 뉴스를 빠르고 신뢰도 높게 전달하는 경제 전문 미디어입니다.</description>
+    <generator>Hugo</generator>
+    <language>ko-kr</language>
+    <lastBuildDate>Sun, 29 Jun 2025 20:10:00 +0900</lastBuildDate><atom:link href="http://localhost:5000/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>International</title>
+      <link>http://localhost:5000/categories/international/</link>
+      <pubDate>Sun, 29 Jun 2025 20:10:00 +0900</pubDate>
+      
+      <guid>http://localhost:5000/categories/international/</guid>
+      <description></description>
+      <content:encoded></content:encoded>
+    </item>
+    
+    <item>
+      <title>It</title>
+      <link>http://localhost:5000/categories/it/</link>
+      <pubDate>Sun, 29 Jun 2025 18:20:00 +0900</pubDate>
+      
+      <guid>http://localhost:5000/categories/it/</guid>
+      <description></description>
+      <content:encoded></content:encoded>
+    </item>
+    
+    <item>
+      <title>Realestate</title>
+      <link>http://localhost:5000/categories/realestate/</link>
+      <pubDate>Sun, 29 Jun 2025 16:45:00 +0900</pubDate>
+      
+      <guid>http://localhost:5000/categories/realestate/</guid>
+      <description></description>
+      <content:encoded></content:encoded>
+    </item>
+    
+    <item>
+      <title>Securities</title>
+      <link>http://localhost:5000/categories/securities/</link>
+      <pubDate>Sun, 29 Jun 2025 14:15:00 +0900</pubDate>
+      
+      <guid>http://localhost:5000/categories/securities/</guid>
+      <description></description>
+      <content:encoded></content:encoded>
+    </item>
+    
+    <item>
+      <title>Economy</title>
+      <link>http://localhost:5000/categories/economy/</link>
+      <pubDate>Sun, 29 Jun 2025 10:30:00 +0900</pubDate>
+      
+      <guid>http://localhost:5000/categories/economy/</guid>
+      <description></description>
+      <content:encoded></content:encoded>
+    </item>
+    
+  </channel>
+</rss>
