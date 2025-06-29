@@ -73,8 +73,9 @@ related:
     - name: date
       weight: 10
 
-paginate: 12
-paginatePath: page
+pagination:
+  pagerSize: 12
+  path: page
 
-enableRobotsTXT: true
+enableRobotsTXT: false
 enableGitInfo: true

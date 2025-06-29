@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://econmingle.com/sitemap.xml
+Sitemap: https://econmingle.com/index.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Disallow admin areas (if any)
+# Disallow: /admin/ 

@@ -227,7 +227,7 @@ function validateEmail(email) {
 
 function subscribeNewsletter(email) {
     // In a real implementation, this would send the email to a backend service
-    console.log('Newsletter subscription:', email);
+    // TODO: Implement backend newsletter subscription
     showNotification('뉴스레터 구독이 완료되었습니다!');
 }
 
@@ -316,8 +316,8 @@ addSkipToContent();
 
 // Global error handling
 window.addEventListener('error', function(e) {
-    console.error('JavaScript error:', e.error);
     // In production, you might want to send this to an error tracking service
+    // TODO: Implement error tracking (e.g., Sentry, LogRocket)
 });
 
 // Service Worker Registration (for PWA features)
@@ -325,10 +325,10 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js')
             .then(function(registration) {
-                console.log('SW registered: ', registration);
+                // Service worker registered successfully
             })
             .catch(function(registrationError) {
-                console.log('SW registration failed: ', registrationError);
+                // Service worker registration failed
             });
     });
 }
