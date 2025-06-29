@@ -68,12 +68,12 @@ h1, h2, h3, h4, h5, h6 {
     color: white;
     padding: 8px 0;
     overflow: hidden;
+    position: relative;
 }
 
 .ticker-content {
     display: flex;
     align-items: center;
-    white-space: nowrap;
 }
 
 .ticker-label {
@@ -83,20 +83,40 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     margin-right: 20px;
     flex-shrink: 0;
+    z-index: 10;
+    position: relative;
 }
 
 .ticker-items {
-    animation: scroll-left 60s linear infinite;
+    display: flex;
+    white-space: nowrap;
+    animation: scroll-left 120s linear infinite;
+    min-width: 100%;
 }
 
 .ticker-item {
-    margin-right: 50px;
+    margin-right: 100px;
     font-weight: 500;
+    flex-shrink: 0;
+}
+
+.ticker-item::after {
+    content: " • ";
+    margin-left: 50px;
+    opacity: 0.7;
+}
+
+.ticker-item:last-child::after {
+    content: "";
 }
 
 @keyframes scroll-left {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
+    0% { 
+        transform: translateX(100%); 
+    }
+    100% { 
+        transform: translateX(-100%); 
+    }
 }
 
 .main-header {
@@ -811,7 +831,18 @@ h1, h2, h3, h4, h5, h6 {
     }
     
     .ticker-items {
-        animation-duration: 30s;
+        animation-duration: 40s;
+    }
+    
+    .ticker-item {
+        margin-right: 40px;
+        font-size: 0.85rem;
+    }
+    
+    .ticker-label {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        margin-right: 15px;
     }
 }
 
@@ -887,6 +918,17 @@ h1, h2, h3, h4, h5, h6 {
 @media (prefers-reduced-motion: reduce) {
     .ticker-items {
         animation: none;
+        position: static;
+        transform: none;
+    }
+    
+    .ticker-item {
+        margin-right: 30px;
+        font-size: 0.9rem;
+    }
+    
+    .breaking-news-ticker {
+        padding: 8px 0;
     }
     
     .card {
