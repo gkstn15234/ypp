@@ -292,6 +292,27 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
+/* Clickable Card */
+.clickable-card {
+    position: relative;
+    cursor: pointer;
+}
+
+.clickable-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.clickable-card:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
 .card-img-wrapper {
     position: relative;
     overflow: hidden;

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeSocialShare();
     initializeUpNext();
     initializeNewsletter();
+    initializeClickableCards();
 });
 
 // Reading Progress Bar
@@ -217,6 +218,42 @@ function initializeNewsletter() {
                 showNotification('올바른 이메일 주소를 입력해주세요.');
             }
         });
+    });
+}
+
+// Clickable Cards
+function initializeClickableCards() {
+    const clickableCards = document.querySelectorAll('.clickable-card');
+    
+    clickableCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Don't trigger if clicking on an actual link or button
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || 
+                e.target.closest('a') || e.target.closest('button')) {
+                return;
+            }
+            
+            const href = this.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            }
+        });
+        
+        // Add keyboard support for accessibility
+        card.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const href = this.getAttribute('data-href');
+                if (href) {
+                    window.location.href = href;
+                }
+            }
+        });
+        
+        // Make card focusable for keyboard navigation
+        if (!card.getAttribute('tabindex')) {
+            card.setAttribute('tabindex', '0');
+        }
     });
 }
 

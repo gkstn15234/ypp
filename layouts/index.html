@@ -1,42 +1,4 @@
 {{ define "main" }}
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        {{ $featured := where .Site.RegularPages ".Params.featured" true }}
-        {{ if $featured }}
-        {{ $hero := index $featured 0 }}
-        <div class="hero-article">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <div class="hero-content">
-                        <div class="category-badge-large">{{ $hero.Section | title }}</div>
-                        <h1 class="hero-title">
-                            <a href="{{ $hero.Permalink }}">{{ $hero.Title }}</a>
-                        </h1>
-                        <p class="hero-description">{{ $hero.Description | default $hero.Summary | truncate 200 }}</p>
-                        <div class="hero-meta">
-                            <span class="author">
-                                <i class="fas fa-user"></i> {{ $hero.Params.author }}
-                            </span>
-                            <span class="date">
-                                <i class="fas fa-clock"></i> {{ $hero.Date.Format "1월 2일 15:04" }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    {{ if $hero.Params.image }}
-                    <div class="hero-image">
-                        <img src="{{ $hero.Params.image }}" alt="{{ $hero.Title }}" class="img-fluid rounded">
-                    </div>
-                    {{ end }}
-                </div>
-            </div>
-        </div>
-        {{ end }}
-    </div>
-</section>
-
 <!-- Main Content Grid -->
 <section class="main-content">
     <div class="container">

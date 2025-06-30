@@ -1,5 +1,5 @@
 <article class="article-card">
-    <div class="card h-100">
+    <div class="card h-100 clickable-card" data-href="{{ .Permalink }}">
         {{ if .Params.image }}
         <div class="card-img-wrapper">
             <img src="{{ .Params.image }}" class="card-img-top" alt="{{ .Title }}">
