@@ -1,4 +1,4 @@
-baseURL: '/'
+baseURL: 'https://hugodiscoverpro.pages.dev'
 languageCode: 'ko-kr'
 title: '이콘밍글 - 경제뉴스의 새로운 기준'
 defaultContentLanguage: 'ko'
@@ -119,7 +119,7 @@ disableKinds: []
 # URL 최적화
 uglyURLs: false
 canonifyURLs: false
-relativeURLs: true
+relativeURLs: false
 
 # 보안 헤더
 security:
