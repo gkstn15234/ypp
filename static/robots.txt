@@ -2,8 +2,8 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://econmingle.com/sitemap.xml
-Sitemap: https://econmingle.com/index.xml
+Sitemap: https://gkstn15234.github.io/HugoDiscoverPro/sitemap.xml
+Sitemap: https://gkstn15234.github.io/HugoDiscoverPro/index.xml
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1

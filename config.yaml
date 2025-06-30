@@ -1,4 +1,4 @@
-baseURL: '/'
+baseURL: 'https://gkstn15234.github.io/HugoDiscoverPro'
 languageCode: 'ko-kr'
 title: '이콘밍글 - 경제뉴스의 새로운 기준'
 defaultContentLanguage: 'ko'
@@ -80,7 +80,24 @@ pagination:
 enableRobotsTXT: true
 enableGitInfo: true
 
-# Cloudflare Pages 최적화
+# SEO 최적화
+googleAnalytics: ""
+disableKinds: []
+
+# URL 최적화
 uglyURLs: false
 canonifyURLs: true
 relativeURLs: false
+
+# 보안 헤더
+security:
+  enableInlineShortcodes: false
+  funcs:
+    getenv:
+      - "^HUGO_"
+      - "^WC_"
+  http:
+    methods:
+      - "(?i)GET|POST"
+    urls:
+      - ".*"
