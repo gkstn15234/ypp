@@ -28,7 +28,7 @@
     <meta property="og:site_name" content="{{ .Site.Title }}">
     <meta property="og:locale" content="ko_KR">
     {{ if .Params.image }}
-    <meta property="og:image" content="{{ .Params.image | replace "_1280.jpg" "_1200.jpg" | absURL }}">
+    <meta property="og:image" content="{{ .Params.image | absURL }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="{{ .Title }}">
@@ -50,7 +50,7 @@
     <meta name="twitter:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
     <meta name="twitter:description" content="{{ if .Description }}{{ .Description }}{{ else }}{{ .Site.Params.description }}{{ end }}">
     {{ if .Params.image }}
-    <meta name="twitter:image" content="{{ .Params.image | replace "_1280.jpg" "_1200.jpg" | absURL }}">
+    <meta name="twitter:image" content="{{ .Params.image | absURL }}">
     <meta name="twitter:image:alt" content="{{ .Title }}">
     {{ end }}
     
@@ -67,7 +67,7 @@
         {{ if .Params.image }}
         "image": {
             "@type": "ImageObject",
-            "url": "{{ .Params.image | replace "_1280.jpg" "_1200.jpg" | absURL }}",
+            "url": "{{ .Params.image | absURL }}",
             "width": 1200,
             "height": 630
         },

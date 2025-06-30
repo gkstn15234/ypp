@@ -2,13 +2,11 @@
     <div class="card h-100 clickable-card" data-href="{{ .Permalink }}">
         {{ if .Params.image }}
         <div class="card-img-wrapper">
-            <img src="{{ .Params.image | replace "_1280.jpg" "_640.jpg" }}" 
+            <img src="{{ .Params.image }}" 
                  loading="lazy" 
                  class="card-img-top" 
                  alt="{{ .Title }}"
-                 width="640"
-                 height="480"
-                 style="aspect-ratio: 4/3; object-fit: cover;">
+                 style="aspect-ratio: 4/3; object-fit: cover; height: 200px;">
             <div class="category-badge">{{ .Section | title }}</div>
         </div>
         {{ end }}
