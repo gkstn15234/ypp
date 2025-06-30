@@ -289,17 +289,49 @@ function initializeLazyLoading() {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.remove('lazy');
+                    
+                    // For data-src images (fallback)
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                    }
+                    
+                    // Add loaded class when image loads
+                    img.addEventListener('load', () => {
+                        img.classList.add('loaded');
+                    });
+                    
+                    // Handle error case
+                    img.addEventListener('error', () => {
+                        img.classList.add('loaded'); // Still remove placeholder
+                        console.log('Image failed to load:', img.src);
+                    });
+                    
                     imageObserver.unobserve(img);
                 }
             });
+        }, {
+            root: null,
+            rootMargin: '50px', // Load images 50px before they enter viewport
+            threshold: 0.1
         });
 
-        document.querySelectorAll('img[data-src]').forEach(img => {
+        // Observe all lazy images
+        document.querySelectorAll('img[loading="lazy"], img[data-src]').forEach(img => {
             imageObserver.observe(img);
         });
     }
+    
+    // Immediate loading for images that are already in viewport
+    document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+        if (img.complete) {
+            img.classList.add('loaded');
+        } else {
+            img.addEventListener('load', () => {
+                img.classList.add('loaded');
+            });
+        }
+    });
 }
 
 // Performance: Preload critical resources
@@ -312,12 +344,25 @@ function preloadCriticalResources() {
         link.href = nextPageLink.href;
         document.head.appendChild(link);
     }
+    
+    // Preload critical images
+    const heroImage = document.querySelector('.hero-image img');
+    if (heroImage) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = heroImage.src;
+        document.head.appendChild(link);
+    }
 }
 
-// Initialize performance optimizations
+// Initialize performance optimizations immediately
+initializeLazyLoading();
+preloadCriticalResources();
+
+// Initialize performance optimizations with slight delay for non-critical items
 setTimeout(() => {
-    initializeLazyLoading();
-    preloadCriticalResources();
+    // Additional performance optimizations can go here
 }, 1000);
 
 // Accessibility: Skip to content

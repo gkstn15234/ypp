@@ -13,12 +13,18 @@
                 <news:name>{{ .Site.Title }}</news:name>
                 <news:language>ko</news:language>
             </news:publication>
-            {{ if or (eq .Params.genre "opinion") (eq .Params.genre "oped") }}
+            {{ if eq .Section "securities" }}
+            <news:genres>PressRelease</news:genres>
+            {{ else if or (eq .Section "economy") (eq .Section "realestate") (eq .Section "it") (eq .Section "international") }}
             <news:genres>OpEd</news:genres>
-            {{ else if eq .Params.genre "blog" }}
+            {{ else if .Params.genre }}
+            {{ if eq .Params.genre "blog" }}
             <news:genres>Blog</news:genres>
             {{ else if eq .Params.genre "pressrelease" }}
             <news:genres>PressRelease</news:genres>
+            {{ else if or (eq .Params.genre "opinion") (eq .Params.genre "oped") }}
+            <news:genres>OpEd</news:genres>
+            {{ end }}
             {{ end }}
             <news:publication_date>{{ .Date.Format "2006-01-02T15:04:05-07:00" }}</news:publication_date>
             <news:title>{{ .Title }}</news:title>
