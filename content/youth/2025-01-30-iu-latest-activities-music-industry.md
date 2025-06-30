@@ -23,7 +23,7 @@ wordCount: 1300
 
 ## 아이유, 2025년 음악계 새로운 변화 주도
 
-![아이유 공식 프로필](https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA5MDJfMjgy%2FMDAxNjkzNjIzOTI0ODky.jpg&type=a340 "아이유 2025년 공식 프로필")
+![아이유 공식 프로필](https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=500&fit=crop&crop=center "아이유 공식 프로필")
 
 가수 아이유(본명 이지은)가 2025년을 맞아 음악 산업에서 새로운 도전과 혁신을 예고하며 K-POP 업계의 주목을 받고 있다. 데뷔 16년차를 맞은 아이유는 여전히 최고의 인기를 유지하며 후배 아티스트들에게 영감을 주는 존재로 자리매김하고 있다.
 
@@ -39,7 +39,7 @@ wordCount: 1300
 
 ### 2025년 월드투어 'HEREH' 글로벌 확장
 
-![아이유 콘서트 무대](https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA4MTVfMjY5%2FMDAxNjkyMDg5NTI0MzUw.jpg&type=a340 "아이유 HEREH 월드투어 콘서트")
+![아이유 콘서트 무대](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/IU_at_Love_Poem_Concert_2019.jpg/800px-IU_at_Love_Poem_Concert_2019.jpg "아이유 HEREH 월드투어 콘서트")
 
 아이유는 올해 3월부터 시작되는 월드투어 'HEREH(헤어)'를 통해 글로벌 팬들과 만날 예정이다. 이번 투어는 아시아를 넘어 북미, 유럽까지 확장되어 총 30개 도시에서 50회 공연이 예정되어 있다.
 
@@ -52,7 +52,7 @@ wordCount: 1300
 
 ### K-POP 산업에 미치는 경제적 영향
 
-![K-POP 산업 성장](https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzEwMjVfMTM2%2FMDAxNjk4MjEyNzQzODk2.png&type=a340 "K-POP 글로벌 산업 성장")
+![K-POP 산업 성장](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Kpop_worldwide_Google_search_trends.png/800px-Kpop_worldwide_Google_search_trends.png "K-POP 글로벌 산업 성장")
 
 한국콘텐츠진흥원에 따르면, 아이유의 음악 활동은 연간 약 300억 원의 직간접 경제 효과를 창출하는 것으로 분석되었다. 이는 콘서트 티켓 판매, 음원 수익, 광고 모델 활동, 관련 상품 판매 등을 종합한 수치다.
 
@@ -78,7 +78,7 @@ wordCount: 1300
 
 ### 음악 산업 트렌드 변화 주도
 
-![음악 스트리밍 트렌드](https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA3MjBfMTc5%2FMDAxNjg5ODI5MTYzNjM0.jpg&type=a340 "음악 스트리밍 산업 변화")
+![음악 스트리밍 트렌드](https://cdn.pixabay.com/photo/2020/05/18/16/17/social-media-5187243_1280.png "음악 스트리밍 산업 변화")
 
 아이유는 전통적인 발매 방식에서 벗어나 디지털 플랫폼을 적극 활용한 마케팅으로 음악 산업의 새로운 패러다임을 제시하고 있다. 특히 소셜미디어와 팬클럽 플랫폼을 통한 직접 소통으로 팬들과의 유대감을 강화하고 있다.
 
@@ -100,7 +100,7 @@ wordCount: 1300
 
 ### 글로벌 K-POP 시장에서의 위상
 
-![K-POP 글로벌 확산](https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA2MTJfMjEw%2FMDAxNjg2NTU2NzQzOTI4.png&type=a340 "K-POP 글로벌 시장 확산")
+![K-POP 글로벌 확산](https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=500&fit=crop&crop=center "K-POP 글로벌 시장 확산")
 
 아이유는 BTS, 블랙핑크와 함께 K-POP의 글로벌 확산을 이끄는 대표 아티스트로 평가받고 있다. 특히 서정적이고 감성적인 음악으로 아시아권을 넘어 서구 시장에서도 인지도를 높여가고 있다.
 
