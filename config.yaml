@@ -41,9 +41,41 @@ taxonomies:
   author: authors
 
 outputs:
-  home: ['HTML', 'RSS', 'JSON']
+  home: ['HTML', 'RSS', 'JSON', 'SitemapGeneral', 'SitemapNews', 'SitemapAuthors', 'SitemapPages', 'SitemapLocal', 'SitemapVideo']
   page: ['HTML']
   section: ['HTML', 'RSS']
+
+outputFormats:
+  SitemapGeneral:
+    mediaType: 'application/xml'
+    baseName: 'sitemap-general'
+    isPlainText: true
+    notAlternative: true
+  SitemapNews:
+    mediaType: 'application/xml'
+    baseName: 'sitemap-news'
+    isPlainText: true
+    notAlternative: true
+  SitemapAuthors:
+    mediaType: 'application/xml'
+    baseName: 'sitemap-authors'
+    isPlainText: true
+    notAlternative: true
+  SitemapPages:
+    mediaType: 'application/xml'
+    baseName: 'sitemap-pages'
+    isPlainText: true
+    notAlternative: true
+  SitemapLocal:
+    mediaType: 'application/xml'
+    baseName: 'sitemap-local'
+    isPlainText: true
+    notAlternative: true
+  SitemapVideo:
+    mediaType: 'application/xml'
+    baseName: 'sitemap-video'
+    isPlainText: true
+    notAlternative: true
 
 markup:
   goldmark:

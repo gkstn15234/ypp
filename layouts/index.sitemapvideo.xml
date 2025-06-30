@@ -1,0 +1,62 @@
+{{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+    
+    {{ range .Site.RegularPages }}
+    {{ if and (not .Params.private) (or .Params.video_url .Params.youtube_id .Params.video_file) }}
+    <url>
+        <loc>{{ .Permalink }}</loc>
+        <lastmod>{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" }}</lastmod>
+        <video:video>
+            {{ if .Params.video_thumbnail }}
+            <video:thumbnail_loc>{{ .Params.video_thumbnail | absURL }}</video:thumbnail_loc>
+            {{ else if .Params.image }}
+            <video:thumbnail_loc>{{ .Params.image | absURL }}</video:thumbnail_loc>
+            {{ end }}
+            
+            <video:title>{{ .Title }}</video:title>
+            
+            {{ if .Description }}
+            <video:description>{{ .Description | truncate 2048 }}</video:description>
+            {{ else }}
+            <video:description>{{ .Summary | truncate 2048 }}</video:description>
+            {{ end }}
+            
+            {{ if .Params.video_url }}
+            <video:content_loc>{{ .Params.video_url }}</video:content_loc>
+            {{ else if .Params.youtube_id }}
+            <video:player_loc>https://www.youtube.com/embed/{{ .Params.youtube_id }}</video:player_loc>
+            {{ else if .Params.video_file }}
+            <video:content_loc>{{ .Params.video_file | absURL }}</video:content_loc>
+            {{ end }}
+            
+            {{ if .Params.video_duration }}
+            <video:duration>{{ .Params.video_duration }}</video:duration>
+            {{ end }}
+            
+            <video:publication_date>{{ .Date.Format "2006-01-02T15:04:05-07:00" }}</video:publication_date>
+            
+            {{ if .Params.tags }}
+            <video:tag>{{ delimit .Params.tags ", " }}</video:tag>
+            {{ end }}
+            
+            <video:category>{{ .Section | title }}</video:category>
+            
+            {{ if .Params.video_family_friendly }}
+            <video:family_friendly>{{ .Params.video_family_friendly }}</video:family_friendly>
+            {{ else }}
+            <video:family_friendly>yes</video:family_friendly>
+            {{ end }}
+            
+            {{ if .Params.video_live }}
+            <video:live>{{ .Params.video_live }}</video:live>
+            {{ else }}
+            <video:live>no</video:live>
+            {{ end }}
+            
+        </video:video>
+    </url>
+    {{ end }}
+    {{ end }}
+    
+</urlset> 
