@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeUpNext();
     initializeNewsletter();
     initializeClickableCards();
+    initializeEnhancedUpNext();
 });
 
 // Reading Progress Bar
@@ -15,14 +16,13 @@ function initializeReadingProgress() {
     const progressBar = document.getElementById('reading-progress');
     if (!progressBar) return;
 
-    window.addEventListener('scroll', function() {
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
+    window.addEventListener('scroll', () => {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const trackLength = documentHeight - windowHeight;
-        const pctScrolled = Math.floor((scrollTop / trackLength) * 100);
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
         
-        progressBar.style.width = pctScrolled + '%';
+        progressBar.style.width = Math.min(scrollPercentage, 100) + '%';
     });
 }
 
@@ -147,56 +147,75 @@ function showNotification(message) {
     }, 3000);
 }
 
-// Up Next Sticky Component
+// Up Next Article Recommendation
 function initializeUpNext() {
     const upNext = document.getElementById('upNext');
     if (!upNext) return;
-
-    let isVisible = false;
     
-    window.addEventListener('scroll', function() {
-        const scrolled = window.pageYOffset;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        const scrollPercentage = (scrolled / (documentHeight - windowHeight)) * 100;
+    // Get related articles from the page
+    const relatedArticles = document.querySelectorAll('.related-articles .article-card');
+    if (relatedArticles.length === 0) return;
+    
+    let currentScrollPosition = 0;
+    
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
         
-        if (scrollPercentage > 70 && !isVisible) {
-            showUpNext();
-            isVisible = true;
-        } else if (scrollPercentage <= 70 && isVisible) {
+        // Show up next when user scrolled 70% of the article
+        if (scrollPercentage > 70 && relatedArticles.length > 0) {
+            showUpNext(relatedArticles[0]);
+        } else {
             hideUpNext();
-            isVisible = false;
         }
+        
+        currentScrollPosition = scrollTop;
     });
 }
 
-function showUpNext() {
+function showUpNext(articleElement) {
     const upNext = document.getElementById('upNext');
-    if (upNext) {
-        upNext.style.display = 'block';
+    if (!upNext) return;
+    
+    const nextArticleContent = document.getElementById('nextArticleContent');
+    if (nextArticleContent && !nextArticleContent.innerHTML) {
+        // Extract article information
+        const titleElement = articleElement.querySelector('.card-title a');
+        const imageElement = articleElement.querySelector('.card-img-top');
+        const categoryElement = articleElement.querySelector('.category-badge');
+        const descElement = articleElement.querySelector('.card-text');
         
-        // Load next article content (simplified)
-        const nextArticleContent = document.getElementById('nextArticleContent');
-        if (nextArticleContent && !nextArticleContent.innerHTML) {
+        if (titleElement) {
+            const title = titleElement.textContent;
+            const href = titleElement.href;
+            const imageSrc = imageElement ? imageElement.src : '';
+            const category = categoryElement ? categoryElement.textContent : '';
+            const description = descElement ? descElement.textContent : '';
+            
             nextArticleContent.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <div class="flex-shrink-0 me-3">
-                        <img src="/images/placeholder.jpg" alt="Next Article" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-                    </div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-1">다음 추천 기사</h6>
-                        <p class="mb-0 small text-muted">계속 읽어보세요</p>
+                <div class="next-article-preview" onclick="window.location.href='${href}'">
+                    ${imageSrc ? `<img src="${imageSrc}" alt="${title}" class="next-article-image">` : ''}
+                    <div class="next-article-info">
+                        ${category ? `<span class="next-category-badge">${category}</span>` : ''}
+                        <h6 class="next-article-title">${title}</h6>
+                        ${description ? `<p class="next-article-desc">${description.substring(0, 80)}...</p>` : ''}
                     </div>
                 </div>
             `;
         }
     }
+    
+    upNext.style.display = 'block';
+    upNext.style.opacity = '1';
 }
 
 function hideUpNext() {
     const upNext = document.getElementById('upNext');
     if (upNext) {
         upNext.style.display = 'none';
+        upNext.style.opacity = '0';
     }
 }
 
@@ -413,4 +432,78 @@ if ('serviceWorker' in navigator) {
                 // Service worker registration failed
             });
     });
+}
+
+// Enhanced Up Next Article Recommendation
+function initializeEnhancedUpNext() {
+    const upNext = document.getElementById('upNext');
+    if (!upNext) return;
+    
+    // Get related articles from the page
+    const relatedArticles = document.querySelectorAll('.related-articles .article-card');
+    if (relatedArticles.length === 0) return;
+    
+    let isUpNextVisible = false;
+    
+    window.addEventListener('scroll', () => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
+        
+        // Show up next when user scrolled 70% of the article
+        if (scrollPercentage > 70 && relatedArticles.length > 0 && !isUpNextVisible) {
+            showEnhancedUpNext(relatedArticles[0]);
+            isUpNextVisible = true;
+        } else if (scrollPercentage <= 70 && isUpNextVisible) {
+            hideEnhancedUpNext();
+            isUpNextVisible = false;
+        }
+    });
+}
+
+function showEnhancedUpNext(articleElement) {
+    const upNext = document.getElementById('upNext');
+    if (!upNext) return;
+    
+    const nextArticleContent = document.getElementById('nextArticleContent');
+    if (!nextArticleContent) return;
+    
+    // Extract article information
+    const titleElement = articleElement.querySelector('.card-title a');
+    const imageElement = articleElement.querySelector('.card-img-top');
+    const categoryElement = articleElement.querySelector('.category-badge');
+    const descElement = articleElement.querySelector('.card-text');
+    
+    if (titleElement) {
+        const title = titleElement.textContent.trim();
+        const href = titleElement.href;
+        const imageSrc = imageElement ? imageElement.src : '';
+        const category = categoryElement ? categoryElement.textContent.trim() : '';
+        const description = descElement ? descElement.textContent.trim() : '';
+        
+        nextArticleContent.innerHTML = `
+            <div class="next-article-preview" onclick="window.location.href='${href}'" style="cursor: pointer;">
+                ${imageSrc ? `<img src="${imageSrc}" alt="${title}" class="next-article-image" loading="lazy">` : ''}
+                <div class="next-article-info">
+                    ${category ? `<span class="next-category-badge">${category}</span>` : ''}
+                    <h6 class="next-article-title">${title}</h6>
+                    ${description ? `<p class="next-article-desc">${description.substring(0, 120)}...</p>` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    upNext.style.display = 'block';
+    upNext.classList.add('show');
+}
+
+function hideEnhancedUpNext() {
+    const upNext = document.getElementById('upNext');
+    if (upNext) {
+        upNext.classList.remove('show');
+        setTimeout(() => {
+            upNext.style.display = 'none';
+        }, 300); // Wait for animation to complete
+    }
 }
