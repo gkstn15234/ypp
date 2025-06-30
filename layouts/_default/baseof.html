@@ -15,20 +15,44 @@
     <meta name="author" content="{{ if .Params.author }}{{ .Params.author }}{{ else }}{{ .Site.Params.author }}{{ end }}">
     <meta name="generator" content="Hugo {{ hugo.Version }}">
     
+    <!-- News Keywords for Google News -->
+    {{ if .Params.tags }}
+    <meta name="news_keywords" content="{{ delimit .Params.tags ", " }}">
+    {{ end }}
+    
     <!-- Open Graph -->
     <meta property="og:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
     <meta property="og:description" content="{{ if .Description }}{{ .Description }}{{ else }}{{ .Site.Params.description }}{{ end }}">
     <meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
     <meta property="og:url" content="{{ .Permalink }}">
     <meta property="og:site_name" content="{{ .Site.Title }}">
+    <meta property="og:locale" content="ko_KR">
     {{ if .Params.image }}
     <meta property="og:image" content="{{ .Params.image | absURL }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ .Title }}">
+    {{ end }}
+    
+    <!-- Article specific Open Graph -->
+    {{ if .IsPage }}
+    <meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">
+    <meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}">
+    <meta property="article:author" content="{{ .Params.author }}">
+    <meta property="article:section" content="{{ .Section | title }}">
+    {{ range .Params.tags }}
+    <meta property="article:tag" content="{{ . }}">
+    {{ end }}
     {{ end }}
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}{{ end }}">
     <meta name="twitter:description" content="{{ if .Description }}{{ .Description }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+    {{ if .Params.image }}
+    <meta name="twitter:image" content="{{ .Params.image | absURL }}">
+    <meta name="twitter:image:alt" content="{{ .Title }}">
+    {{ end }}
     
     <!-- Structured Data -->
     {{ if .IsPage }}
@@ -40,6 +64,14 @@
         "description": "{{ .Description }}",
         "datePublished": "{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}",
         "dateModified": "{{ .Lastmod.Format "2006-01-02T15:04:05Z07:00" }}",
+        {{ if .Params.image }}
+        "image": {
+            "@type": "ImageObject",
+            "url": "{{ .Params.image | absURL }}",
+            "width": 1200,
+            "height": 630
+        },
+        {{ end }}
         "author": {
             "@type": "Person",
             "name": "{{ .Params.author }}"
@@ -55,7 +87,9 @@
         "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "{{ .Permalink }}"
-        }
+        }{{ if .Params.tags }},
+        "keywords": "{{ delimit .Params.tags ", " }}"{{ end }}{{ if .Section }},
+        "articleSection": "{{ .Section | title }}"{{ end }}
     }
     </script>
     {{ end }}
