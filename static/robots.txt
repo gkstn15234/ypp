@@ -1,10 +1,9 @@
 User-agent: *
 Allow: /
-Disallow: 
 
-# Sitemap URLs
-Sitemap: https://gkstn15234.github.io/HugoDiscoverPro/sitemap.xml
-Sitemap: https://gkstn15234.github.io/HugoDiscoverPro/index.xml
+# Sitemap URLs - Will be automatically resolved by Cloudflare Pages
+Sitemap: /sitemap.xml
+Sitemap: /index.xml
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1 

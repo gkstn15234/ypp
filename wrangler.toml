@@ -13,6 +13,9 @@ watch_dir = "."
 HUGO_VERSION = "0.147.9"
 
 [[build.environment_variables]]
+NODE_VERSION = "18"
+
+[[build.environment_variables]]
 HUGO_ENV = "production"
 
 [[build.environment_variables]]
