@@ -24,6 +24,7 @@ Thumbs.db
 # AI System - Do not deploy
 ai-system/
 package.json
+static/js/news-processor.js
 
 # Environment variables
 .env
