@@ -6,7 +6,24 @@
                  loading="lazy" 
                  class="card-img-top" 
                  alt="{{ .Title }}"
-                 style="aspect-ratio: 4/3; object-fit: cover; height: 200px;">
+                 style="aspect-ratio: 4/3; object-fit: cover; height: 200px;"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="image-placeholder" style="display: none; height: 200px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                <div style="text-align: center;">
+                    <i class="fas fa-image fa-2x mb-2"></i>
+                    <div>{{ .Section | title }}</div>
+                </div>
+            </div>
+            <div class="category-badge">{{ .Section | title }}</div>
+        </div>
+        {{ else }}
+        <div class="card-img-wrapper">
+            <div class="image-placeholder" style="height: 200px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                <div style="text-align: center;">
+                    <i class="fas fa-image fa-2x mb-2"></i>
+                    <div>{{ .Section | title }}</div>
+                </div>
+            </div>
             <div class="category-badge">{{ .Section | title }}</div>
         </div>
         {{ end }}

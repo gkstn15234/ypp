@@ -25,6 +25,8 @@ Thumbs.db
 ai-system/
 package.json
 static/js/news-processor.js
+image_scraper.py
+auto_news_generator.py
 
 # Environment variables
 .env
