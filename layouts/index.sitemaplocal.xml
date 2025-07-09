@@ -9,7 +9,7 @@
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
         <geo:geo>
-            <!-- 이콘밍글 본사 위치 (서울 구로구) -->
+            <!-- 포스트업 본사 위치 (경북 경산시) -->
             <geo:format>kml</geo:format>
         </geo:geo>
     </url>

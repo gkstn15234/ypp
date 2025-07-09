@@ -1,5 +1,5 @@
-// Service Worker for Econmingle
-const CACHE_NAME = 'econmingle-v1';
+// Service Worker for PostUp
+const CACHE_NAME = 'postup-v1';
 const urlsToCache = [
   '/',
   '/css/style.css',

@@ -1,4 +1,4 @@
-// Main JavaScript functionality for Econmingle
+// Main JavaScript functionality for PostUp
 
 document.addEventListener('DOMContentLoaded', function() {
     initializeReadingProgress();
