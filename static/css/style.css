@@ -63,71 +63,7 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.breaking-news-ticker {
-    background: var(--primary-color);
-    color: white;
-    padding: 8px 0;
-    overflow: hidden;
-    position: relative;
-}
 
-.ticker-content {
-    display: flex;
-    align-items: center;
-}
-
-.ticker-label {
-    background: var(--danger-color);
-    padding: 4px 12px;
-    border-radius: 4px;
-    font-weight: 600;
-    margin-right: 20px;
-    flex-shrink: 0;
-    z-index: 10;
-    position: relative;
-}
-
-.ticker-items {
-    display: flex;
-    white-space: nowrap;
-    animation: scroll-left 120s linear infinite;
-    min-width: 100%;
-}
-
-.ticker-item {
-    margin-right: 100px;
-    font-weight: 500;
-    flex-shrink: 0;
-}
-
-.ticker-item::after {
-    content: " • ";
-    margin-left: 50px;
-    opacity: 0.7;
-}
-
-.ticker-item:last-child::after {
-    content: "";
-}
-
-@keyframes scroll-left {
-    0% { 
-        transform: translateX(100%); 
-        opacity: 1;
-    }
-    80% { 
-        transform: translateX(20%); 
-        opacity: 1;
-    }
-    95% { 
-        transform: translateX(0%); 
-        opacity: 0;
-    }
-    100% { 
-        transform: translateX(-10%); 
-        opacity: 0;
-    }
-}
 
 .main-header {
     padding: 1rem 0;
@@ -961,20 +897,7 @@ img {
         align-items: center;
     }
     
-    .ticker-items {
-        animation-duration: 60s;
-    }
-    
-    .ticker-item {
-        margin-right: 40px;
-        font-size: 0.85rem;
-    }
-    
-    .ticker-label {
-        font-size: 0.75rem;
-        padding: 3px 8px;
-        margin-right: 15px;
-    }
+
 }
 
 @media (max-width: 576px) {
@@ -1020,7 +943,7 @@ img {
 /* Print Styles */
 @media print {
     .site-header,
-    .breaking-news-ticker,
+
     .social-share,
     .newsletter-section,
     .site-footer,
@@ -1047,20 +970,7 @@ img {
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-    .ticker-items {
-        animation: none;
-        position: static;
-        transform: none;
-    }
-    
-    .ticker-item {
-        margin-right: 30px;
-        font-size: 0.9rem;
-    }
-    
-    .breaking-news-ticker {
-        padding: 8px 0;
-    }
+
     
     .card {
         transition: none;

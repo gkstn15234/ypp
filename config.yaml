@@ -1,39 +1,30 @@
 baseURL: 'https://hugodiscoverpro.pages.dev'
 languageCode: 'ko-kr'
-title: '이콘밍글 - 경제뉴스의 새로운 기준'
+title: '포스트업 - 건강의 새로운 기준'
 defaultContentLanguage: 'ko'
 hasCJKLanguage: true
 
 params:
-  description: '이콘밍글은 시의성 있고 깊이 있는 경제 뉴스를 빠르고 신뢰도 높게 전달하는 경제 전문 미디어입니다.'
-  keywords: '경제뉴스, 증권, 부동산, IT, 국제경제, 금융'
+  description: '포스트업은 건강한 라이프스타일과 운동 정보를 전문적으로 다루는 건강 미디어입니다.'
+  keywords: '건강, 운동, 피트니스, 다이어트, 웰빙, 건강관리, 헬스케어'
   author: '주식회사 픽펄스'
   company: '주식회사 픽펄스'
   registration: '서울,아55580'
   address: '서울특별시 구로구 구로동 197-17'
   phone: '070-8065-3076'
-  email: 'info@econmingle.com'
+  email: 'info@postup.com'
   publisher: '김광호'
   editor: '김광호'
   youthProtectionOfficer: '김광호'
 
 menu:
   main:
-    - name: '경제'
-      url: '/economy/'
+    - name: '건강'
+      url: '/health/'
       weight: 10
-    - name: '증권'
-      url: '/securities/'
+    - name: '운동'
+      url: '/exercise/'
       weight: 20
-    - name: '부동산'
-      url: '/realestate/'
-      weight: 30
-    - name: 'IT'
-      url: '/it/'
-      weight: 40
-    - name: '국제'
-      url: '/international/'
-      weight: 50
 
 taxonomies:
   tag: tags
