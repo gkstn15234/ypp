@@ -1,7 +1,7 @@
 ---
 title: "이용약관"
 description: "오토데일리 서비스 이용약관을 확인하세요."
-draft: true
+draft: false
 ---
 
 # 이용약관

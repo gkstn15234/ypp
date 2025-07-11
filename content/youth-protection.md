@@ -1,7 +1,7 @@
 ---
 title: "청소년보호정책"
-description: "포스트업의 청소년보호정책을 확인하세요."
-draft: true
+description: "오토데일리의 청소년보호정책을 확인하세요."
+draft: false
 ---
 
 # 청소년보호정책

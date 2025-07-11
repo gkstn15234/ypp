@@ -2889,7 +2889,7 @@ img {
 .footer-logo-text {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--primary-color);
+    color: white !important;
     margin-bottom: 1rem;
 }
 
@@ -2918,11 +2918,6 @@ img {
 
 .footer-links a:hover {
     color: white;
-}
-
-.footer-links span {
-    color: #6c757d;
-    font-size: 0.9rem;
 }
 
 .footer-bottom {
