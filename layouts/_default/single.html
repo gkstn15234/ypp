@@ -48,10 +48,28 @@
                         </div>
                     </header>
 
-                    <!-- Article Image -->
+                    <!-- Article Image - Google Discover Optimized -->
                     {{ if .Params.images }}
                     <div class="article-main-image">
-                        <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                        {{ $imagePath := index .Params.images 0 }}
+                        {{ if (strings.HasPrefix $imagePath "/images/") }}
+                            <!-- 로컬 이미지 - Google Discover 최적화 -->
+                            <img src="{{ $imagePath }}" 
+                                 alt="{{ .Title }}" 
+                                 class="img-fluid discover-optimized"
+                                 loading="lazy"
+                                 width="1200" 
+                                 height="675"
+                                 data-discover="true">
+                        {{ else }}
+                            <!-- 외부 이미지 -->
+                            <img src="{{ $imagePath }}" 
+                                 alt="{{ .Title }}" 
+                                 class="img-fluid discover-optimized"
+                                 loading="lazy"
+                                 width="1200" 
+                                 height="675">
+                        {{ end }}
                     </div>
                     {{ end }}
 
