@@ -1,6 +1,7 @@
 ---
 title: "회사소개"
 description: "오토데일리와 휴먼빅데이터에 대해 알아보세요."
+draft: true
 ---
 
 # 회사소개

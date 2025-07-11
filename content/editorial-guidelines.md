@@ -1,7 +1,7 @@
 ---
 title: "편집 지침"
 description: "오토데일리의 편집 지침과 원칙을 확인하세요."
-private: true
+draft: true
 ---
 
 # 편집 지침

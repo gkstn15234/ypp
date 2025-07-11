@@ -7,7 +7,8 @@
             <div class="row">
                 <!-- Main Article -->
                 <div class="col-lg-8">
-                    {{ $mainArticle := index (where .Site.RegularPages ".Section" "automotive") 0 }}
+                    {{ $automotivePages := where .Site.RegularPages ".Section" "automotive" }}
+                    {{ $mainArticle := index $automotivePages 0 }}
                     {{ if $mainArticle }}
                     <article class="main-article">
                         <div class="article-image">
@@ -34,7 +35,7 @@
                 <!-- Side Articles -->
                 <div class="col-lg-4">
                     <div class="side-articles">
-                        {{ range first 4 (after 1 (where .Site.RegularPages ".Section" "automotive")) }}
+                        {{ range first 4 (after 1 $automotivePages) }}
                         <article class="side-article">
                             <div class="row">
                                 <div class="col-4">
@@ -81,7 +82,8 @@
                 <!-- Latest News -->
                 <div class="tab-pane fade show active" id="latest" role="tabpanel">
                     <div class="row">
-                        {{ range first 6 .Site.RegularPages }}
+                        {{ $newsPages := where .Site.RegularPages ".Section" "in" (slice "automotive" "economy") }}
+                        {{ range first 6 $newsPages }}
                         <div class="col-lg-4 col-md-6 mb-3">
                             <article class="news-item">
                                 <div class="news-thumb">
@@ -111,10 +113,12 @@
 
                 <!-- Category Tabs Content -->
                 {{ range .Site.Menus.main }}
+                {{ $sectionName := strings.Trim .URL "/" }}
                 <div class="tab-pane fade" id="{{ .Name }}" role="tabpanel">
                     <div class="row">
-                        {{ $sectionName := strings.TrimPrefix "/" (strings.TrimSuffix "/" .URL) }}
-                        {{ range first 6 (where $.Site.RegularPages ".Section" $sectionName) }}
+                        {{ $articles := where $.Site.RegularPages ".Section" $sectionName }}
+                        {{ if $articles }}
+                        {{ range first 6 $articles }}
                         <div class="col-lg-4 col-md-6 mb-3">
                             <article class="news-item">
                                 <div class="news-thumb">
@@ -139,6 +143,11 @@
                             </article>
                         </div>
                         {{ end }}
+                        {{ else }}
+                        <div class="col-12">
+                            <p class="text-center">{{ .Name }} 카테고리에 기사가 없습니다.</p>
+                        </div>
+                        {{ end }}
                     </div>
                 </div>
                 {{ end }}
@@ -148,7 +157,8 @@
         <!-- Additional News Grid -->
         <section class="additional-news">
             <div class="row">
-                {{ range first 8 (after 7 .Site.RegularPages) }}
+                {{ $allNewsPages := where .Site.RegularPages ".Section" "in" (slice "automotive" "economy") }}
+                {{ range first 8 (after 6 $allNewsPages) }}
                 <div class="col-lg-3 col-md-6 mb-4">
                     <article class="small-news-item">
                         <div class="small-news-thumb">
