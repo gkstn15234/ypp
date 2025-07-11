@@ -156,9 +156,22 @@ class AutoDailyEditor {
         inputs.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
+                // input 이벤트 (기본)
                 element.addEventListener('input', () => this.updatePreview());
+                
+                // textarea의 경우 추가 이벤트들도 등록
+                if (element.tagName === 'TEXTAREA') {
+                    element.addEventListener('keyup', () => this.updatePreview());
+                    element.addEventListener('paste', () => {
+                        // 붙여넣기 후 잠시 기다린 후 업데이트
+                        setTimeout(() => this.updatePreview(), 10);
+                    });
+                }
             }
         });
+        
+        // 초기 미리보기 렌더링
+        this.updatePreview();
     }
 
     updatePreview() {
@@ -186,14 +199,23 @@ class AutoDailyEditor {
         const categoryIcon = category === 'automotive' ? '🚗' : '📈';
         const categoryName = category === 'automotive' ? '자동차' : '경제';
         const formattedDate = publishDate ? new Date(publishDate).toLocaleDateString('ko-KR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
         }) : '';
 
-        const markdownContent = content ? marked.parse(content) : '';
+        let markdownContent = '';
+        if (content) {
+            try {
+                markdownContent = marked.parse(content);
+            } catch (error) {
+                console.warn('Markdown 파싱 오류:', error);
+                // 마크다운 파싱이 실패하면 줄바꿈만 처리해서 표시
+                markdownContent = content.replace(/\n/g, '<br>');
+            }
+        }
 
         previewContent.innerHTML = `
             <div class="article-preview fade-in-up">
@@ -242,7 +264,7 @@ class AutoDailyEditor {
                     <div class="card-body py-5">
                         <div class="loading-spinner mb-3"></div>
                         <p class="text-muted">기사 목록을 불러오는 중...</p>
-                    </div>
+                        </div>
                 </div>
             </div>
         `;
@@ -283,9 +305,9 @@ class AutoDailyEditor {
                                 <i class="fas fa-key me-1"></i>GitHub 토큰 설정
                             </button>
                         </div>
-                    </div>
                 </div>
-            `;
+            </div>
+        `;
         }
     }
 
@@ -754,9 +776,9 @@ class AutoDailyEditor {
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         `;
-
+        
         document.body.insertAdjacentHTML('beforeend', alertHtml);
-
+        
         // 3초 후 자동 제거
         setTimeout(() => {
             const alert = document.querySelector('.alert:last-of-type');
@@ -919,7 +941,7 @@ author: "${author}"
         
         // OpenAI Writer 설정
         if (window.openaiWriter) {
-            window.openaiWriter.configure(apiKey);
+        window.openaiWriter.configure(apiKey);
         }
 
         // 모달 닫기
@@ -943,8 +965,8 @@ author: "${author}"
             const aiTitle = document.getElementById('aiTitle')?.value;
             if (!aiTitle) {
                 this.showNotification('제목을 입력해주세요.', 'error');
-                return;
-            }
+            return;
+        }
 
             // 진행률 표시
             const progressDiv = document.getElementById('aiProgress');
