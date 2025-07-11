@@ -9,8 +9,10 @@
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
         <geo:geo>
-            <!-- 포스트업 본사 위치 (경북 경산시) -->
+            <!-- 휴먼빅데이터 본사 위치 (인천시 남동구 은청로 4-7 B동 332호) -->
             <geo:format>kml</geo:format>
+            <geo:lat>37.4540</geo:lat>
+            <geo:lng>126.6918</geo:lng>
         </geo:geo>
     </url>
     
@@ -22,6 +24,8 @@
         <priority>0.7</priority>
         <geo:geo>
             <geo:format>kml</geo:format>
+            <geo:lat>37.4540</geo:lat>
+            <geo:lng>126.6918</geo:lng>
         </geo:geo>
     </url>
     
@@ -42,7 +46,7 @@
     
     <!-- Regional Economic News -->
     {{ range where .Site.RegularPages "Section" "economy" }}
-    {{ if and (not .Params.private) (or .Params.region .Params.city) }}
+    {{ if not .Params.private }}
     <url>
         <loc>{{ .Permalink }}</loc>
         <lastmod>{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" }}</lastmod>
@@ -50,6 +54,27 @@
         <priority>0.6</priority>
         <geo:geo>
             <geo:format>kml</geo:format>
+            <!-- 한국 경제 뉴스 - 서울 중심 좌표 -->
+            <geo:lat>37.5665</geo:lat>
+            <geo:lng>126.9780</geo:lng>
+        </geo:geo>
+    </url>
+    {{ end }}
+    {{ end }}
+    
+    <!-- Automotive News -->
+    {{ range where .Site.RegularPages "Section" "automotive" }}
+    {{ if not .Params.private }}
+    <url>
+        <loc>{{ .Permalink }}</loc>
+        <lastmod>{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+        <geo:geo>
+            <geo:format>kml</geo:format>
+            <!-- 한국 자동차 뉴스 - 서울 중심 좌표 -->
+            <geo:lat>37.5665</geo:lat>
+            <geo:lng>126.9780</geo:lng>
         </geo:geo>
     </url>
     {{ end }}
