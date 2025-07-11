@@ -17,6 +17,11 @@ params:
   publisher: '오은진'
   editor: '오은진'
   youthProtectionOfficer: '오은진'
+  
+  # 언론사 등록 정보
+  mediaRegistration: '인천,아55580'
+  registrationDate: '2025년 6월 15일'
+  publicationDate: '2025년 6월 15일'
 
   # 이미지 가이드라인 (기자용 참고사항)
   imageGuidelines:

@@ -42,7 +42,7 @@
         <div class="container">
             <div class="copyright-info">
                 <p>
-                    회사: 오토데일리 | 제호 : 오토데일리 | 등록번호 : {{ .Site.Params.registration }} | 등록일 : 2025-06-15 | 발행일 : 2025-06-15<br>
+                    회사: 오토데일리 | 제호 : 오토데일리 | 등록번호 : {{ .Site.Params.mediaRegistration }} | 등록일 : {{ .Site.Params.registrationDate }} | 발행일 : {{ .Site.Params.publicationDate }}<br>
                     주소 : {{ .Site.Params.address }} | 대표전화 : {{ .Site.Params.phone }}<br>
                     발행·편집인 : {{ .Site.Params.publisher }} | 청소년보호책임자 : {{ .Site.Params.youthProtectionOfficer }} | 문의 및 제보 : {{ .Site.Params.email }}<br>
                     Copyright © {{ now.Format "2006" }} 오토데일리. All rights reserved.
