@@ -98,7 +98,7 @@
                 {{ range .Paginator.Pages }}
                 <article class="article-list-item">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-5">
                             <div class="article-thumb">
                                 {{ if .Params.images }}
                                 <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
@@ -109,7 +109,7 @@
                                 {{ end }}
                             </div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-7">
                             <div class="article-content">
                                 <div class="article-meta">
                                     <span class="article-date">{{ .Date.Format "2006년 01월 02일" }}</span>

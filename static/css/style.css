@@ -1596,7 +1596,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .featured-image {
-    height: 300px;
+    height: 350px;
     overflow: hidden;
 }
 
@@ -1759,7 +1759,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .article-list-item .article-thumb {
-    height: 150px;
+    height: 200px;
     overflow: hidden;
     border-radius: 6px;
 }
