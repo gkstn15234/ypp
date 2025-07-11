@@ -1,36 +1,71 @@
 <header class="site-header">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="date-info">
+                    {{ now.Format "2006년 1월 2일 월요일" }}
+                </div>
+                <div class="user-actions">
+                    <a href="#" class="user-icon">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <a href="#" class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    <button class="menu-toggle d-lg-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Header -->
     <div class="main-header">
         <div class="container">
-            <nav class="navbar navbar-expand-lg">
-                <!-- Logo -->
-                <a class="navbar-brand" href="{{ "/" | relURL }}">
-                    <img src="{{ "/images/logo.svg" | relURL }}" alt="포스트업" class="logo">
-                </a>
-                
-                <!-- Mobile Toggle -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                
-                <!-- Navigation Menu -->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        {{ range .Site.Menus.main }}
-                        <li class="nav-item">
-                            <a class="nav-link {{ if $.IsMenuCurrent "main" . }}active{{ end }}" href="{{ .URL }}">{{ .Name }}</a>
-                        </li>
-                        {{ end }}
-                    </ul>
-                    
-                    <!-- Search Toggle -->
-                    <div class="header-actions">
-                        <button class="btn btn-link search-toggle" type="button" data-bs-toggle="modal" data-bs-target="#searchModal">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
+            <div class="row align-items-center">
+                <div class="col-lg-3">
+                    <!-- Logo -->
+                    <a class="navbar-brand" href="{{ "/" | relURL }}">
+                        <h1 class="logo-text">오토데일리</h1>
+                    </a>
                 </div>
-            </nav>
+                <div class="col-lg-9">
+                    <!-- Navigation Menu -->
+                    <nav class="main-nav">
+                        <ul class="nav-menu">
+                            {{ range .Site.Menus.main }}
+                            <li class="nav-item">
+                                <a class="nav-link {{ if $.IsMenuCurrent "main" . }}active{{ end }}" href="{{ .URL }}">{{ .Name }}</a>
+                            </li>
+                            {{ end }}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/contact/">문의</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/about/">회사소개</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breaking News Bar -->
+    <div class="breaking-news-bar">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <span class="breaking-label">속보</span>
+                <div class="breaking-content">
+                    <marquee behavior="scroll" direction="left" scrollamount="3">
+                        {{ range first 3 (where .Site.RegularPages ".Section" "automotive") }}
+                        <span class="breaking-item">{{ .Title }}</span>
+                        {{ end }}
+                    </marquee>
+                </div>
+            </div>
         </div>
     </div>
 </header>

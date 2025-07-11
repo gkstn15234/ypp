@@ -1,29 +1,38 @@
 baseURL: 'https://hugodiscoverpro.pages.dev'
 languageCode: 'ko-kr'
-title: '포스트업 - 건강의 새로운 기준'
+title: '오토데일리 - 자동차 경제의 새로운 기준'
 defaultContentLanguage: 'ko'
 hasCJKLanguage: true
 
 params:
-  description: '포스트업은 건강한 라이프스타일과 운동 정보를 전문적으로 다루는 건강 미디어입니다.'
-  keywords: '건강, 운동, 피트니스, 다이어트, 웰빙, 건강관리, 헬스케어'
-  author: '주식회사 픽펄스'
-  company: '주식회사 픽펄스'
-  registration: '경북,아55580'
-  address: '경북 경산시 진량읍 일연로 747'
-  phone: '010-7539-8504'
-  email: 'hangil9910@gmail.com'
-  publisher: '김한수'
-  editor: '김한수'
-  youthProtectionOfficer: '김한수'
+  description: '오토데일리는 자동차 산업과 경제 정보를 전문적으로 다루는 자동차 경제 미디어입니다.'
+  keywords: '자동차, 경제, 모빌리티, 자동차산업, 카비즈니스, 오토, 자동차뉴스'
+  author: '휴먼빅데이터'
+  company: '휴먼빅데이터'
+  registration: '847-59-00407'
+  address: '인천시 남동구 은청로 4-7 B동 332호'
+  phone: '1811-9670'
+  email: 'contact@humanbigdata.com'
+  publisher: '오은진'
+  editor: '오은진'
+  youthProtectionOfficer: '오은진'
+
+  # 이미지 가이드라인 (기자용 참고사항)
+  imageGuidelines:
+    minWidth: 1200
+    recommendedWidth: 1600
+    aspectRatio: "16:9"
+    format: "jpg"
+    quality: 95
+    description: "구글 디스커버 노출을 위해 최소 1200px 이상의 고품질 이미지를 사용하세요."
 
 menu:
   main:
-    - name: '건강'
-      url: '/health/'
+    - name: '자동차'
+      url: '/automotive/'
       weight: 10
-    - name: '운동'
-      url: '/exercise/'
+    - name: '경제'
+      url: '/economy/'
       weight: 20
 
 taxonomies:
@@ -80,6 +89,16 @@ imaging:
   resampleFilter: lanczos
   quality: 95
   anchor: smart
+  # 구글 디스커버 최적화를 위한 이미지 크기 설정
+  sizes:
+    - "480x270"   # 16:9 소형 썸네일
+    - "800x450"   # 16:9 중형 썸네일
+    - "1200x675"  # 16:9 대형 이미지 (구글 디스커버 권장)
+    - "1600x900"  # 16:9 초고화질
+    - "1200x630"  # Open Graph 표준 (Facebook, Twitter)
+  # 이미지 처리 옵션
+  bgColor: "#ffffff"
+  hint: photo
 
 sitemap:
   changefreq: daily

@@ -1,41 +1,167 @@
 {{ define "main" }}
-<!-- Main Content Grid -->
-<section class="main-content">
+<!-- Main Content -->
+<main class="main-content">
     <div class="container">
-        <!-- Featured Articles Grid -->
-        <div class="featured-grid mb-5">
+        <!-- Top News Section -->
+        <section class="top-news-section mb-4">
             <div class="row">
-                {{ $recent := where (where .Site.RegularPages ".Section" "!=" "") ".Section" "!=" "authors" }}
-                {{ range first 4 (after 1 $recent) }}
-                <div class="col-lg-3 col-md-6 mb-4">
-                    {{ partial "article-card.html" . }}
+                <!-- Main Article -->
+                <div class="col-lg-8">
+                    {{ $mainArticle := index (where .Site.RegularPages ".Section" "automotive") 0 }}
+                    {{ if $mainArticle }}
+                    <article class="main-article">
+                        <div class="article-image">
+                            {{ if $mainArticle.Params.images }}
+                            <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid">
+                            {{ else }}
+                            <img src="/images/default-automotive.jpg" alt="{{ $mainArticle.Title }}" class="img-fluid">
+                            {{ end }}
+                        </div>
+                        <div class="article-content">
+                            <span class="article-category">속보</span>
+                            <h1 class="article-title">
+                                <a href="{{ $mainArticle.Permalink }}">{{ $mainArticle.Title }}</a>
+                            </h1>
+                            <p class="article-summary">{{ $mainArticle.Summary | truncate 200 }}</p>
+                        </div>
+                    </article>
+                    {{ end }}
                 </div>
-                {{ end }}
+                
+                <!-- Side Articles -->
+                <div class="col-lg-4">
+                    <div class="side-articles">
+                        {{ range first 4 (after 1 (where .Site.RegularPages ".Section" "automotive")) }}
+                        <article class="side-article">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="article-thumb">
+                                        {{ if .Params.images }}
+                                        <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                        {{ else }}
+                                        <img src="/images/default-thumb.jpg" alt="{{ .Title }}" class="img-fluid">
+                                        {{ end }}
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <h3 class="article-title">
+                                        <a href="{{ .Permalink }}">{{ .Title | truncate 50 }}</a>
+                                    </h3>
+                                    <p class="article-excerpt">{{ .Summary | truncate 80 }}</p>
+                                </div>
+                            </div>
+                        </article>
+                        {{ end }}
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Category Sections -->
-        {{ range .Site.Sections }}
-        {{ if not (in (slice "authors") .Section) }}
-        <section class="category-section mb-5">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <i class="fas fa-{{ if eq .Section "economy" }}chart-line{{ else if eq .Section "securities" }}chart-bar{{ else if eq .Section "realestate" }}home{{ else if eq .Section "it" }}laptop-code{{ else }}globe{{ end }}"></i>
-                    {{ .Title }}
-                </h2>
-                <a href="{{ .Permalink }}" class="view-all-link">전체보기 <i class="fas fa-arrow-right"></i></a>
+        <!-- News Categories Tabs -->
+        <section class="news-categories mb-4">
+            <div class="category-tabs">
+                <ul class="nav nav-tabs" id="categoryTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="latest-tab" data-bs-toggle="tab" data-bs-target="#latest" type="button" role="tab">최신뉴스</button>
+                    </li>
+                    {{ range .Site.Menus.main }}
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="{{ .Name }}-tab" data-bs-toggle="tab" data-bs-target="#{{ .Name }}" type="button" role="tab">{{ .Name }}</button>
+                    </li>
+                    {{ end }}
+                </ul>
             </div>
             
-            <div class="row">
-                {{ range first 3 .Pages }}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    {{ partial "article-card.html" . }}
+            <div class="tab-content" id="categoryTabsContent">
+                <!-- Latest News -->
+                <div class="tab-pane fade show active" id="latest" role="tabpanel">
+                    <div class="row">
+                        {{ range first 6 .Site.RegularPages }}
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <article class="news-item">
+                                <div class="news-thumb">
+                                    {{ if .Params.images }}
+                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                    {{ else }}
+                                    <img src="/images/default-news.jpg" alt="{{ .Title }}" class="img-fluid">
+                                    {{ end }}
+                                </div>
+                                <div class="news-content">
+                                    <span class="news-category">{{ .Section | title }}</span>
+                                    <h4 class="news-title">
+                                        <a href="{{ .Permalink }}">{{ .Title }}</a>
+                                    </h4>
+                                    <p class="news-excerpt">{{ .Summary | truncate 100 }}</p>
+                                    <div class="news-meta">
+                                        <span class="news-date">{{ .Date.Format "01월 02일" }}</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+
+                <!-- Category Tabs Content -->
+                {{ range .Site.Menus.main }}
+                <div class="tab-pane fade" id="{{ .Name }}" role="tabpanel">
+                    <div class="row">
+                        {{ $sectionName := strings.TrimPrefix "/" (strings.TrimSuffix "/" .URL) }}
+                        {{ range first 6 (where $.Site.RegularPages ".Section" $sectionName) }}
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <article class="news-item">
+                                <div class="news-thumb">
+                                    {{ if .Params.images }}
+                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                    {{ else }}
+                                    <img src="/images/default-news.jpg" alt="{{ .Title }}" class="img-fluid">
+                                    {{ end }}
+                                </div>
+                                <div class="news-content">
+                                    <span class="news-category">{{ .Section | title }}</span>
+                                    <h4 class="news-title">
+                                        <a href="{{ .Permalink }}">{{ .Title }}</a>
+                                    </h4>
+                                    <p class="news-excerpt">{{ .Summary | truncate 100 }}</p>
+                                    <div class="news-meta">
+                                        <span class="news-date">{{ .Date.Format "01월 02일" }}</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {{ end }}
+                    </div>
                 </div>
                 {{ end }}
             </div>
         </section>
-        {{ end }}
-        {{ end }}
+
+        <!-- Additional News Grid -->
+        <section class="additional-news">
+            <div class="row">
+                {{ range first 8 (after 7 .Site.RegularPages) }}
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <article class="small-news-item">
+                        <div class="small-news-thumb">
+                            {{ if .Params.images }}
+                            <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                            {{ else }}
+                            <img src="/images/default-small.jpg" alt="{{ .Title }}" class="img-fluid">
+                            {{ end }}
+                        </div>
+                        <div class="small-news-content">
+                            <h5 class="small-news-title">
+                                <a href="{{ .Permalink }}">{{ .Title | truncate 60 }}</a>
+                            </h5>
+                            <div class="small-news-meta">
+                                <span class="small-news-date">{{ .Date.Format "01월 02일" }}</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                {{ end }}
+            </div>
+        </section>
     </div>
-</section>
+</main>
 {{ end }}

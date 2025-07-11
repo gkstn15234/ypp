@@ -1,28 +1,140 @@
 {{ define "main" }}
 {{ partial "breadcrumb.html" . }}
 
-<section class="list-page">
+<section class="category-page">
     <div class="container">
-        <div class="page-header">
-            <h1><i class="fas fa-{{ if eq .Section "economy" }}chart-line{{ else if eq .Section "securities" }}chart-bar{{ else if eq .Section "realestate" }}home{{ else if eq .Section "it" }}laptop-code{{ else }}globe{{ end }}"></i> {{ .Title }}</h1>
-            {{ if .Description }}
-            <p class="page-description">{{ .Description }}</p>
-            {{ end }}
+        <!-- Category Header -->
+        <div class="category-header">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="category-title-section">
+                        <h1 class="category-title">{{ .Title }}</h1>
+                        {{ if .Description }}
+                        <p class="category-description">{{ .Description }}</p>
+                        {{ end }}
+                        <div class="category-meta">
+                            <span class="article-count">총 {{ len .Pages }}개 기사</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="category-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-newspaper"></i>
+                            <span>{{ len .Pages }}</span>
+                            <small>기사</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="articles-grid">
+        <!-- Featured Article -->
+        {{ if .Pages }}
+        <div class="featured-category-article">
+            {{ $featured := index .Pages 0 }}
             <div class="row">
-                {{ range .Paginator.Pages }}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    {{ partial "article-card.html" . }}
+                <div class="col-lg-8">
+                    <article class="category-featured">
+                        <div class="featured-image">
+                            {{ if $featured.Params.images }}
+                            <img src="{{ index $featured.Params.images 0 }}" alt="{{ $featured.Title }}" class="img-fluid">
+                            {{ else }}
+                            <div class="no-image-large">
+                                <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
+                            </div>
+                            {{ end }}
+                        </div>
+                        <div class="featured-content">
+                            <div class="featured-meta">
+                                <span class="featured-date">{{ $featured.Date.Format "2006년 01월 02일" }}</span>
+                                <span class="featured-author">{{ $featured.Params.author }}</span>
+                            </div>
+                            <h2 class="featured-title">
+                                <a href="{{ $featured.Permalink }}">{{ $featured.Title }}</a>
+                            </h2>
+                            <p class="featured-excerpt">{{ $featured.Summary | truncate 200 }}</p>
+                            <a href="{{ $featured.Permalink }}" class="read-more-btn">자세히 보기</a>
+                        </div>
+                    </article>
                 </div>
+                <div class="col-lg-4">
+                    <!-- Recent Articles Sidebar -->
+                    <div class="recent-articles-sidebar">
+                        <h4 class="sidebar-title">최근 기사</h4>
+                        {{ range first 4 (after 1 .Pages) }}
+                        <article class="recent-article-item">
+                            <div class="recent-article-content">
+                                <h5 class="recent-title">
+                                    <a href="{{ .Permalink }}">{{ .Title | truncate 60 }}</a>
+                                </h5>
+                                <div class="recent-meta">
+                                    <span class="recent-date">{{ .Date.Format "01월 02일" }}</span>
+                                </div>
+                            </div>
+                        </article>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ end }}
+
+        <!-- Articles List -->
+        <div class="articles-list-section">
+            <div class="section-header">
+                <h3 class="section-title">전체 기사</h3>
+                <div class="sort-options">
+                    <span class="sort-label">정렬:</span>
+                    <select class="sort-select">
+                        <option value="latest">최신순</option>
+                        <option value="popular">인기순</option>
+                        <option value="title">제목순</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="articles-grid">
+                {{ range .Paginator.Pages }}
+                <article class="article-list-item">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="article-thumb">
+                                {{ if .Params.images }}
+                                <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                {{ else }}
+                                <div class="no-image">
+                                    <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
+                                </div>
+                                {{ end }}
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="article-content">
+                                <div class="article-meta">
+                                    <span class="article-date">{{ .Date.Format "2006년 01월 02일" }}</span>
+                                    <span class="article-author">{{ .Params.author }}</span>
+                                </div>
+                                <h3 class="article-title">
+                                    <a href="{{ .Permalink }}">{{ .Title }}</a>
+                                </h3>
+                                <p class="article-excerpt">{{ .Summary | truncate 150 }}</p>
+                                <div class="article-tags">
+                                    {{ range first 3 .Params.tags }}
+                                    <span class="tag">#{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
                 {{ end }}
             </div>
         </div>
 
         <!-- Pagination -->
         {{ if gt .Paginator.TotalPages 1 }}
-        <nav class="pagination-nav">
+        <nav class="pagination-section">
             <ul class="pagination justify-content-center">
                 {{ if .Paginator.HasPrev }}
                 <li class="page-item">
