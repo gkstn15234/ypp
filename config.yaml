@@ -123,9 +123,6 @@ pagination:
 enableRobotsTXT: true
 enableGitInfo: true
 
-# 실시간 업데이트를 위한 캐시 설정
-cacheDir: "cache"
-ignoreCache: false
 # 빌드 최적화
 buildDrafts: false
 buildFuture: false
