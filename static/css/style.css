@@ -1062,6 +1062,13 @@ h1, h2, h3, h4, h5, h6 {
 .author-name {
     font-weight: 600;
     color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.author-name:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
 }
 
 .publish-date {
@@ -1202,6 +1209,23 @@ h1, h2, h3, h4, h5, h6 {
 .author-details h5 {
     margin: 0 0 0.5rem 0;
     color: var(--primary-color);
+}
+
+.author-name-title {
+    margin: 0 0 0.5rem 0;
+}
+
+.author-name-title .author-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.author-name-title .author-name:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
 }
 
 .author-details p {
@@ -3132,6 +3156,14 @@ img {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+
+    .article-meta-info .author-name {
+        font-size: 1rem;
+    }
+
+    .author-name-title .author-name {
+        font-size: 1.2rem;
     }
 
     .article-sidebar {
