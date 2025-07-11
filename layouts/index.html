@@ -2,11 +2,12 @@
 <!-- Main Content -->
 <main class="main-content">
     <div class="container">
+        {{ $allArticles := shuffle (where .Site.RegularPages ".Section" "in" (slice "automotive" "economy")) }}
         <div class="row">
             <!-- Left Column - Side Articles -->
             <div class="col-lg-3">
                 <div class="left-articles">
-                    {{ $leftArticles := first 3 (where .Site.RegularPages ".Section" "automotive") }}
+                    {{ $leftArticles := first 3 (after 4 $allArticles) }}
                     {{ range $leftArticles }}
                     <article class="side-news-card">
                         <div class="side-news-image">
@@ -33,7 +34,7 @@
             <!-- Center Column - Main Article -->
             <div class="col-lg-6">
                 <div class="main-news-section">
-                    {{ $mainArticle := index (where .Site.RegularPages ".Section" "automotive") 0 }}
+                    {{ $mainArticle := index $allArticles 0 }}
                     {{ if $mainArticle }}
                     <article class="main-news-article">
                         <div class="main-news-image">
@@ -41,7 +42,7 @@
                             <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid">
                             {{ else }}
                             <div class="no-image-main-center">
-                                <i class="fas fa-car"></i>
+                                <i class="fas fa-{{ if eq $mainArticle.Section "automotive" }}car{{ else if eq $mainArticle.Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
                             </div>
                             {{ end }}
                         </div>
@@ -54,32 +55,32 @@
                     </article>
                     {{ end }}
                     
-                    <!-- Secondary Main Article -->
-                    {{ $secondaryArticle := index (where .Site.RegularPages ".Section" "automotive") 1 }}
-                    {{ if $secondaryArticle }}
+                    <!-- Secondary Articles -->
+                    {{ $secondaryArticles := first 3 (after 1 $allArticles) }}
+                    {{ range $secondaryArticles }}
                     <article class="secondary-news-article">
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="secondary-news-image">
-                                    {{ if $secondaryArticle.Params.images }}
-                                    <img src="{{ index $secondaryArticle.Params.images 0 }}" alt="{{ $secondaryArticle.Title }}" class="img-fluid">
+                                    {{ if .Params.images }}
+                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
                                     {{ else }}
                                     <div class="no-image-secondary">
-                                        <i class="fas fa-car"></i>
+                                        <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
                                     </div>
                                     {{ end }}
                                 </div>
                             </div>
                             <div class="col-md-8">
                                 <div class="secondary-news-content">
-                                    <span class="secondary-category-badge">{{ $secondaryArticle.Section | title }}</span>
+                                    <span class="secondary-category-badge">{{ .Section | title }}</span>
                                     <h2 class="secondary-news-title">
-                                        <a href="{{ $secondaryArticle.RelPermalink }}">{{ $secondaryArticle.Title }}</a>
+                                        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
                                     </h2>
-                                    <p class="secondary-news-excerpt">{{ $secondaryArticle.Summary | plainify | truncate 150 }}</p>
+                                    <p class="secondary-news-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
                                     <div class="secondary-news-meta">
-                                        <span class="secondary-news-date">{{ $secondaryArticle.Date.Format "01월 02일" }}</span>
-                                        <span class="secondary-news-author">{{ $secondaryArticle.Params.author }}</span>
+                                        <span class="secondary-news-date">{{ .Date.Format "01월 02일" }}</span>
+                                        <span class="secondary-news-author">{{ .Params.author }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -92,7 +93,7 @@
             <!-- Right Column - Right Articles -->
             <div class="col-lg-3">
                 <div class="right-articles">
-                    {{ $rightArticles := first 6 (after 3 (where .Site.RegularPages ".Section" "in" (slice "automotive" "economy"))) }}
+                    {{ $rightArticles := first 6 (after 7 $allArticles) }}
                     {{ range $rightArticles }}
                     <article class="right-news-item">
                         <div class="right-news-content">
@@ -122,7 +123,7 @@
                 <div class="bottom-news-section">
                     <h2 class="section-title">최신 뉴스</h2>
                     <div class="row">
-                        {{ $bottomArticles := first 8 (after 6 (where .Site.RegularPages ".Section" "in" (slice "automotive" "economy"))) }}
+                        {{ $bottomArticles := first 8 (after 13 $allArticles) }}
                         {{ range $bottomArticles }}
                         <div class="col-lg-3 col-md-6 mb-4">
                             <article class="bottom-news-card">
