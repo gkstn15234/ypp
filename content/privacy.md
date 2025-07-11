@@ -1,7 +1,9 @@
 ---
 title: "개인정보처리방침"
 description: "오토데일리 개인정보처리방침을 확인하세요."
+date: 2025-01-01T00:00:00+09:00
 draft: false
+hideDate: true
 ---
 
 # 개인정보처리방침

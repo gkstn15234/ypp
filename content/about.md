@@ -1,7 +1,9 @@
 ---
 title: "회사소개"
 description: "오토데일리와 휴먼빅데이터에 대해 알아보세요."
+date: 2025-01-01T00:00:00+09:00
 draft: false
+hideDate: true
 ---
 
 # 회사소개

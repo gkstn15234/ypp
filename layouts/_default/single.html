@@ -26,9 +26,11 @@
                                 <a href="/authors/{{ .Params.author | urlize }}/" class="author-name">{{ .Params.author }}</a>
                                 {{ end }}
                                 {{ end }}
+                                {{ if not .Params.hideDate }}
                                 <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}" class="publish-date">
                                     {{ .Date.Format "2006년 01월 02일 15:04" }}
                                 </time>
+                                {{ end }}
                             </div>
                             <div class="meta-right">
                                 <div class="social-share-inline">

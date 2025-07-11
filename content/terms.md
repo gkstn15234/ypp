@@ -1,7 +1,9 @@
 ---
 title: "이용약관"
 description: "오토데일리 서비스 이용약관을 확인하세요."
+date: 2025-01-01T00:00:00+09:00
 draft: false
+hideDate: true
 ---
 
 # 이용약관

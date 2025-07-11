@@ -1,7 +1,9 @@
 ---
 title: "편집 지침"
 description: "오토데일리의 편집 지침과 원칙을 확인하세요."
+date: 2025-01-01T00:00:00+09:00
 draft: false
+hideDate: true
 ---
 
 # 편집 지침

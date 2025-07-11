@@ -1,7 +1,9 @@
 ---
 title: "정보제보 및 문의"
 description: "오토데일리에 제보하거나 문의사항이 있으시면 연락해 주세요."
+date: 2025-01-01T00:00:00+09:00
 draft: false
+hideDate: true
 ---
 
 # 정보제보 및 문의
