@@ -7,7 +7,7 @@
             <!-- Left Column - Side Articles -->
             <div class="col-lg-3">
                 <div class="left-articles">
-                    {{ $leftArticles := first 3 (after 4 $allArticles) }}
+                    {{ $leftArticles := first 4 (after 3 $allArticles) }}
                     {{ range $leftArticles }}
                     <article class="side-news-card">
                         <div class="side-news-image">
@@ -56,7 +56,7 @@
                     {{ end }}
                     
                     <!-- Secondary Articles -->
-                    {{ $secondaryArticles := first 3 (after 1 $allArticles) }}
+                    {{ $secondaryArticles := first 2 (after 1 $allArticles) }}
                     {{ range $secondaryArticles }}
                     <article class="secondary-news-article">
                         <div class="row">
@@ -93,7 +93,7 @@
             <!-- Right Column - Right Articles -->
             <div class="col-lg-3">
                 <div class="right-articles">
-                    {{ $rightArticles := first 6 (after 7 $allArticles) }}
+                    {{ $rightArticles := first 4 (after 7 $allArticles) }}
                     {{ range $rightArticles }}
                     <article class="right-news-item">
                         <div class="right-news-content">
@@ -117,13 +117,13 @@
             </div>
         </div>
 
-        <!-- Bottom Section - Additional News -->
-        <div class="row mt-5">
+        <!-- Latest News Section -->
+        <div class="row mt-3">
             <div class="col-12">
                 <div class="bottom-news-section">
                     <h2 class="section-title">최신 뉴스</h2>
                     <div class="row">
-                        {{ $bottomArticles := first 8 (after 13 $allArticles) }}
+                        {{ $bottomArticles := first 8 (after 11 $allArticles) }}
                         {{ range $bottomArticles }}
                         <div class="col-lg-3 col-md-6 mb-4">
                             <article class="bottom-news-card">
