@@ -39,4 +39,26 @@
   Cache-Control: public, max-age=3600
 
 /robots.txt
-  Cache-Control: public, max-age=3600 
+  Cache-Control: public, max-age=3600
+
+# HTML pages - shorter cache for real-time updates
+/
+  Cache-Control: public, max-age=300, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=300, must-revalidate
+
+/automotive/
+  Cache-Control: public, max-age=600, must-revalidate
+
+/economy/
+  Cache-Control: public, max-age=600, must-revalidate
+
+/automotive/*
+  Cache-Control: public, max-age=1800, must-revalidate
+
+/economy/*
+  Cache-Control: public, max-age=1800, must-revalidate
+
+/authors/*
+  Cache-Control: public, max-age=3600, must-revalidate 

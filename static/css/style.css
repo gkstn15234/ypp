@@ -609,6 +609,13 @@ h1, h2, h3, h4, h5, h6 {
 .secondary-news-author {
     color: var(--primary-color);
     font-weight: 500;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.secondary-news-author:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
 }
 
 /* Right Column - Right Articles */
@@ -2886,6 +2893,13 @@ img {
     margin-bottom: 1rem;
 }
 
+.main-footer h5 {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
 .footer-links {
     list-style: none;
     padding: 0;
@@ -2904,6 +2918,11 @@ img {
 
 .footer-links a:hover {
     color: white;
+}
+
+.footer-links span {
+    color: #6c757d;
+    font-size: 0.9rem;
 }
 
 .footer-bottom {

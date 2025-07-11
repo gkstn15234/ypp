@@ -3,6 +3,7 @@ languageCode: 'ko-kr'
 title: '오토데일리 - 자동차 경제의 새로운 기준'
 defaultContentLanguage: 'ko'
 hasCJKLanguage: true
+timeZone: 'Asia/Seoul'
 
 params:
   description: '오토데일리는 자동차 산업과 경제 정보를 전문적으로 다루는 자동차 경제 미디어입니다.'
@@ -101,7 +102,7 @@ imaging:
   hint: photo
 
 sitemap:
-  changefreq: daily
+  changefreq: hourly
   priority: 0.5
   filename: sitemap.xml
 
@@ -121,6 +122,14 @@ pagination:
 
 enableRobotsTXT: true
 enableGitInfo: true
+
+# 실시간 업데이트를 위한 캐시 설정
+cacheDir: "cache"
+ignoreCache: false
+# 빌드 최적화
+buildDrafts: false
+buildFuture: false
+buildExpired: false
 
 # SEO 최적화
 googleAnalytics: ""

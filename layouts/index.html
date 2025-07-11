@@ -80,7 +80,13 @@
                                     <p class="secondary-news-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
                                     <div class="secondary-news-meta">
                                         <span class="secondary-news-date">{{ .Date.Format "01월 02일" }}</span>
-                                        <span class="secondary-news-author">{{ .Params.author }}</span>
+                                        {{ if .Params.author }}
+                                        {{ if eq .Params.author "오은진" }}
+                                        <a href="/authors/oh-eun-jin/" class="secondary-news-author">{{ .Params.author }}</a>
+                                        {{ else }}
+                                        <a href="/authors/{{ .Params.author | urlize }}/" class="secondary-news-author">{{ .Params.author }}</a>
+                                        {{ end }}
+                                        {{ end }}
                                     </div>
                                 </div>
                             </div>

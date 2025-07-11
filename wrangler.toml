@@ -1,0 +1,18 @@
+name = "autodaily"
+compatibility_date = "2024-01-01"
+
+[env.production]
+account_id = "${CLOUDFLARE_ACCOUNT_ID}"
+zone_id = "${CLOUDFLARE_ZONE_ID}"
+
+[[env.production.routes]]
+pattern = "autodaily.com/*"
+zone_id = "${CLOUDFLARE_ZONE_ID}"
+
+[build]
+command = "hugo --minify"
+publish = "public"
+
+[build.environment_variables]
+HUGO_VERSION = "0.121.0"
+NODE_VERSION = "18" 
