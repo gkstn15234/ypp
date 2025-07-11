@@ -1,911 +1,777 @@
 /**
- * 오토데일리 기사 에디터 메인 스크립트
+ * 🚀 오토데일리 AI 에디터 Pro - 고급 기능 스크립트
  */
 
-class ArticleEditor {
+class AutoDailyEditor {
     constructor() {
-        this.currentImageUrls = [];  // 다중 이미지 지원
-        this.currentSlug = '';
-        this.githubModal = null;
-        this.aiWriteModal = null;
-        this.openaiModal = null;
-        this.autoSaveInterval = null;
+        this.currentTheme = 'dark';
+        this.articles = [];
+        this.filteredArticles = [];
+        this.currentFilter = 'all';
+        this.githubToken = '';
+        this.repoOwner = 'gkstn15234';
+        this.repoName = 'news';
         
         this.init();
     }
 
+    // 🎯 초기화
     init() {
         this.setupEventListeners();
-        this.setupAutoSave();
-        this.loadDraftFromStorage();
+        this.initializeTheme();
         this.initializeDateTime();
-        this.setupGitHubModal();
+        this.setupPreviewUpdate();
+        this.loadStoredData();
+        this.initializeArticleManagement();
+        this.addAnimations();
     }
 
-    /**
-     * 이벤트 리스너 설정
-     */
+    // 🎨 이벤트 리스너 설정
     setupEventListeners() {
-        // 폼 입력 이벤트
-        document.getElementById('title').addEventListener('input', () => this.updatePreview());
-        document.getElementById('category').addEventListener('change', () => this.updatePreview());
-        document.getElementById('author').addEventListener('change', () => this.updatePreview());
-        document.getElementById('description').addEventListener('input', () => {
-            this.updateCharCount();
-            this.updatePreview();
+        // 테마 토글
+        document.getElementById('themeToggle')?.addEventListener('click', () => {
+            this.toggleTheme();
         });
-        document.getElementById('tags').addEventListener('input', () => this.updatePreview());
-        document.getElementById('content').addEventListener('input', () => this.updatePreview());
 
-        // 이미지 업로드 이벤트
-        this.setupImageUpload();
+        // AI 글작성 버튼
+        document.getElementById('aiWriteBtn')?.addEventListener('click', () => {
+            this.showAIWriteModal();
+        });
 
-        // 액션 버튼 이벤트
-        document.getElementById('aiWriteBtn').addEventListener('click', () => this.showAIWriteModal());
-        document.getElementById('downloadBtn').addEventListener('click', () => this.downloadMarkdown());
-        document.getElementById('uploadBtn').addEventListener('click', () => this.showGitHubModal());
-        document.getElementById('confirmUpload').addEventListener('click', () => this.uploadToGitHub());
-        
-        // AI 관련 이벤트
-        document.getElementById('generateArticle').addEventListener('click', () => this.generateAIArticle());
-        document.getElementById('saveOpenaiKey').addEventListener('click', () => this.saveOpenAIKey());
+        // 기사 관리 새로고침
+        document.getElementById('refreshArticles')?.addEventListener('click', () => {
+            this.loadArticles();
+        });
 
-        // 키보드 단축키
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
-                    case 's':
-                        e.preventDefault();
-                        this.saveDraftToStorage();
-                        this.showToast('임시저장 완료', 'success');
-                        break;
-                    case 'Enter':
-                        e.preventDefault();
-                        this.downloadMarkdown();
-                        break;
-                }
+        // 카테고리 필터
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.filterArticles(e.target.dataset.filter);
+            });
+        });
+
+        // 탭 전환 시 기사 목록 로드
+        document.getElementById('manage-tab')?.addEventListener('shown.bs.tab', () => {
+            if (this.articles.length === 0) {
+                this.loadArticles();
             }
         });
-    }
 
-    /**
-     * 이미지 업로드 기능 설정 (다중 로컬 업로드)
-     */
-    setupImageUpload() {
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('imageFiles');
+        // 글자 수 카운터
+        document.getElementById('description')?.addEventListener('input', (e) => {
+            document.getElementById('descLength').textContent = e.target.value.length;
+        });
 
         // 드래그 앤 드롭
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
+        this.setupDragAndDrop();
 
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
-
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            
-            const files = Array.from(e.dataTransfer.files).filter(file => file.type.startsWith('image/'));
-            if (files.length > 0) {
-                this.handleMultipleImageUpload(files);
-            }
-        });
-
-        // 클릭 업로드
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                const files = Array.from(e.target.files);
-                this.handleMultipleImageUpload(files);
-            }
-        });
+        // 폼 유효성 검사
+        this.setupFormValidation();
     }
 
-    /**
-     * 다중 이미지 업로드 처리
-     * @param {Array} files - 업로드할 파일들
-     */
-    async handleMultipleImageUpload(files) {
-        if (files.length > 4) {
-            this.showToast('최대 4개의 이미지까지만 업로드 가능합니다.', 'error');
-            return;
-        }
-
-        try {
-            // 현재 슬러그가 없으면 임시 슬러그 생성
-            if (!this.currentSlug) {
-                this.currentSlug = this.generateTempSlug();
-            }
-
-            this.showUploadProgress(true);
-            this.updateProgressText('이미지 최적화 중...');
-
-            // 로컬 이미지 업로드 실행
-            const imagePaths = await window.localImageUploader.uploadMultipleImages(
-                files, 
-                this.currentSlug, 
-                (progress) => {
-                    this.updateUploadProgress(progress);
-                }
-            );
-
-            // 성공 처리
-            this.currentImageUrls = imagePaths;
-            this.showMultipleImagePreview(imagePaths);
-            this.updatePreview();
-            this.showToast(`${files.length}개 이미지 업로드 완료!`, 'success');
-
-        } catch (error) {
-            console.error('이미지 업로드 실패:', error);
-            this.showToast(`업로드 실패: ${error.message}`, 'error');
-        } finally {
-            this.showUploadProgress(false);
-        }
+    // 🌙 테마 관리
+    initializeTheme() {
+        const savedTheme = localStorage.getItem('editor-theme') || 'dark';
+        this.setTheme(savedTheme);
     }
 
-    /**
-     * 임시 슬러그 생성
-     * @returns {string} 임시 슬러그
-     */
-    generateTempSlug() {
+    toggleTheme() {
+        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+        
+        // 애니메이션 효과
+        document.body.style.transition = 'all 0.5s ease';
+        setTimeout(() => {
+            document.body.style.transition = '';
+        }, 500);
+    }
+
+    setTheme(theme) {
+        this.currentTheme = theme;
+        const body = document.body;
+        const html = document.documentElement;
+        const themeIcon = document.getElementById('themeIcon');
+
+        if (theme === 'light') {
+            body.classList.remove('dark-theme');
+            body.classList.add('light-theme');
+            html.setAttribute('data-theme', 'light');
+            themeIcon.className = 'fas fa-sun';
+        } else {
+            body.classList.remove('light-theme');
+            body.classList.add('dark-theme');
+            html.setAttribute('data-theme', 'dark');
+            themeIcon.className = 'fas fa-moon';
+        }
+
+        localStorage.setItem('editor-theme', theme);
+    }
+
+    // ⏰ 날짜/시간 초기화
+    initializeDateTime() {
         const now = new Date();
-        return `temp-article-${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}-${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
-    }
-
-    /**
-     * 업로드 진행률 표시
-     * @param {boolean} show - 표시 여부
-     */
-    showUploadProgress(show) {
-        const progressDiv = document.getElementById('uploadProgress');
-        progressDiv.style.display = show ? 'block' : 'none';
-    }
-
-    /**
-     * 업로드 진행률 업데이트
-     * @param {number} progress - 진행률 (0-100)
-     */
-    updateUploadProgress(progress) {
-        const progressBar = document.querySelector('#uploadProgress .progress-bar');
-        progressBar.style.width = `${progress}%`;
-        progressBar.textContent = `${Math.round(progress)}%`;
-    }
-
-    /**
-     * 진행률 텍스트 업데이트
-     * @param {string} text - 표시할 텍스트
-     */
-    updateProgressText(text) {
-        const progressText = document.getElementById('progressText');
-        if (progressText) {
-            progressText.textContent = text;
+        const kstOffset = 9 * 60; // 한국 시간 오프셋 (분)
+        const kstTime = new Date(now.getTime() + (kstOffset * 60 * 1000));
+        
+        const publishDateInput = document.getElementById('publishDate');
+        if (publishDateInput) {
+            const formattedDate = kstTime.toISOString().slice(0, 16);
+            publishDateInput.value = formattedDate;
         }
     }
 
-    /**
-     * 다중 이미지 미리보기 표시
-     * @param {Array} imagePaths - 이미지 경로들
-     */
-    showMultipleImagePreview(imagePaths) {
-        const container = document.getElementById('imagePreviewContainer');
-        const grid = document.getElementById('imagePreviewGrid');
-        const pathsList = document.getElementById('imagePathsList');
-
-        // 기존 내용 초기화
-        grid.innerHTML = '';
-        pathsList.innerHTML = '';
-
-        imagePaths.forEach((path, index) => {
-            // 이미지 미리보기 생성
-            const col = document.createElement('div');
-            col.className = 'col-6 col-md-3';
-            
-            const imageItem = document.createElement('div');
-            imageItem.className = 'image-preview-item';
-            
-            // 로컬 저장소에서 이미지 데이터 가져오기
-            const imageData = window.localImageUploader.getImagePreview(this.currentSlug, index + 1);
-            
-            imageItem.innerHTML = `
-                <img src="${imageData || '/images/placeholder.jpg'}" alt="이미지 ${index + 1}">
-                <div class="image-index">${index + 1}</div>
-                <button class="remove-image" onclick="articleEditor.removeImage(${index})" title="이미지 삭제">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            col.appendChild(imageItem);
-            grid.appendChild(col);
-
-            // 이미지 경로 표시
-            const pathItem = document.createElement('div');
-            pathItem.className = 'image-path-item';
-            pathItem.textContent = path;
-            pathsList.appendChild(pathItem);
-        });
-
-        container.style.display = 'block';
-    }
-
-    /**
-     * 이미지 삭제
-     * @param {number} index - 삭제할 이미지 인덱스
-     */
-    removeImage(index) {
-        if (confirm('이 이미지를 삭제하시겠습니까?')) {
-            // 배열에서 제거
-            this.currentImageUrls.splice(index, 1);
-            
-            // 로컬 저장소에서 삭제
-            window.localImageUploader.clearArticleImages(this.currentSlug);
-            
-            // 남은 이미지들 다시 업로드 (인덱스 재정렬)
-            if (this.currentImageUrls.length > 0) {
-                this.showMultipleImagePreview(this.currentImageUrls);
-            } else {
-                document.getElementById('imagePreviewContainer').style.display = 'none';
-                this.currentImageUrls = [];
+    // 👁️ 미리보기 업데이트
+    setupPreviewUpdate() {
+        const inputs = ['title', 'content', 'description', 'author', 'category'];
+        inputs.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('input', () => this.updatePreview());
             }
-            
-            this.updatePreview();
-            this.showToast('이미지가 삭제되었습니다.', 'info');
-        }
+        });
     }
 
-    /**
-     * 실시간 미리보기 업데이트
-     */
     updatePreview() {
-        const title = document.getElementById('title').value;
-        const category = document.getElementById('category').value;
-        const author = document.getElementById('author').value;
-        const description = document.getElementById('description').value;
-        const content = document.getElementById('content').value;
-        const publishDate = document.getElementById('publishDate').value;
+        const title = document.getElementById('title')?.value || '';
+        const content = document.getElementById('content')?.value || '';
+        const description = document.getElementById('description')?.value || '';
+        const author = document.getElementById('author')?.value || '오은진';
+        const category = document.getElementById('category')?.value || 'automotive';
+        const publishDate = document.getElementById('publishDate')?.value || '';
 
-        if (!title && !content) {
-            document.getElementById('preview').innerHTML = `
+        const previewContent = document.getElementById('preview');
+        if (!previewContent) return;
+
+        if (!title && !content && !description) {
+            previewContent.innerHTML = `
                 <div class="text-center text-muted p-5">
-                    <i class="fas fa-eye fa-3x mb-3"></i>
-                    <p>기사 정보를 입력하면 미리보기가 표시됩니다</p>
+                    <i class="fas fa-newspaper fa-4x mb-4 text-primary"></i>
+                    <h5 class="text-light">실시간 미리보기</h5>
+                    <p class="text-muted">기사 정보를 입력하면 여기에 미리보기가 표시됩니다</p>
                 </div>
             `;
             return;
         }
 
-        // Hugo single.html 스타일로 미리보기 생성
-        const previewHtml = this.generatePreviewHtml({
-            title,
-            category,
-            author,
-            description,
-            content,
-            publishDate,
-            imageUrls: this.currentImageUrls
-        });
+        const categoryIcon = category === 'automotive' ? '🚗' : '📈';
+        const categoryName = category === 'automotive' ? '자동차' : '경제';
+        const formattedDate = publishDate ? new Date(publishDate).toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : '';
 
-        document.getElementById('preview').innerHTML = previewHtml;
-    }
+        const markdownContent = content ? marked.parse(content) : '';
 
-    /**
-     * 미리보기 HTML 생성
-     * @param {Object} data - 기사 데이터
-     * @returns {string} HTML 문자열
-     */
-    generatePreviewHtml(data) {
-        const categoryName = data.category === 'automotive' ? '자동차' : '경제';
-        const formatDate = (dateStr) => {
-            if (!dateStr) return new Date().toLocaleDateString('ko-KR');
-            return new Date(dateStr).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        };
-
-        return `
-            <div class="single-article-page">
-                <div class="container-fluid">
-                    <article class="main-article-content">
-                        <header class="article-header">
-                            <div class="article-category-badge">${categoryName}</div>
-                            <h1 class="article-main-title">${data.title || '제목을 입력하세요'}</h1>
-                            
-                            <div class="article-meta-info">
-                                <div class="meta-left">
-                                    <span class="author-name">${data.author}</span>
-                                    <time class="publish-date">${formatDate(data.publishDate)}</time>
-                                </div>
-                                <div class="meta-right">
-                                    <div class="social-share-inline">
-                                        <button class="share-btn-inline facebook"><i class="fab fa-facebook-f"></i></button>
-                                        <button class="share-btn-inline twitter"><i class="fab fa-twitter"></i></button>
-                                        <button class="share-btn-inline copy"><i class="fas fa-link"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </header>
-
-                        ${data.imageUrls && data.imageUrls.length > 0 ? `
-                        <div class="article-main-image">
-                            <img src="${data.imageUrls[0]}" alt="${data.title}" class="img-fluid discover-optimized" 
-                                 width="1200" height="675" data-discover="true">
-                        </div>
-                        ` : ''}
-
-                        ${data.description ? `
-                        <div class="article-summary">
-                            <p>${data.description}</p>
-                        </div>
-                        ` : ''}
-
-                        <div class="article-content">
-                            ${data.content ? marked.parse(data.content) : '<p>본문을 입력하세요...</p>'}
-                        </div>
-                    </article>
+        previewContent.innerHTML = `
+            <div class="article-preview fade-in-up">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-primary me-2">${categoryIcon} ${categoryName}</span>
+                    <small class="text-muted">${formattedDate}</small>
+                </div>
+                
+                <h1 class="preview-title mb-3">${title}</h1>
+                
+                ${description ? `
+                    <div class="alert glass-card border-info mb-4">
+                        <i class="fas fa-quote-left text-info me-2"></i>
+                        <em>${description}</em>
+                    </div>
+                ` : ''}
+                
+                <div class="preview-meta mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-circle text-primary me-2"></i>
+                        <span class="text-light">${author}</span>
+                    </div>
+                </div>
+                
+                <div class="preview-body">
+                    ${markdownContent}
                 </div>
             </div>
         `;
     }
 
-    /**
-     * 글자 수 카운트 업데이트
-     */
-    updateCharCount() {
-        const description = document.getElementById('description').value;
-        const countSpan = document.getElementById('descLength');
-        countSpan.textContent = description.length;
-        
-        if (description.length > 150) {
-            countSpan.style.color = 'red';
-        } else {
-            countSpan.style.color = '';
+    // 📂 기사 관리 초기화
+    initializeArticleManagement() {
+        this.loadStoredGithubToken();
+    }
+
+    // 📰 기사 목록 로드
+    async loadArticles() {
+        const gridElement = document.getElementById('articlesGrid');
+        if (!gridElement) return;
+
+        // 로딩 상태 표시
+        gridElement.innerHTML = `
+            <div class="col-12 text-center">
+                <div class="glass-card">
+                    <div class="card-body py-5">
+                        <div class="loading-spinner mb-3"></div>
+                        <p class="text-muted">기사 목록을 불러오는 중...</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        try {
+            // Automotive 및 Economy 카테고리의 기사들을 가져옴
+            const [automotiveFiles, economyFiles] = await Promise.all([
+                this.fetchGithubContents('content/automotive'),
+                this.fetchGithubContents('content/economy')
+            ]);
+
+            // MD 파일만 필터링하고 _index.md 제외
+            const automotiveArticles = automotiveFiles
+                .filter(file => file.name.endsWith('.md') && file.name !== '_index.md')
+                .map(file => ({ ...file, category: 'automotive' }));
+
+            const economyArticles = economyFiles
+                .filter(file => file.name.endsWith('.md') && file.name !== '_index.md')
+                .map(file => ({ ...file, category: 'economy' }));
+
+            this.articles = [...automotiveArticles, ...economyArticles];
+            
+            // 각 기사의 메타데이터 로드
+            await this.loadArticleMetadata();
+            
+            this.filterArticles(this.currentFilter);
+
+        } catch (error) {
+            console.error('기사 목록 로드 실패:', error);
+            gridElement.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="glass-card">
+                        <div class="card-body py-5">
+                            <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
+                            <h5 class="text-warning mb-2">기사 목록을 불러올 수 없습니다</h5>
+                            <p class="text-muted mb-3">GitHub 토큰을 설정해주세요</p>
+                            <button class="btn btn-outline-primary btn-sm" onclick="editor.showGithubModal()">
+                                <i class="fas fa-key me-1"></i>GitHub 토큰 설정
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
     }
 
-    /**
-     * 마크다운 에디터에 텍스트 삽입
-     * @param {string} before - 앞에 삽입할 텍스트
-     * @param {string} after - 뒤에 삽입할 텍스트
-     */
-    insertText(before, after) {
+    // 📡 GitHub API 호출
+    async fetchGithubContents(path) {
+        if (!this.githubToken) {
+            throw new Error('GitHub 토큰이 필요합니다');
+        }
+
+        const response = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/contents/${path}`, {
+            headers: {
+                'Authorization': `token ${this.githubToken}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`GitHub API 오류: ${response.status}`);
+        }
+
+        return await response.json();
+    }
+
+    // 📄 기사 메타데이터 로드
+    async loadArticleMetadata() {
+        const promises = this.articles.map(async (article) => {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/contents/content/${article.category}/${article.name}`, {
+                    headers: {
+                        'Authorization': `token ${this.githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = atob(data.content);
+                    const metadata = this.parseFrontMatter(content);
+                    
+                    article.metadata = metadata;
+                    article.content = content;
+                    article.sha = data.sha; // 삭제를 위해 필요
+                }
+            } catch (error) {
+                console.warn(`기사 메타데이터 로드 실패: ${article.name}`, error);
+                article.metadata = {
+                    title: article.name.replace('.md', '').replace(/-/g, ' '),
+                    date: '날짜 없음',
+                    author: '알 수 없음'
+                };
+            }
+        });
+
+        await Promise.all(promises);
+    }
+
+    // 📑 Front Matter 파싱
+    parseFrontMatter(content) {
+        const frontMatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+        if (!frontMatterMatch) return {};
+
+        const frontMatterText = frontMatterMatch[1];
+        const lines = frontMatterText.split('\n');
+        const metadata = {};
+
+        lines.forEach(line => {
+            const colonIndex = line.indexOf(':');
+            if (colonIndex > -1) {
+                const key = line.substring(0, colonIndex).trim();
+                let value = line.substring(colonIndex + 1).trim();
+                
+                // 따옴표 제거
+                if ((value.startsWith('"') && value.endsWith('"')) ||
+                    (value.startsWith("'") && value.endsWith("'"))) {
+                    value = value.slice(1, -1);
+                }
+                
+                metadata[key] = value;
+            }
+        });
+
+        return metadata;
+    }
+
+    // 🔍 기사 필터링
+    filterArticles(filter) {
+        this.currentFilter = filter;
+        
+        // 필터 버튼 활성화 상태 업데이트
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.filter === filter);
+        });
+
+        // 기사 필터링
+        this.filteredArticles = filter === 'all' 
+            ? this.articles 
+            : this.articles.filter(article => article.category === filter);
+
+        this.renderArticles();
+    }
+
+    // 🎨 기사 목록 렌더링
+    renderArticles() {
+        const gridElement = document.getElementById('articlesGrid');
+        if (!gridElement) return;
+
+        if (this.filteredArticles.length === 0) {
+            gridElement.innerHTML = `
+                <div class="col-12 text-center">
+                    <div class="glass-card">
+                        <div class="card-body py-5">
+                            <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                            <h5 class="text-muted">기사가 없습니다</h5>
+                            <p class="text-muted">선택한 카테고리에 기사가 없습니다</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        const articlesHtml = this.filteredArticles.map((article, index) => {
+            const metadata = article.metadata || {};
+            const title = metadata.title || article.name.replace('.md', '').replace(/-/g, ' ');
+            const date = metadata.date || '날짜 없음';
+            const author = metadata.author || '알 수 없음';
+            const description = metadata.description || '설명 없음';
+            const categoryIcon = article.category === 'automotive' ? '🚗' : '📈';
+            const categoryName = article.category === 'automotive' ? '자동차' : '경제';
+
+            return `
+                <div class="col-lg-4 col-md-6 mb-4 fade-in-up" style="animation-delay: ${index * 0.1}s">
+                    <div class="article-card h-100" onclick="editor.showArticleModal('${article.name}', '${article.category}')">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary">${categoryIcon} ${categoryName}</span>
+                            <small class="text-muted">${date}</small>
+                        </div>
+                        
+                        <h5 class="article-title mb-2">${title}</h5>
+                        
+                        <div class="article-meta mb-3">
+                            <i class="fas fa-user text-primary me-1"></i>
+                            <span>${author}</span>
+                        </div>
+                        
+                        <p class="article-excerpt mb-3">${description}</p>
+                        
+                        <div class="article-actions mt-auto">
+                            <button class="btn btn-outline-warning btn-sm" onclick="event.stopPropagation(); editor.editArticle('${article.name}', '${article.category}')">
+                                <i class="fas fa-edit me-1"></i>편집
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="event.stopPropagation(); editor.deleteArticle('${article.name}', '${article.category}')">
+                                <i class="fas fa-trash me-1"></i>삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        gridElement.innerHTML = articlesHtml;
+    }
+
+    // ✏️ 기사 편집
+    editArticle(filename, category) {
+        const article = this.articles.find(a => a.name === filename && a.category === category);
+        if (!article) return;
+
+        // 기사 작성 탭으로 이동
+        const writeTab = document.getElementById('write-tab');
+        if (writeTab) {
+            writeTab.click();
+            
+            // 잠시 후 데이터 채우기 (탭 전환 애니메이션 완료 후)
+            setTimeout(() => {
+                this.populateEditor(article);
+            }, 300);
+        }
+    }
+
+    // 📝 에디터에 기사 데이터 채우기
+    populateEditor(article) {
+        const metadata = article.metadata || {};
+        
+        document.getElementById('title').value = metadata.title || '';
+        document.getElementById('category').value = article.category || 'automotive';
+        document.getElementById('author').value = metadata.author || '오은진';
+        document.getElementById('description').value = metadata.description || '';
+        document.getElementById('tags').value = (metadata.tags || []).join(', ');
+        
+        if (metadata.date) {
+            const date = new Date(metadata.date);
+            document.getElementById('publishDate').value = date.toISOString().slice(0, 16);
+        }
+
+        // 본문 내용 (Front Matter 제거)
+        const content = article.content.replace(/^---\n[\s\S]*?\n---\n/, '');
+        document.getElementById('content').value = content;
+
+        // 미리보기 업데이트
+        this.updatePreview();
+
+        // 성공 메시지
+        this.showNotification('기사를 불러왔습니다. 편집 후 다시 업로드하세요.', 'info');
+    }
+
+    // 🗑️ 기사 삭제
+    async deleteArticle(filename, category) {
+        if (!confirm(`정말로 "${filename}" 기사를 삭제하시겠습니까?`)) {
+            return;
+        }
+
+        const article = this.articles.find(a => a.name === filename && a.category === category);
+        if (!article || !article.sha) {
+            this.showNotification('기사 정보를 찾을 수 없습니다.', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/contents/content/${category}/${filename}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `token ${this.githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Delete article: ${filename}`,
+                    sha: article.sha
+                })
+            });
+
+            if (response.ok) {
+                this.showNotification('기사가 성공적으로 삭제되었습니다.', 'success');
+                this.loadArticles(); // 목록 새로고침
+            } else {
+                throw new Error(`삭제 실패: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('기사 삭제 오류:', error);
+            this.showNotification('기사 삭제에 실패했습니다.', 'error');
+        }
+    }
+
+    // 🎭 기사 상세 모달 표시
+    showArticleModal(filename, category) {
+        const article = this.articles.find(a => a.name === filename && a.category === category);
+        if (!article) return;
+
+        const modal = new bootstrap.Modal(document.getElementById('articleModal'));
+        const modalTitle = document.getElementById('articleModalTitle');
+        const modalBody = document.getElementById('articleModalBody');
+
+        const metadata = article.metadata || {};
+        const title = metadata.title || filename;
+        const content = article.content.replace(/^---\n[\s\S]*?\n---\n/, '');
+
+        modalTitle.innerHTML = `<i class="fas fa-eye text-info me-2"></i>${title}`;
+        modalBody.innerHTML = `
+            <div class="article-detail">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong class="text-light">카테고리:</strong>
+                        <span class="badge bg-primary ms-2">
+                            ${category === 'automotive' ? '🚗 자동차' : '📈 경제'}
+                        </span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong class="text-light">작성자:</strong>
+                        <span class="text-muted ms-2">${metadata.author || '알 수 없음'}</span>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong class="text-light">발행일:</strong>
+                    <span class="text-muted ms-2">${metadata.date || '날짜 없음'}</span>
+                </div>
+                
+                ${metadata.description ? `
+                    <div class="mb-3">
+                        <strong class="text-light">요약:</strong>
+                        <p class="text-muted mt-1">${metadata.description}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="content-preview glass-card p-3" style="max-height: 400px; overflow-y: auto;">
+                    ${marked.parse(content)}
+                </div>
+            </div>
+        `;
+
+        modal.show();
+    }
+
+    // 📂 드래그 앤 드롭 설정
+    setupDragAndDrop() {
+        const uploadArea = document.getElementById('uploadArea');
+        if (!uploadArea) return;
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, this.preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.remove('dragover');
+            }, false);
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('imageFiles').files = files;
+                // 이미지 업로드 처리는 local-upload.js에서 담당
+            }
+        }, false);
+    }
+
+    preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    // ✅ 폼 유효성 검사
+    setupFormValidation() {
+        const requiredFields = ['title', 'category', 'author', 'publishDate', 'description'];
+        
+        requiredFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('blur', () => {
+                    this.validateField(field);
+                });
+            }
+        });
+    }
+
+    validateField(field) {
+        const isValid = field.value.trim() !== '';
+        field.classList.toggle('is-invalid', !isValid);
+        field.classList.toggle('is-valid', isValid);
+    }
+
+    // 💾 저장된 데이터 로드
+    loadStoredData() {
+        // GitHub 토큰 로드
+        this.loadStoredGithubToken();
+        
+        // 폼 데이터 자동 저장/복원
+        const formFields = ['title', 'description', 'tags', 'content'];
+        formFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                // 저장된 값 복원
+                const savedValue = localStorage.getItem(`editor-${fieldId}`);
+                if (savedValue) {
+                    field.value = savedValue;
+                }
+                
+                // 자동 저장 설정
+                field.addEventListener('input', () => {
+                    localStorage.setItem(`editor-${fieldId}`, field.value);
+                });
+            }
+        });
+    }
+
+    loadStoredGithubToken() {
+        this.githubToken = localStorage.getItem('github-token') || '';
+        const tokenInput = document.getElementById('githubToken');
+        if (tokenInput && this.githubToken) {
+            tokenInput.value = this.githubToken;
+        }
+    }
+
+    // 🎨 애니메이션 효과
+    addAnimations() {
+        // 스크롤 애니메이션
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // 카드 요소들에 애니메이션 관찰자 추가
+        document.querySelectorAll('.glass-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // 버튼 호버 효과
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    }
+
+    // 🎭 모달 관리
+    showAIWriteModal() {
+        const openaiKey = localStorage.getItem('openai-api-key');
+        if (!openaiKey) {
+            this.showOpenAIModal();
+            return;
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('aiWriteModal'));
+        modal.show();
+    }
+
+    showOpenAIModal() {
+        const modal = new bootstrap.Modal(document.getElementById('openaiModal'));
+        modal.show();
+    }
+
+    showGithubModal() {
+        const modal = new bootstrap.Modal(document.getElementById('githubModal'));
+        modal.show();
+    }
+
+    // 📢 알림 메시지
+    showNotification(message, type = 'info') {
+        const alertTypes = {
+            success: 'alert-success',
+            error: 'alert-danger',
+            warning: 'alert-warning',
+            info: 'alert-info'
+        };
+
+        const alertHtml = `
+            <div class="alert ${alertTypes[type]} alert-dismissible fade show position-fixed" 
+                 style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;" role="alert">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', alertHtml);
+
+        // 3초 후 자동 제거
+        setTimeout(() => {
+            const alert = document.querySelector('.alert:last-of-type');
+            if (alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }
+        }, 3000);
+    }
+
+    // 🚀 유틸리티 메서드들
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    truncateText(text, maxLength = 100) {
+        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    }
+
+    // 🎯 마크다운 텍스트 삽입 헬퍼
+    insertText(before, after = '') {
         const textarea = document.getElementById('content');
+        if (!textarea) return;
+
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const selectedText = textarea.value.substring(start, end);
-        
-        const newText = before + selectedText + after;
-        textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+        const replacementText = before + selectedText + after;
+
+        textarea.value = textarea.value.substring(0, start) + replacementText + textarea.value.substring(end);
         
         // 커서 위치 조정
         const newCursorPos = start + before.length + selectedText.length;
         textarea.setSelectionRange(newCursorPos, newCursorPos);
         textarea.focus();
-        
-        this.updatePreview();
-    }
 
-    /**
-     * Hugo Front Matter 생성
-     * @returns {Object} 기사 데이터와 파일명
-     */
-    generateHugoFrontMatter() {
-        const title = document.getElementById('title').value;
-        const category = document.getElementById('category').value;
-        const author = document.getElementById('author').value;
-        const description = document.getElementById('description').value;
-        const tags = document.getElementById('tags').value;
-        const content = document.getElementById('content').value;
-        const publishDate = document.getElementById('publishDate').value;
-
-        if (!title || !content) {
-            throw new Error('제목과 본문은 필수입니다.');
-        }
-
-        // 태그 처리
-        const tagArray = tags.split(',')
-            .map(tag => tag.trim())
-            .filter(tag => tag.length > 0)
-            .slice(0, 5); // 최대 5개
-
-        // 파일명 생성 (한글 -> 영문 변환)
-        const filename = this.generateFilename(title);
-
-        // Front Matter 생성
-        const frontMatter = `---
-title: "${title}"
-description: "${description}"
-author: "${author}"
-date: ${publishDate ? new Date(publishDate).toISOString() : new Date().toISOString()}
-${this.currentImageUrls.length > 0 ? `images: [${this.currentImageUrls.map(url => `"${url}"`).join(', ')}]` : ''}
-${tagArray.length > 0 ? `tags: [${tagArray.map(tag => `"${tag}"`).join(', ')}]` : ''}
----
-
-${content}`;
-
-        return {
-            content: frontMatter,
-            filename: filename,
-            category: category
-        };
-    }
-
-    /**
-     * 파일명 생성 (한글 -> 영문 변환)
-     * @param {string} title - 기사 제목
-     * @returns {string} 파일명
-     */
-    generateFilename(title) {
-        // 간단한 한글->영문 변환 매핑
-        const koreanToEnglish = {
-            '현대': 'hyundai',
-            '기아': 'kia',
-            '제네시스': 'genesis',
-            '쌍용': 'ssangyong',
-            '한국': 'korea',
-            '자동차': 'car',
-            '전기차': 'electric-car',
-            '신차': 'new-car',
-            '출시': 'launch',
-            '경제': 'economy',
-            '시장': 'market',
-            '판매': 'sales',
-            '투자': 'investment',
-            '성장': 'growth'
-        };
-
-        let filename = title.toLowerCase();
-        
-        // 한글 단어 변환
-        Object.keys(koreanToEnglish).forEach(korean => {
-            filename = filename.replace(new RegExp(korean, 'g'), koreanToEnglish[korean]);
-        });
-
-        // 한글이 남아있으면 로마자 변환 (간단한 방법)
-        filename = filename
-            .replace(/[ㄱ-ㅎㅏ-ㅣ가-힣]/g, '') // 남은 한글 제거
-            .replace(/[^a-z0-9\s-]/g, '') // 영문, 숫자, 공백, 하이픈만 남김
-            .replace(/\s+/g, '-') // 공백을 하이픈으로
-            .replace(/-+/g, '-') // 연속 하이픈 정리
-            .replace(/^-|-$/g, ''); // 앞뒤 하이픈 제거
-
-        // 기본 파일명이 없으면 날짜 사용
-        if (!filename) {
-            filename = 'article-' + new Date().toISOString().split('T')[0];
-        }
-
-        return filename + '.md';
-    }
-
-    /**
-     * 마크다운 파일 다운로드
-     */
-    downloadMarkdown() {
-        try {
-            const result = this.generateHugoFrontMatter();
-            
-            const blob = new Blob([result.content], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = result.filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            this.showToast('파일 다운로드 완료!', 'success');
-        } catch (error) {
-            this.showToast(error.message, 'error');
-        }
-    }
-
-    /**
-     * GitHub 업로드 모달 표시
-     */
-    showGitHubModal() {
-        if (!this.githubModal) {
-            this.githubModal = new bootstrap.Modal(document.getElementById('githubModal'));
-        }
-        this.githubModal.show();
-    }
-
-    /**
-     * GitHub 모달 설정
-     */
-    setupGitHubModal() {
-        // 토큰 자동 저장/불러오기
-        const tokenInput = document.getElementById('githubToken');
-        tokenInput.value = sessionStorage.getItem('github_token') || '';
-        
-        tokenInput.addEventListener('input', () => {
-            sessionStorage.setItem('github_token', tokenInput.value);
-        });
-
-        // OpenAI API 키 자동 불러오기
-        const openaiKey = sessionStorage.getItem('openai_api_key');
-        if (openaiKey) {
-            window.openaiWriter.configure(openaiKey);
-        }
-    }
-
-    /**
-     * GitHub에 업로드
-     */
-    async uploadToGitHub() {
-        const token = document.getElementById('githubToken').value;
-        if (!token) {
-            this.showToast('GitHub 토큰을 입력해주세요.', 'error');
-            return;
-        }
-
-        try {
-            const result = this.generateHugoFrontMatter();
-            const path = `content/${result.category}/${result.filename}`;
-            
-            // GitHub API로 파일 업로드
-            const response = await fetch('https://api.github.com/repos/gkstn15234/news/contents/' + path, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: `새 기사 추가: ${document.getElementById('title').value}`,
-                    content: btoa(unescape(encodeURIComponent(result.content)))
-                })
-            });
-
-            if (response.ok) {
-                this.showToast('GitHub 업로드 성공!', 'success');
-                this.githubModal.hide();
-                this.clearForm();
-            } else {
-                const errorData = await response.json();
-                throw new Error(errorData.message || '업로드 실패');
-            }
-        } catch (error) {
-            console.error('GitHub 업로드 실패:', error);
-            this.showToast(`업로드 실패: ${error.message}`, 'error');
-        }
-    }
-
-    /**
-     * 자동 저장 설정
-     */
-    setupAutoSave() {
-        this.autoSaveInterval = setInterval(() => {
-            this.saveDraftToStorage();
-        }, 30000); // 30초마다 자동 저장
-    }
-
-    /**
-     * 임시저장
-     */
-    saveDraftToStorage() {
-        const draft = {
-            title: document.getElementById('title').value,
-            category: document.getElementById('category').value,
-            author: document.getElementById('author').value,
-            description: document.getElementById('description').value,
-            tags: document.getElementById('tags').value,
-            content: document.getElementById('content').value,
-            publishDate: document.getElementById('publishDate').value,
-            imageUrls: this.currentImageUrls,
-            slug: this.currentSlug,
-            timestamp: new Date().toISOString()
-        };
-
-        localStorage.setItem('article_draft', JSON.stringify(draft));
-    }
-
-    /**
-     * 임시저장 불러오기
-     */
-    loadDraftFromStorage() {
-        const draft = localStorage.getItem('article_draft');
-        if (draft) {
-            try {
-                const data = JSON.parse(draft);
-                
-                // 24시간 이내 데이터만 복원
-                const savedTime = new Date(data.timestamp);
-                const now = new Date();
-                if (now - savedTime < 24 * 60 * 60 * 1000) {
-                    document.getElementById('title').value = data.title || '';
-                    document.getElementById('category').value = data.category || 'automotive';
-                    document.getElementById('author').value = data.author || '오은진';
-                    document.getElementById('description').value = data.description || '';
-                    document.getElementById('tags').value = data.tags || '';
-                    document.getElementById('content').value = data.content || '';
-                    document.getElementById('publishDate').value = data.publishDate || '';
-                    this.currentImageUrls = data.imageUrls || [];
-                    this.currentSlug = data.slug || '';
-                    
-                    this.updateCharCount();
-                    this.updatePreview();
-                    
-                    this.showToast('임시저장된 내용을 복원했습니다.', 'info');
-                }
-            } catch (error) {
-                console.error('임시저장 복원 실패:', error);
-            }
-        }
-    }
-
-    /**
-     * 현재 시간으로 발행일시 초기화
-     */
-    initializeDateTime() {
-        const now = new Date();
-        const offset = now.getTimezoneOffset() * 60000;
-        const localTime = new Date(now.getTime() - offset);
-        document.getElementById('publishDate').value = localTime.toISOString().slice(0, 16);
-    }
-
-    /**
-     * 폼 초기화
-     */
-    clearForm() {
-        document.getElementById('title').value = '';
-        document.getElementById('description').value = '';
-        document.getElementById('tags').value = '';
-        document.getElementById('content').value = '';
-        this.currentImageUrls = [];
-        
-        // 이미지 미리보기 숨기기
-        document.getElementById('imagePreviewContainer').style.display = 'none';
-        
-        // 로컬 이미지 삭제
-        if (this.currentSlug) {
-            window.localImageUploader.clearArticleImages(this.currentSlug);
-        }
-        
-        this.updateCharCount();
-        this.updatePreview();
-        this.initializeDateTime();
-        
-        localStorage.removeItem('article_draft');
-    }
-
-    /**
-     * 토스트 메시지 표시
-     * @param {string} message - 메시지
-     * @param {string} type - 타입 (success, error, info)
-     */
-    showToast(message, type = 'info') {
-        // 간단한 토스트 구현
-        const toast = document.createElement('div');
-        toast.className = `alert alert-${type === 'error' ? 'danger' : type} position-fixed`;
-        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-        toast.innerHTML = `
-            <div class="d-flex align-items-center">
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
-                <div>${message}</div>
-                <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
-            </div>
-        `;
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            if (toast.parentElement) {
-                toast.remove();
-            }
-        }, 5000);
-    }
-
-    /**
-     * AI 글작성 모달 표시
-     */
-    showAIWriteModal() {
-        // OpenAI API 키 확인
-        const apiKey = sessionStorage.getItem('openai_api_key');
-        if (!apiKey) {
-            this.showOpenAIModal();
-            return;
-        }
-
-        if (!this.aiWriteModal) {
-            this.aiWriteModal = new bootstrap.Modal(document.getElementById('aiWriteModal'));
-        }
-        this.aiWriteModal.show();
-    }
-
-    /**
-     * OpenAI 설정 모달 표시
-     */
-    showOpenAIModal() {
-        if (!this.openaiModal) {
-            this.openaiModal = new bootstrap.Modal(document.getElementById('openaiModal'));
-        }
-        
-        // 기존 키가 있으면 표시
-        const existingKey = sessionStorage.getItem('openai_api_key');
-        if (existingKey) {
-            document.getElementById('openaiApiKey').value = existingKey;
-        }
-        
-        this.openaiModal.show();
-    }
-
-    /**
-     * OpenAI API 키 저장
-     */
-    saveOpenAIKey() {
-        const apiKey = document.getElementById('openaiApiKey').value.trim();
-        if (!apiKey) {
-            this.showToast('API 키를 입력해주세요.', 'error');
-            return;
-        }
-
-        if (!apiKey.startsWith('sk-')) {
-            this.showToast('올바른 OpenAI API 키 형식이 아닙니다.', 'error');
-            return;
-        }
-
-        // OpenAI 인스턴스에 설정
-        window.openaiWriter.configure(apiKey);
-        
-        // 세션에 저장
-        sessionStorage.setItem('openai_api_key', apiKey);
-        
-        this.openaiModal.hide();
-        this.showToast('OpenAI API 키가 저장되었습니다.', 'success');
-
-        // AI 글작성 모달 표시
-        setTimeout(() => {
-            this.showAIWriteModal();
-        }, 500);
-    }
-
-    /**
-     * AI 기사 생성
-     */
-    async generateAIArticle() {
-        const title = document.getElementById('aiTitle').value.trim();
-        const description = document.getElementById('aiDescription').value.trim();
-        const category = document.getElementById('aiCategory').value;
-        const referenceContent = document.getElementById('referenceContent').value.trim();
-
-        if (!title) {
-            this.showToast('기사 제목을 입력해주세요.', 'error');
-            return;
-        }
-
-        try {
-            this.showAIProgress(true);
-            this.updateAIProgress(10, 'AI가 카테고리를 분석하고 있습니다...');
-
-            // 카테고리 자동 분류
-            let finalCategory = category;
-            if (category === 'auto') {
-                finalCategory = window.openaiWriter.determineEconomyOrAutomotive(title, description, 'automotive');
-                this.updateAIProgress(30, 'AI가 기사 구조를 설계하고 있습니다...');
-            }
-
-            // 기사 데이터 준비
-            const articleData = {
-                title: title,
-                description: description || `${title}에 대한 상세 분석`,
-                category: finalCategory
-            };
-
-            this.updateAIProgress(50, 'AI가 기사를 작성하고 있습니다...');
-
-            // AI 기사 생성
-            const result = await window.openaiWriter.generateArticle(articleData, (progress) => {
-                this.updateAIProgress(50 + (progress * 0.4), 'AI가 기사를 작성하고 있습니다...');
-            });
-
-            this.updateAIProgress(95, '생성된 기사를 에디터에 적용하고 있습니다...');
-
-            // 생성된 내용을 폼에 적용
-            this.applyAIGeneratedContent(result, finalCategory);
-
-            this.updateAIProgress(100, '완료!');
-            
-            setTimeout(() => {
-                this.showAIProgress(false);
-                this.aiWriteModal.hide();
-                this.showToast('AI 기사 생성이 완료되었습니다!', 'success');
-            }, 1000);
-
-        } catch (error) {
-            console.error('AI 기사 생성 실패:', error);
-            this.showAIProgress(false);
-            this.showToast(`AI 기사 생성 실패: ${error.message}`, 'error');
-        }
-    }
-
-    /**
-     * AI 진행률 표시
-     * @param {boolean} show - 표시 여부
-     */
-    showAIProgress(show) {
-        const progressDiv = document.getElementById('aiProgress');
-        progressDiv.style.display = show ? 'block' : 'none';
-        
-        if (!show) {
-            this.updateAIProgress(0, '');
-        }
-    }
-
-    /**
-     * AI 진행률 업데이트
-     * @param {number} progress - 진행률 (0-100)
-     * @param {string} text - 진행 상태 텍스트
-     */
-    updateAIProgress(progress, text) {
-        const progressBar = document.querySelector('#aiProgress .progress-bar');
-        const progressText = document.getElementById('aiProgressText');
-        
-        progressBar.style.width = `${progress}%`;
-        if (progressText && text) {
-            progressText.textContent = text;
-        }
-    }
-
-    /**
-     * AI 생성 콘텐츠를 폼에 적용
-     * @param {Object} result - AI 생성 결과
-     * @param {string} category - 카테고리
-     */
-    applyAIGeneratedContent(result, category) {
-        // 제목에서 h1 태그 제거
-        const cleanTitle = result.title.replace(/<\/?h1[^>]*>/g, '');
-        
-        // 폼 필드 업데이트
-        document.getElementById('title').value = cleanTitle;
-        document.getElementById('category').value = category;
-        document.getElementById('content').value = result.content;
-        
-        // 슬러그 업데이트
-        this.currentSlug = result.slug;
-        
-        // 기사 요약을 AI 제목에서 추출 (간단한 방법)
-        const titleMatch = cleanTitle.match(/^"([^"]+)"/);
-        if (titleMatch) {
-            document.getElementById('description').value = titleMatch[1];
-        }
-        
         // 미리보기 업데이트
-        this.updateCharCount();
         this.updatePreview();
-        
-        // AI 모달 필드 초기화
-        document.getElementById('aiTitle').value = '';
-        document.getElementById('aiDescription').value = '';
-        document.getElementById('referenceContent').value = '';
-        document.getElementById('aiCategory').value = 'auto';
     }
 }
 
-// 전역 함수들
-window.insertText = function(before, after) {
-    if (window.articleEditor) {
-        window.articleEditor.insertText(before, after);
-    }
-};
+// 🌟 전역 인스턴스 생성
+const editor = new AutoDailyEditor();
 
-// 에디터 초기화
+// 🔧 전역 함수들 (HTML에서 호출용)
+function insertText(before, after = '') {
+    editor.insertText(before, after);
+}
+
+// 🏁 초기화 완료 후 실행
 document.addEventListener('DOMContentLoaded', () => {
-    window.articleEditor = new ArticleEditor();
+    console.log('🚀 오토데일리 AI 에디터 Pro 로드 완료!');
     
-    // 전역 함수로 노출 (HTML에서 호출용)
-    window.removeImage = (index) => {
-        if (window.articleEditor) {
-            window.articleEditor.removeImage(index);
-        }
-    };
+    // 초기 미리보기 업데이트
+    setTimeout(() => {
+        editor.updatePreview();
+    }, 100);
 }); 
