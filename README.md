@@ -14,7 +14,7 @@ CLOUDFLARE_API_TOKEN: Cloudflare API 토큰
 CLOUDFLARE_ACCOUNT_ID: Cloudflare 계정 ID
 CLOUDFLARE_ZONE: Cloudflare Zone ID
 CLOUDFLARE_TOKEN: 캐시 무효화용 토큰
-SITE_URL: 사이트 URL (예: https://autodaily.com)
+SITE_URL: 사이트 URL (예: https://autodaiiy.com)
 ```
 
 ### 캐시 설정 (실시간 업데이트)

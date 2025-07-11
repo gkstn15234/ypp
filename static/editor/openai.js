@@ -132,7 +132,7 @@ class OpenAIWriter {
     "name": "오토데일리",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://your-domain.com/logo.png"
+      "url": "https://autodaiiy.com/logo.png"
     }
   },
   "image": [
@@ -143,7 +143,7 @@ class OpenAIWriter {
   ],
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "https://your-domain.com/${category}/${slug}"
+    "@id": "https://autodaiiy.com/${category}/${slug}"
   }
 }
 </script>`;
