@@ -3252,6 +3252,13 @@ img {
         padding: 1.5rem;
     }
     
+    /* Mobile Article Image - Full Width */
+    .article-main-image {
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
+        width: calc(100% + 3rem);
+    }
+    
     /* Category Page Mobile */
     .category-title {
         font-size: 2rem;
