@@ -1,7 +1,7 @@
 {{ define "main" }}
 <!-- Main Content -->
 <main class="main-content">
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
             <!-- Left Column - Side Articles -->
             <div class="col-lg-3">
@@ -21,7 +21,7 @@
                         </div>
                         <div class="side-news-content">
                             <h3 class="side-news-title">
-                                <a href="{{ .Permalink }}">{{ .Title }}</a>
+                                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
                             </h3>
                             <p class="side-news-excerpt">{{ .Summary | plainify | truncate 80 }}</p>
                         </div>
@@ -48,14 +48,40 @@
                         <div class="main-news-content">
                             <span class="main-category-badge">속보</span>
                             <h1 class="main-news-title">
-                                <a href="{{ $mainArticle.Permalink }}">{{ $mainArticle.Title }}</a>
+                                <a href="{{ $mainArticle.RelPermalink }}">{{ $mainArticle.Title }}</a>
                             </h1>
-                            <div class="main-news-summary">
-                                <ul>
-                                    <li>{{ $mainArticle.Summary | plainify | truncate 100 }}</li>
-                                    <li>BMW는 2025년 한 해 동안 다음과 같은 전기차 모델을 출시할 예정이다</li>
-                                    <li>새로운 전기차들의 국내 출시 가격은 5,000만원대부터 1억원대까지 구성</li>
-                                </ul>
+                        </div>
+                    </article>
+                    {{ end }}
+                    
+                    <!-- Secondary Main Article -->
+                    {{ $secondaryArticle := index (where .Site.RegularPages ".Section" "automotive") 1 }}
+                    {{ if $secondaryArticle }}
+                    <article class="secondary-news-article">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="secondary-news-image">
+                                    {{ if $secondaryArticle.Params.images }}
+                                    <img src="{{ index $secondaryArticle.Params.images 0 }}" alt="{{ $secondaryArticle.Title }}" class="img-fluid">
+                                    {{ else }}
+                                    <div class="no-image-secondary">
+                                        <i class="fas fa-car"></i>
+                                    </div>
+                                    {{ end }}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="secondary-news-content">
+                                    <span class="secondary-category-badge">{{ $secondaryArticle.Section | title }}</span>
+                                    <h2 class="secondary-news-title">
+                                        <a href="{{ $secondaryArticle.RelPermalink }}">{{ $secondaryArticle.Title }}</a>
+                                    </h2>
+                                    <p class="secondary-news-excerpt">{{ $secondaryArticle.Summary | plainify | truncate 150 }}</p>
+                                    <div class="secondary-news-meta">
+                                        <span class="secondary-news-date">{{ $secondaryArticle.Date.Format "01월 02일" }}</span>
+                                        <span class="secondary-news-author">{{ $secondaryArticle.Params.author }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </article>
@@ -72,7 +98,7 @@
                         <div class="right-news-content">
                             <span class="right-category-badge">{{ .Section | title }}</span>
                             <h4 class="right-news-title">
-                                <a href="{{ .Permalink }}">{{ .Title | truncate 60 }}</a>
+                                <a href="{{ .RelPermalink }}">{{ .Title | truncate 60 }}</a>
                             </h4>
                         </div>
                         <div class="right-news-image">
@@ -112,7 +138,7 @@
                                 <div class="bottom-news-content">
                                     <span class="bottom-category">{{ .Section | title }}</span>
                                     <h5 class="bottom-news-title">
-                                        <a href="{{ .Permalink }}">{{ .Title | truncate 50 }}</a>
+                                        <a href="{{ .RelPermalink }}">{{ .Title | truncate 50 }}</a>
                                     </h5>
                                     <div class="bottom-news-meta">
                                         <span class="bottom-news-date">{{ .Date.Format "01월 02일" }}</span>
