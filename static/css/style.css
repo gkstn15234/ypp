@@ -311,6 +311,27 @@ h1, h2, h3, h4, h5, h6 {
     transition: transform 0.3s ease;
 }
 
+.no-image-main {
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+}
+
+.no-image-main span {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    text-align: center;
+    padding: 0 2rem;
+    line-height: 1.3;
+}
+
 .main-article:hover .article-image img {
     transform: scale(1.05);
 }
@@ -2721,6 +2742,40 @@ img {
         max-width: 250px;
         text-align: center;
     }
+}
+
+/* No Image Placeholders */
+.no-image-thumb {
+    width: 100%;
+    height: 100%;
+    background: var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+}
+
+.no-image-news {
+    width: 100%;
+    height: 180px;
+    background: var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 2rem;
+}
+
+.no-image-small {
+    width: 100%;
+    height: 120px;
+    background: var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 1.5rem;
 }
 
 @media (max-width: 576px) {

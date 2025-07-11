@@ -12,9 +12,12 @@
                     <article class="main-article">
                         <div class="article-image">
                             {{ if $mainArticle.Params.images }}
-                            <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid">
+                            <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid" loading="lazy">
                             {{ else }}
-                            <img src="/images/default-automotive.jpg" alt="{{ $mainArticle.Title }}" class="img-fluid">
+                            <div class="no-image-main">
+                                <i class="fas fa-car"></i>
+                                <span>{{ $mainArticle.Title }}</span>
+                            </div>
                             {{ end }}
                         </div>
                         <div class="article-content">
@@ -37,9 +40,11 @@
                                 <div class="col-4">
                                     <div class="article-thumb">
                                         {{ if .Params.images }}
-                                        <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                        <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" loading="lazy">
                                         {{ else }}
-                                        <img src="/images/default-thumb.jpg" alt="{{ .Title }}" class="img-fluid">
+                                        <div class="no-image-thumb">
+                                            <i class="fas fa-car"></i>
+                                        </div>
                                         {{ end }}
                                     </div>
                                 </div>
@@ -81,9 +86,11 @@
                             <article class="news-item">
                                 <div class="news-thumb">
                                     {{ if .Params.images }}
-                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" loading="lazy">
                                     {{ else }}
-                                    <img src="/images/default-news.jpg" alt="{{ .Title }}" class="img-fluid">
+                                    <div class="no-image-news">
+                                        <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
+                                    </div>
                                     {{ end }}
                                 </div>
                                 <div class="news-content">
@@ -112,9 +119,11 @@
                             <article class="news-item">
                                 <div class="news-thumb">
                                     {{ if .Params.images }}
-                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" loading="lazy">
                                     {{ else }}
-                                    <img src="/images/default-news.jpg" alt="{{ .Title }}" class="img-fluid">
+                                    <div class="no-image-news">
+                                        <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
+                                    </div>
                                     {{ end }}
                                 </div>
                                 <div class="news-content">
@@ -144,9 +153,11 @@
                     <article class="small-news-item">
                         <div class="small-news-thumb">
                             {{ if .Params.images }}
-                            <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                            <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" loading="lazy">
                             {{ else }}
-                            <img src="/images/default-small.jpg" alt="{{ .Title }}" class="img-fluid">
+                            <div class="no-image-small">
+                                <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
+                            </div>
                             {{ end }}
                         </div>
                         <div class="small-news-content">
