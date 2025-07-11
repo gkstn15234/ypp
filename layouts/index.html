@@ -95,13 +95,7 @@
                 <div class="right-articles">
                     {{ $rightArticles := first 4 (after 7 $allArticles) }}
                     {{ range $rightArticles }}
-                    <article class="right-news-item">
-                        <div class="right-news-content">
-                            <span class="right-category-badge">{{ .Section | title }}</span>
-                            <h4 class="right-news-title">
-                                <a href="{{ .RelPermalink }}">{{ .Title | truncate 60 }}</a>
-                            </h4>
-                        </div>
+                    <article class="right-news-card">
                         <div class="right-news-image">
                             {{ if .Params.images }}
                             <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
@@ -110,6 +104,13 @@
                                 <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
                             </div>
                             {{ end }}
+                            <span class="right-category-tag">{{ .Section | title }}</span>
+                        </div>
+                        <div class="right-news-content">
+                            <h3 class="right-news-title">
+                                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                            </h3>
+                            <p class="right-news-excerpt">{{ .Summary | plainify | truncate 80 }}</p>
                         </div>
                     </article>
                     {{ end }}
