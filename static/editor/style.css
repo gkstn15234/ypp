@@ -439,6 +439,210 @@ body {
     padding: 1.5rem;
 }
 
+/* 🔘 모달 내 입력 요소 스타일 개선 */
+.modal .form-control,
+.modal .form-select,
+.modal input[type="text"],
+.modal input[type="email"],
+.modal input[type="password"],
+.modal input[type="url"],
+.modal textarea {
+    background: var(--bg-glass) !important;
+    border: 1px solid var(--border-primary) !important;
+    border-radius: 12px !important;
+    color: var(--text-primary) !important;
+    padding: 12px 16px !important;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.modal .form-control:focus,
+.modal .form-select:focus,
+.modal input:focus,
+.modal textarea:focus {
+    background: var(--bg-glass-hover) !important;
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1) !important;
+    outline: none !important;
+}
+
+.modal .form-control::placeholder,
+.modal input::placeholder,
+.modal textarea::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.8;
+}
+
+/* 🏷️ 모달 라벨 스타일 */
+.modal .form-label {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.modal .form-text {
+    color: var(--text-muted) !important;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.modal .form-text a {
+    color: var(--accent-primary) !important;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.modal .form-text a:hover {
+    color: var(--accent-info) !important;
+    text-decoration: underline;
+}
+
+/* 🎨 모달 제목 스타일 */
+.modal-title {
+    color: var(--text-primary) !important;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.modal-title i {
+    margin-right: 8px;
+    opacity: 0.8;
+}
+
+/* 🚨 모달 경고 박스 */
+.modal .alert {
+    background: var(--bg-glass) !important;
+    border: 1px solid var(--border-primary) !important;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.modal .alert.border-warning {
+    border-color: var(--accent-warning) !important;
+    background: rgba(210, 153, 34, 0.1) !important;
+}
+
+.modal .alert.border-info {
+    border-color: var(--accent-info) !important;
+    background: rgba(121, 192, 255, 0.1) !important;
+}
+
+.modal .alert.border-primary {
+    border-color: var(--accent-primary) !important;
+    background: rgba(88, 166, 255, 0.1) !important;
+}
+
+.modal .alert strong {
+    color: var(--text-primary) !important;
+}
+
+.modal .alert .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+/* 🔒 GitHub 토큰 입력 특별 스타일 */
+#githubToken,
+#openaiApiKey {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace !important;
+    letter-spacing: 0.5px;
+    background: var(--bg-tertiary) !important;
+    border: 2px solid var(--border-primary) !important;
+}
+
+#githubToken:focus,
+#openaiApiKey:focus {
+    border-color: var(--accent-success) !important;
+    box-shadow: 0 0 0 3px rgba(63, 185, 80, 0.1) !important;
+}
+
+/* 📝 읽기 전용 입력 필드 */
+.modal input[readonly] {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-secondary) !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* 🎯 모달 버튼 스타일 */
+.modal .btn-secondary {
+    background: var(--bg-glass) !important;
+    border: 1px solid var(--border-primary) !important;
+    color: var(--text-primary) !important;
+    border-radius: 12px;
+    padding: 8px 20px;
+    transition: all 0.3s ease;
+}
+
+.modal .btn-secondary:hover {
+    background: var(--bg-glass-hover) !important;
+    border-color: var(--border-primary) !important;
+    color: var(--text-primary) !important;
+    transform: translateY(-1px);
+}
+
+/* 🌐 외부 링크 스타일 */
+.modal a[target="_blank"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--accent-primary) !important;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: transparent;
+}
+
+.modal a[target="_blank"]:hover {
+    background: rgba(88, 166, 255, 0.1);
+    transform: translateX(2px);
+    text-decoration: none;
+}
+
+/* 📋 리스트 스타일 */
+.modal ul {
+    padding-left: 1.5rem;
+    margin-bottom: 0;
+}
+
+.modal ul li {
+    color: var(--text-muted) !important;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+/* 🎨 progress 바 스타일 개선 */
+.modal .progress {
+    background: var(--bg-glass) !important;
+    border: 1px solid var(--border-primary);
+    border-radius: 50px;
+    height: 12px;
+    overflow: hidden;
+}
+
+.modal .progress-bar {
+    border-radius: 50px;
+    transition: width 0.6s ease;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-info)) !important;
+}
+
+/* 💾 Select 드롭다운 화살표 개선 */
+.modal .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f0f6fc' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 12px;
+    padding-right: 40px !important;
+}
+
+.light-theme .modal .form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2324292f' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+
 /* 📰 기사 관리 그리드 */
 .article-card {
     background: var(--bg-glass);

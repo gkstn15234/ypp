@@ -38,6 +38,31 @@ class AutoDailyEditor {
             this.showAIWriteModal();
         });
 
+        // 다운로드 버튼
+        document.getElementById('downloadBtn')?.addEventListener('click', () => {
+            this.downloadMarkdown();
+        });
+
+        // 업로드 버튼
+        document.getElementById('uploadBtn')?.addEventListener('click', () => {
+            this.showGithubModal();
+        });
+
+        // GitHub 업로드 확인 버튼
+        document.getElementById('confirmUpload')?.addEventListener('click', () => {
+            this.uploadToGitHub();
+        });
+
+        // OpenAI API 키 저장
+        document.getElementById('saveOpenaiKey')?.addEventListener('click', () => {
+            this.saveOpenAIKey();
+        });
+
+        // AI 기사 생성
+        document.getElementById('generateArticle')?.addEventListener('click', () => {
+            this.generateAIArticle();
+        });
+
         // 기사 관리 새로고침
         document.getElementById('refreshArticles')?.addEventListener('click', () => {
             this.loadArticles();
@@ -60,6 +85,11 @@ class AutoDailyEditor {
         // 글자 수 카운터
         document.getElementById('description')?.addEventListener('input', (e) => {
             document.getElementById('descLength').textContent = e.target.value.length;
+        });
+
+        // 이미지 파일 업로드
+        document.getElementById('imageFiles')?.addEventListener('change', (e) => {
+            this.handleImageUpload(e.target.files);
         });
 
         // 드래그 앤 드롭
@@ -683,11 +713,26 @@ class AutoDailyEditor {
     }
 
     showOpenAIModal() {
+        // 저장된 OpenAI API 키 로드
+        const savedApiKey = localStorage.getItem('openai-api-key');
+        const apiKeyInput = document.getElementById('openaiApiKey');
+        if (apiKeyInput && savedApiKey) {
+            apiKeyInput.value = savedApiKey;
+        }
+        
         const modal = new bootstrap.Modal(document.getElementById('openaiModal'));
         modal.show();
     }
 
     showGithubModal() {
+        // 저장된 GitHub 토큰 로드
+        const savedToken = localStorage.getItem('github-token');
+        const tokenInput = document.getElementById('githubToken');
+        if (tokenInput && savedToken) {
+            tokenInput.value = savedToken;
+            this.githubToken = savedToken;
+        }
+        
         const modal = new bootstrap.Modal(document.getElementById('githubModal'));
         modal.show();
     }
@@ -755,6 +800,462 @@ class AutoDailyEditor {
 
         // 미리보기 업데이트
         this.updatePreview();
+    }
+
+    // 📥 마크다운 다운로드
+    downloadMarkdown() {
+        try {
+            const markdownContent = this.generateMarkdown();
+            const filename = this.generateFilename();
+            
+            // Blob 생성
+            const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+            
+            // 다운로드 링크 생성
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            
+            // 다운로드 실행
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // URL 해제
+            URL.revokeObjectURL(url);
+            
+            this.showNotification(`파일이 다운로드되었습니다: ${filename}`, 'success');
+        } catch (error) {
+            console.error('다운로드 오류:', error);
+            this.showNotification('파일 다운로드에 실패했습니다.', 'error');
+        }
+    }
+
+    // 📄 마크다운 생성
+    generateMarkdown() {
+        const title = document.getElementById('title')?.value || '';
+        const category = document.getElementById('category')?.value || 'automotive';
+        const author = document.getElementById('author')?.value || '오은진';
+        const description = document.getElementById('description')?.value || '';
+        const tags = document.getElementById('tags')?.value || '';
+        const content = document.getElementById('content')?.value || '';
+        const publishDate = document.getElementById('publishDate')?.value || '';
+
+        if (!title || !content) {
+            throw new Error('제목과 본문은 필수 입력사항입니다.');
+        }
+
+        // 태그 배열 생성
+        const tagArray = tags.split(',')
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0)
+            .slice(0, 5); // 최대 5개
+
+        // 카테고리 한글명
+        const categoryKorean = category === 'automotive' ? '자동차' : '경제';
+
+        // 날짜 형식 변환
+        const date = publishDate ? new Date(publishDate).toISOString() : new Date().toISOString();
+
+        // 이미지 URL 수집 (업로드된 이미지 또는 기본 이미지)
+        const imageUrls = this.getImageUrls();
+
+        // Front Matter 생성
+        const frontMatter = `---
+title: "${title}"
+description: "${description}"
+date: ${date}
+draft: false
+categories: ["${categoryKorean}"]
+tags: [${tagArray.map(tag => `"${tag}"`).join(', ')}]
+images: [${imageUrls.map(url => `"${url}"`).join(', ')}]
+author: "${author}"
+---
+
+`;
+
+        return frontMatter + content;
+    }
+
+    // 🖼️ 이미지 URL 수집
+    getImageUrls() {
+        const imageUrls = [];
+        
+        // 업로드된 이미지가 있는지 확인
+        const imagePathsList = document.getElementById('imagePathsList');
+        if (imagePathsList && imagePathsList.textContent) {
+            const paths = imagePathsList.textContent.split('\n').filter(path => path.trim());
+            imageUrls.push(...paths);
+        }
+        
+        // 기본 이미지가 없으면 Unsplash 이미지 사용
+        if (imageUrls.length === 0) {
+            const category = document.getElementById('category')?.value || 'automotive';
+            const defaultImage = category === 'automotive' 
+                ? 'https://images.unsplash.com/photo-1494905998402-395d579af36f?w=1600&h=900&fit=crop&q=95'
+                : 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1600&h=900&fit=crop&q=95';
+            imageUrls.push(defaultImage);
+        }
+        
+        return imageUrls;
+    }
+
+    // 🤖 OpenAI API 키 저장
+    saveOpenAIKey() {
+        const apiKey = document.getElementById('openaiApiKey')?.value;
+        if (!apiKey) {
+            this.showNotification('API 키를 입력해주세요.', 'error');
+            return;
+        }
+
+        if (!apiKey.startsWith('sk-')) {
+            this.showNotification('유효한 OpenAI API 키를 입력해주세요.', 'error');
+            return;
+        }
+
+        // API 키 저장
+        localStorage.setItem('openai-api-key', apiKey);
+        
+        // OpenAI Writer 설정
+        if (window.openaiWriter) {
+            window.openaiWriter.configure(apiKey);
+        }
+
+        // 모달 닫기
+        const modal = bootstrap.Modal.getInstance(document.getElementById('openaiModal'));
+        modal?.hide();
+
+        this.showNotification('OpenAI API 키가 저장되었습니다.', 'success');
+    }
+
+    // 🤖 AI 기사 생성
+    async generateAIArticle() {
+        try {
+            // OpenAI API 키 확인
+            const apiKey = localStorage.getItem('openai-api-key');
+            if (!apiKey) {
+                this.showOpenAIModal();
+                return;
+            }
+
+            // 입력값 검증
+            const aiTitle = document.getElementById('aiTitle')?.value;
+            if (!aiTitle) {
+                this.showNotification('제목을 입력해주세요.', 'error');
+                return;
+            }
+
+            // 진행률 표시
+            const progressDiv = document.getElementById('aiProgress');
+            const progressBar = progressDiv.querySelector('.progress-bar');
+            const progressText = document.getElementById('aiProgressText');
+            const progressPercent = document.getElementById('aiProgressPercent');
+
+            progressDiv.style.display = 'block';
+            
+            // OpenAI Writer 설정
+            if (window.openaiWriter) {
+                window.openaiWriter.configure(apiKey);
+            } else {
+                throw new Error('OpenAI Writer를 찾을 수 없습니다.');
+            }
+
+            // 기사 데이터 준비
+            const articleData = {
+                title: aiTitle,
+                description: document.getElementById('aiDescription')?.value || '',
+                category: document.getElementById('aiCategory')?.value === 'auto' ? 
+                    window.openaiWriter.determineEconomyOrAutomotive(aiTitle, document.getElementById('aiDescription')?.value || '', 'automotive') :
+                    document.getElementById('aiCategory')?.value || 'automotive'
+            };
+
+            // AI 기사 생성
+            const result = await window.openaiWriter.generateArticle(articleData, (progress) => {
+                progressBar.style.width = `${progress}%`;
+                progressPercent.textContent = `${progress}%`;
+                
+                if (progress < 30) {
+                    progressText.textContent = 'AI가 기사 구조를 분석하고 있습니다...';
+                } else if (progress < 70) {
+                    progressText.textContent = 'AI가 기사를 작성하고 있습니다...';
+                } else if (progress < 90) {
+                    progressText.textContent = '기사를 최적화하고 있습니다...';
+                } else {
+                    progressText.textContent = '완료되었습니다!';
+                }
+            });
+
+            // 생성된 기사를 폼에 입력
+            document.getElementById('title').value = result.title.replace(/<\/?h1[^>]*>/g, '');
+            document.getElementById('category').value = articleData.category;
+            document.getElementById('description').value = articleData.description;
+            document.getElementById('content').value = result.content;
+
+            // 미리보기 업데이트
+            this.updatePreview();
+
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(document.getElementById('aiWriteModal'));
+            modal?.hide();
+
+            // 성공 메시지
+            this.showNotification('AI 기사가 성공적으로 생성되었습니다!', 'success');
+
+            // 기사 작성 탭으로 이동
+            const writeTab = document.getElementById('write-tab');
+            if (writeTab) {
+                writeTab.click();
+            }
+
+        } catch (error) {
+            console.error('AI 기사 생성 오류:', error);
+            this.showNotification(`AI 기사 생성 실패: ${error.message}`, 'error');
+        } finally {
+            // 진행률 숨기기
+            const progressDiv = document.getElementById('aiProgress');
+            progressDiv.style.display = 'none';
+        }
+    }
+
+    // 📂 파일명 생성
+    generateFilename() {
+        const title = document.getElementById('title')?.value || '';
+        const category = document.getElementById('category')?.value || 'automotive';
+        
+        // 한글을 영문으로 변환하는 맵핑
+        const koreanToEnglish = {
+            '현대': 'hyundai',
+            '기아': 'kia',
+            '삼성': 'samsung',
+            'LG': 'lg',
+            '테슬라': 'tesla',
+            '전기차': 'electric-vehicle',
+            '자동차': 'car',
+            '신차': 'new-car',
+            '출시': 'launch',
+            '판매': 'sales',
+            '실적': 'earnings',
+            '투자': 'investment',
+            '성장': 'growth',
+            '확장': 'expansion',
+            '개발': 'development',
+            '기술': 'technology',
+            '시장': 'market',
+            '경제': 'economy',
+            '주식': 'stock',
+            '증시': 'stock-market',
+            '금리': 'interest-rate',
+            '부동산': 'real-estate'
+        };
+
+        // 제목을 슬러그로 변환
+        let slug = title.toLowerCase();
+        
+        // 한글 키워드를 영문으로 변환
+        Object.entries(koreanToEnglish).forEach(([korean, english]) => {
+            slug = slug.replace(new RegExp(korean, 'g'), english);
+        });
+        
+        // 한글, 특수문자 제거하고 영문, 숫자, 하이픈만 남기기
+        slug = slug.replace(/[^a-z0-9\s-]/g, '')
+                  .replace(/\s+/g, '-')
+                  .replace(/-+/g, '-')
+                  .replace(/^-|-$/g, '');
+        
+        // 기본값 설정
+        if (!slug || slug.length < 3) {
+            slug = `article-${Date.now()}`;
+        }
+        
+        return `${slug}.md`;
+    }
+
+    // 📤 GitHub 업로드
+    async uploadToGitHub() {
+        try {
+            // GitHub 토큰 확인
+            const tokenInput = document.getElementById('githubToken');
+            const token = tokenInput?.value || this.githubToken;
+            
+            if (!token) {
+                this.showNotification('GitHub 토큰을 입력해주세요.', 'error');
+                return;
+            }
+
+            // 토큰 저장
+            this.githubToken = token;
+            localStorage.setItem('github-token', token);
+
+            // 마크다운 생성
+            const markdownContent = this.generateMarkdown();
+            const filename = this.generateFilename();
+            const category = document.getElementById('category')?.value || 'automotive';
+            
+            // GitHub API 경로 설정
+            const path = `content/${category}/${filename}`;
+            
+            // 파일 내용을 Base64로 인코딩
+            const encodedContent = btoa(unescape(encodeURIComponent(markdownContent)));
+            
+            // GitHub API 요청
+            const response = await fetch(`https://api.github.com/repos/${this.repoOwner}/${this.repoName}/contents/${path}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Add new article: ${filename}`,
+                    content: encodedContent,
+                    branch: 'main'
+                })
+            });
+
+            if (response.ok) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('githubModal'));
+                modal?.hide();
+                
+                this.showNotification('기사가 성공적으로 업로드되었습니다!', 'success');
+                
+                // 폼 초기화 여부 확인
+                if (confirm('업로드가 완료되었습니다. 폼을 초기화하시겠습니까?')) {
+                    this.clearForm();
+                }
+            } else {
+                const error = await response.json();
+                throw new Error(error.message || `업로드 실패: ${response.status}`);
+            }
+
+        } catch (error) {
+            console.error('GitHub 업로드 오류:', error);
+            this.showNotification(`업로드 실패: ${error.message}`, 'error');
+        }
+    }
+
+    // 🧹 폼 초기화
+    clearForm() {
+        const fields = ['title', 'description', 'tags', 'content'];
+        fields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.value = '';
+                localStorage.removeItem(`editor-${fieldId}`);
+            }
+        });
+
+        // 카테고리와 작성자는 기본값으로 리셋
+        document.getElementById('category').value = 'automotive';
+        document.getElementById('author').value = '오은진';
+        
+        // 날짜는 현재 시간으로 리셋
+        this.initializeDateTime();
+        
+        // 미리보기 업데이트
+        this.updatePreview();
+        
+        this.showNotification('폼이 초기화되었습니다.', 'info');
+    }
+
+    // 🖼️ 이미지 업로드 처리
+    async handleImageUpload(files) {
+        if (!files || files.length === 0) return;
+
+        if (files.length > 4) {
+            this.showNotification('최대 4개의 이미지만 업로드할 수 있습니다.', 'warning');
+            return;
+        }
+
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressBar = uploadProgress.querySelector('.progress-bar');
+        const progressText = document.getElementById('progressText');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+        const imagePathsList = document.getElementById('imagePathsList');
+
+        try {
+            // 진행률 표시
+            uploadProgress.style.display = 'block';
+            progressText.textContent = '이미지를 업로드하고 있습니다...';
+
+            // 슬러그 생성 (파일명용)
+            const title = document.getElementById('title')?.value || 'untitled';
+            const slug = this.generateSlugFromTitle(title);
+
+            // 이미지 업로드 (Local Image Uploader 사용)
+            const imagePaths = [];
+            const previewImages = [];
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                progressText.textContent = `이미지 ${i + 1}/${files.length}을 처리하고 있습니다...`;
+                
+                try {
+                    const imagePath = await window.localImageUploader.uploadLocalImage(
+                        file, 
+                        slug, 
+                        i + 1,
+                        (progress) => {
+                            const totalProgress = ((i * 100) + progress) / files.length;
+                            progressBar.style.width = `${totalProgress}%`;
+                        }
+                    );
+                    
+                    imagePaths.push(imagePath);
+                    
+                    // 미리보기 이미지 생성
+                    const preview = window.localImageUploader.getImagePreview(slug, i + 1);
+                    if (preview) {
+                        previewImages.push({
+                            path: imagePath,
+                            preview: preview,
+                            index: i + 1
+                        });
+                    }
+                } catch (error) {
+                    console.error(`이미지 ${i + 1} 업로드 실패:`, error);
+                    this.showNotification(`이미지 ${i + 1} 업로드 실패: ${error.message}`, 'error');
+                }
+            }
+
+            if (imagePaths.length > 0) {
+                // 미리보기 표시
+                imagePreviewGrid.innerHTML = previewImages.map(img => `
+                    <div class="col-6 col-md-3">
+                        <div class="image-preview-item">
+                            <img src="${img.preview}" class="img-thumbnail" alt="Preview ${img.index}">
+                            <small class="text-muted d-block mt-1">이미지 ${img.index}</small>
+                        </div>
+                    </div>
+                `).join('');
+
+                // 이미지 경로 표시
+                imagePathsList.textContent = imagePaths.join('\n');
+                
+                // 미리보기 컨테이너 표시
+                imagePreviewContainer.style.display = 'block';
+
+                this.showNotification(`${imagePaths.length}개의 이미지가 업로드되었습니다.`, 'success');
+            }
+
+        } catch (error) {
+            console.error('이미지 업로드 오류:', error);
+            this.showNotification('이미지 업로드에 실패했습니다.', 'error');
+        } finally {
+            // 진행률 숨기기
+            uploadProgress.style.display = 'none';
+        }
+    }
+
+    // 📝 제목에서 슬러그 생성
+    generateSlugFromTitle(title) {
+        return title.toLowerCase()
+            .replace(/[^a-z0-9\s-가-힣]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '')
+            .slice(0, 30) || `article-${Date.now()}`;
     }
 }
 
