@@ -1,187 +1,130 @@
 {{ define "main" }}
 <!-- Main Content -->
 <main class="main-content">
-    <div class="container">
-        <!-- Top News Section -->
-        <section class="top-news-section mb-4">
-            <div class="row">
-                <!-- Main Article -->
-                <div class="col-lg-8">
-                    {{ $automotivePages := where .Site.RegularPages ".Section" "automotive" }}
-                    {{ $mainArticle := index $automotivePages 0 }}
-                    {{ if $mainArticle }}
-                    <article class="main-article">
-                        <div class="article-image">
-                            {{ if $mainArticle.Params.images }}
-                            <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid" loading="lazy">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left Column - Side Articles -->
+            <div class="col-lg-3">
+                <div class="left-articles">
+                    {{ $leftArticles := first 3 (where .Site.RegularPages ".Section" "automotive") }}
+                    {{ range $leftArticles }}
+                    <article class="side-news-card">
+                        <div class="side-news-image">
+                            {{ if .Params.images }}
+                            <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
                             {{ else }}
-                            <div class="no-image-main">
+                            <div class="no-image-side">
                                 <i class="fas fa-car"></i>
-                                <span>{{ $mainArticle.Title }}</span>
                             </div>
                             {{ end }}
+                            <span class="news-category-tag">{{ .Section | title }}</span>
                         </div>
-                        <div class="article-content">
-                            <span class="article-category">속보</span>
-                            <h1 class="article-title">
-                                <a href="{{ $mainArticle.Permalink }}">{{ $mainArticle.Title }}</a>
-                            </h1>
+                        <div class="side-news-content">
+                            <h3 class="side-news-title">
+                                <a href="{{ .Permalink }}">{{ .Title }}</a>
+                            </h3>
+                            <p class="side-news-excerpt">{{ .Summary | plainify | truncate 80 }}</p>
                         </div>
                     </article>
                     {{ end }}
                 </div>
-                
-                <!-- Side Articles -->
-                <div class="col-lg-4">
-                    <div class="side-articles">
-                        {{ range first 4 (after 1 $automotivePages) }}
-                        <article class="side-article">
-                            <div class="row">
-                                <div class="col-4">
-                                    <div class="article-thumb">
-                                        {{ if .Params.images }}
-                                        <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" loading="lazy">
-                                        {{ else }}
-                                        <div class="no-image-thumb">
-                                            <i class="fas fa-car"></i>
-                                        </div>
-                                        {{ end }}
-                                    </div>
-                                </div>
-                                <div class="col-8">
-                                    <h3 class="article-title">
-                                        <a href="{{ .Permalink }}">{{ .Title | truncate 50 }}</a>
-                                    </h3>
-                                    <p class="article-excerpt">{{ .Summary | plainify | truncate 80 }}</p>
-                                </div>
-                            </div>
-                        </article>
-                        {{ end }}
-                    </div>
-                </div>
             </div>
-        </section>
 
-        <!-- News Categories Tabs -->
-        <section class="news-categories mb-4">
-            <div class="category-tabs">
-                <ul class="nav nav-tabs" id="categoryTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="latest-tab" data-bs-toggle="tab" data-bs-target="#latest" type="button" role="tab">최신뉴스</button>
-                    </li>
-                    {{ range .Site.Menus.main }}
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="{{ .Name }}-tab" data-bs-toggle="tab" data-bs-target="#{{ .Name }}" type="button" role="tab">{{ .Name }}</button>
-                    </li>
-                    {{ end }}
-                </ul>
-            </div>
-            
-            <div class="tab-content" id="categoryTabsContent">
-                <!-- Latest News -->
-                <div class="tab-pane fade show active" id="latest" role="tabpanel">
-                    <div class="row">
-                        {{ $newsPages := where .Site.RegularPages ".Section" "in" (slice "automotive" "economy") }}
-                        {{ range first 6 $newsPages }}
-                        <div class="col-lg-4 col-md-6 mb-3">
-                            <article class="news-item">
-                                <div class="news-thumb">
-                                    {{ if .Params.images }}
-                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" loading="lazy">
-                                    {{ else }}
-                                    <div class="no-image-news">
-                                        <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
-                                    </div>
-                                    {{ end }}
-                                </div>
-                                <div class="news-content">
-                                    <span class="news-category">{{ .Section | title }}</span>
-                                    <h4 class="news-title">
-                                        <a href="{{ .Permalink }}">{{ .Title }}</a>
-                                    </h4>
-                                    <p class="news-excerpt">{{ .Summary | plainify | truncate 100 }}</p>
-                                    <div class="news-meta">
-                                        <span class="news-date">{{ .Date.Format "01월 02일" }}</span>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        {{ end }}
-                    </div>
-                </div>
-
-                <!-- Category Tabs Content -->
-                {{ range .Site.Menus.main }}
-                {{ $sectionName := strings.Trim .URL "/" }}
-                <div class="tab-pane fade" id="{{ .Name }}" role="tabpanel">
-                    <div class="row">
-                        {{ $articles := where $.Site.RegularPages ".Section" $sectionName }}
-                        {{ if $articles }}
-                        {{ range first 6 $articles }}
-                        <div class="col-lg-4 col-md-6 mb-3">
-                            <article class="news-item">
-                                <div class="news-thumb">
-                                    {{ if .Params.images }}
-                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" loading="lazy">
-                                    {{ else }}
-                                    <div class="no-image-news">
-                                        <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
-                                    </div>
-                                    {{ end }}
-                                </div>
-                                <div class="news-content">
-                                    <span class="news-category">{{ .Section | title }}</span>
-                                    <h4 class="news-title">
-                                        <a href="{{ .Permalink }}">{{ .Title }}</a>
-                                    </h4>
-                                    <p class="news-excerpt">{{ .Summary | plainify | truncate 100 }}</p>
-                                    <div class="news-meta">
-                                        <span class="news-date">{{ .Date.Format "01월 02일" }}</span>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        {{ end }}
-                        {{ else }}
-                        <div class="col-12">
-                            <p class="text-center">{{ .Name }} 카테고리에 기사가 없습니다.</p>
-                        </div>
-                        {{ end }}
-                    </div>
-                </div>
-                {{ end }}
-            </div>
-        </section>
-
-        <!-- Additional News Grid -->
-        <section class="additional-news">
-            <div class="row">
-                {{ $allNewsPages := where .Site.RegularPages ".Section" "in" (slice "automotive" "economy") }}
-                {{ range first 8 (after 6 $allNewsPages) }}
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <article class="small-news-item">
-                        <div class="small-news-thumb">
-                            {{ if .Params.images }}
-                            <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" loading="lazy">
+            <!-- Center Column - Main Article -->
+            <div class="col-lg-6">
+                <div class="main-news-section">
+                    {{ $mainArticle := index (where .Site.RegularPages ".Section" "automotive") 0 }}
+                    {{ if $mainArticle }}
+                    <article class="main-news-article">
+                        <div class="main-news-image">
+                            {{ if $mainArticle.Params.images }}
+                            <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid">
                             {{ else }}
-                            <div class="no-image-small">
+                            <div class="no-image-main-center">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            {{ end }}
+                        </div>
+                        <div class="main-news-content">
+                            <span class="main-category-badge">속보</span>
+                            <h1 class="main-news-title">
+                                <a href="{{ $mainArticle.Permalink }}">{{ $mainArticle.Title }}</a>
+                            </h1>
+                            <div class="main-news-summary">
+                                <ul>
+                                    <li>{{ $mainArticle.Summary | plainify | truncate 100 }}</li>
+                                    <li>BMW는 2025년 한 해 동안 다음과 같은 전기차 모델을 출시할 예정이다</li>
+                                    <li>새로운 전기차들의 국내 출시 가격은 5,000만원대부터 1억원대까지 구성</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </article>
+                    {{ end }}
+                </div>
+            </div>
+
+            <!-- Right Column - Right Articles -->
+            <div class="col-lg-3">
+                <div class="right-articles">
+                    {{ $rightArticles := first 6 (after 3 (where .Site.RegularPages ".Section" "in" (slice "automotive" "economy"))) }}
+                    {{ range $rightArticles }}
+                    <article class="right-news-item">
+                        <div class="right-news-content">
+                            <span class="right-category-badge">{{ .Section | title }}</span>
+                            <h4 class="right-news-title">
+                                <a href="{{ .Permalink }}">{{ .Title | truncate 60 }}</a>
+                            </h4>
+                        </div>
+                        <div class="right-news-image">
+                            {{ if .Params.images }}
+                            <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                            {{ else }}
+                            <div class="no-image-right">
                                 <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
                             </div>
                             {{ end }}
                         </div>
-                        <div class="small-news-content">
-                            <h5 class="small-news-title">
-                                <a href="{{ .Permalink }}">{{ .Title | truncate 60 }}</a>
-                            </h5>
-                            <div class="small-news-meta">
-                                <span class="small-news-date">{{ .Date.Format "01월 02일" }}</span>
-                            </div>
-                        </div>
                     </article>
+                    {{ end }}
                 </div>
-                {{ end }}
             </div>
-        </section>
+        </div>
+
+        <!-- Bottom Section - Additional News -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="bottom-news-section">
+                    <h2 class="section-title">최신 뉴스</h2>
+                    <div class="row">
+                        {{ $bottomArticles := first 8 (after 6 (where .Site.RegularPages ".Section" "in" (slice "automotive" "economy"))) }}
+                        {{ range $bottomArticles }}
+                        <div class="col-lg-3 col-md-6 mb-4">
+                            <article class="bottom-news-card">
+                                <div class="bottom-news-image">
+                                    {{ if .Params.images }}
+                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                    {{ else }}
+                                    <div class="no-image-bottom">
+                                        <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
+                                    </div>
+                                    {{ end }}
+                                </div>
+                                <div class="bottom-news-content">
+                                    <span class="bottom-category">{{ .Section | title }}</span>
+                                    <h5 class="bottom-news-title">
+                                        <a href="{{ .Permalink }}">{{ .Title | truncate 50 }}</a>
+                                    </h5>
+                                    <div class="bottom-news-meta">
+                                        <span class="bottom-news-date">{{ .Date.Format "01월 02일" }}</span>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </main>
 {{ end }}
