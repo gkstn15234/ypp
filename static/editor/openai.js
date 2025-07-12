@@ -125,11 +125,11 @@ class OpenAIWriter {
   "dateModified": "${new Date().toISOString()}",
   "author": {
     "@type": "Person",
-    "name": "오토데일리 ${categoryName} 에디터"
+                    "name": "오토데일프릭스 ${categoryName} 에디터"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "오토데일리",
+                    "name": "오토데일프릭스",
     "logo": {
       "@type": "ImageObject",
       "url": "https://autodaiiy.com/logo.png"
@@ -172,7 +172,7 @@ class OpenAIWriter {
             '<img src="/images/IMG_PLACEHOLDER_4.jpg" alt="ALT_PLACEHOLDER_4"/>'
         ];
 
-        return `다음 기사를 오토데일리 스타일로 재작성해 주세요. 반드시 아래 HTML 구조를 따릅니다.
+        return `다음 기사를 오토데일프릭스 스타일로 재작성해 주세요. 반드시 아래 HTML 구조를 따릅니다.
 
 1) <h1>제목</h1>
 2) <div class="vertical-bar-text">소제목1<br>소제목2</div>

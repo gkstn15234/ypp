@@ -1,5 +1,5 @@
 /**
- * 🚀 오토데일리 AI 에디터 Pro - 고급 기능 스크립트
+ * 🚀 오토데일프릭스 AI 에디터 Pro - 고급 기능 스크립트
  */
 
 class AutoDailyEditor {
@@ -1291,7 +1291,7 @@ function insertText(before, after = '') {
 
 // 🏁 초기화 완료 후 실행
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 오토데일리 AI 에디터 Pro 로드 완료!');
+    console.log('🚀 오토데일프릭스 AI 에디터 Pro 로드 완료!');
     
     // 초기 미리보기 업데이트
     setTimeout(() => {

@@ -1,12 +1,12 @@
 baseURL: 'https://autodaiiy.com'
 languageCode: 'ko-kr'
-title: '오토데일리 - 자동차 경제의 새로운 기준'
+title: '오토데일프릭스 - 자동차 경제의 새로운 기준'
 defaultContentLanguage: 'ko'
 hasCJKLanguage: true
 timeZone: 'Asia/Seoul'
 
 params:
-  description: '오토데일리는 자동차 산업과 경제 정보를 전문적으로 다루는 자동차 경제 미디어입니다.'
+  description: '오토데일프릭스는 자동차 산업과 경제 정보를 전문적으로 다루는 자동차 경제 미디어입니다.'
   keywords: '자동차, 경제, 모빌리티, 자동차산업, 카비즈니스, 오토, 자동차뉴스'
   author: '휴먼빅데이터'
   company: '휴먼빅데이터'

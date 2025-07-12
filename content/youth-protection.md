@@ -1,6 +1,6 @@
 ---
 title: "청소년보호정책"
-description: "오토데일리의 청소년보호정책을 확인하세요."
+description: "오토데일프릭스의 청소년보호정책을 확인하세요."
 date: 2025-01-01T00:00:00+09:00
 draft: false
 hideDate: true
