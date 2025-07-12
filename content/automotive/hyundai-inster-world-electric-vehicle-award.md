@@ -6,8 +6,8 @@ draft: false
 categories: ["자동차"]
 tags: ["현대자동차", "INSTER", "세계전기차상", "소형전기차", "자동차시상"]
 images: [
-  "https://images.unsplash.com/photo-1620891549027-942fdc95d7f5?w=1600&h=900&fit=crop&q=95",
-  "https://images.unsplash.com/photo-1621361365424-06f0c2b3c494?w=1600&h=900&fit=crop&q=95"
+  "https://images.unsplash.com/photo-1563720223185-11003d516935?w=1600&h=900&fit=crop&q=95",
+  "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1600&h=900&fit=crop&q=95"
 ]
 author: "오은진"
 ---
@@ -19,7 +19,7 @@ author: "오은진"
 소형 전기차 시장에서 글로벌 인정 획득
 </div>
 
-<img src="https://images.unsplash.com/photo-1620891549027-942fdc95d7f5?w=1600&h=900&fit=crop&q=95" alt="현대 INSTER 2025 세계 전기차 대상 수상"/>
+<img src="https://images.unsplash.com/photo-1563720223185-11003d516935?w=1600&h=900&fit=crop&q=95" alt="현대 INSTER 2025 세계 전기차 대상 수상"/>
 
 현대자동차의 **INSTER**(국내명 캐스퍼 일렉트릭)가 2025 세계 자동차 대상(World Car Awards)에서 전기차 부문 최고상을 수상했다. 이는 현대자동차가 4년 연속으로 세계 자동차 대상을 수상하는 역사적인 쾌거다. 30개국 96명의 자동차 전문 기자들이 참여한 이번 심사에서 INSTER는 혁신적인 디자인과 뛰어난 가치를 인정받았다. 과연 작은 차체에 어떤 혁신 기술이 숨어있을까?
 
@@ -27,7 +27,7 @@ author: "오은진"
 
 <h2>소형차의 한계를 뛰어넘는 기술력</h2>
 
-<img src="https://images.unsplash.com/photo-1621361365424-06f0c2b3c494?w=1600&h=900&fit=crop&q=95" alt="현대 INSTER 혁신적인 디자인"/>
+<img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=1600&h=900&fit=crop&q=95" alt="현대 INSTER 혁신적인 디자인"/>
 
 INSTER의 **독특한 디자인**은 단순한 스타일링이 아니다. 컴팩트한 차체에 최적화된 공기역학적 설계를 통해 효율성을 극대화했다. 특히 도시 주행에 최적화된 회전 반경과 주차 편의성을 제공하면서도 안정적인 고속 주행이 가능하다. 첨단 인포테인먼트 시스템과 직관적인 조작계는 사용자 경험을 크게 향상시켰다. 과연 이 정도 기술이 소형차에 꼭 필요할까?
 

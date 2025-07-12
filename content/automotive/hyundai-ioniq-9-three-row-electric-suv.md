@@ -6,8 +6,8 @@ draft: false
 categories: ["자동차"]
 tags: ["현대자동차", "IONIQ9", "3열전기SUV", "전기차", "가족형SUV"]
 images: [
-  "https://images.unsplash.com/photo-1617886322872-c0d5a8e7f86c?w=1600&h=900&fit=crop&q=95",
-  "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1600&h=900&fit=crop&q=95"
+  "https://images.unsplash.com/photo-1549399048-d52b0b041e2b?w=1600&h=900&fit=crop&q=95",
+  "https://images.unsplash.com/photo-1486496572940-2bb2341fdbdf?w=1600&h=900&fit=crop&q=95"
 ]
 author: "오은진"
 ---
@@ -19,7 +19,7 @@ author: "오은진"
 620km 주행거리로 장거리 여행 걱정 해소
 </div>
 
-<img src="https://images.unsplash.com/photo-1617886322872-c0d5a8e7f86c?w=1600&h=900&fit=crop&q=95" alt="현대 IONIQ 9 3열 전기 SUV 외관"/>
+<img src="https://images.unsplash.com/photo-1549399048-d52b0b041e2b?w=1600&h=900&fit=crop&q=95" alt="현대 IONIQ 9 3열 전기 SUV 외관"/>
 
 현대자동차가 로스앤젤레스 골드스타인 하우스에서 공개한 **IONIQ 9**이 3열 전기 SUV 시장에 혁신을 가져왔다. 이 차량은 최대 620km의 주행거리와 7인승 공간을 제공하며, 가족형 전기차의 새로운 기준을 제시했다. 현대자동차는 2030년까지 23개 전기차 모델을 출시한다는 목표 아래 IONIQ 9을 통해 전기차 시장의 새로운 영역을 개척하고 있다. 과연 이 차량이 가족형 전기차 시장의 판도를 바꿀 수 있을까?
 
@@ -27,7 +27,7 @@ author: "오은진"
 
 <h2>혁신적인 실내 공간 설계의 비밀</h2>
 
-<img src="https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1600&h=900&fit=crop&q=95" alt="현대 IONIQ 9 내부 공간 디자인"/>
+<img src="https://images.unsplash.com/photo-1486496572940-2bb2341fdbdf?w=1600&h=900&fit=crop&q=95" alt="현대 IONIQ 9 내부 공간 디자인"/>
 
 IONIQ 9의 가장 큰 특징은 **혁신적인 실내 공간 설계**다. 플랫 플로어 구조를 통해 6인승 또는 7인승 시트 배치가 가능하며, 1,899mm의 헤드룸과 2,050mm의 레그룸을 제공한다. 1·2열 시트에는 릴렉세이션 시트가 적용되어 완전히 눕힐 수 있으며, 최대 4명이 동시에 휴식을 취할 수 있다. 이는 기존 SUV의 공간 활용도를 완전히 뛰어넘는 혁신적인 설계다. 과연 이 정도 공간이 실제로 필요할까?
 
