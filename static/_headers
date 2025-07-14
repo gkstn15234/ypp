@@ -41,6 +41,25 @@
 /robots.txt
   Cache-Control: public, max-age=3600
 
+# HTML 파일: 매번 재검증하여 항상 최신 상태 유지
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# 내용이 절대 변하지 않는 파일들 (Immutable Assets)
+# CSS, JS 등 빌드 시 파일명에 해시값이 포함되는 파일들을 의미합니다.
+# 1년(31536000초) 동안 절대 서버에 물어보지 말고 저장된 버전을 사용하라고 명령합니다.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+/build/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# 기타 정적 파일 (예: 폰트, 이미지)
+# 1주일 동안 캐시하도록 설정
+/fonts/*
+  Cache-Control: public, max-age=604800
+/images/*
+  Cache-Control: public, max-age=604800
+
 # HTML pages - shorter cache for real-time updates
 /
   Cache-Control: public, max-age=300, must-revalidate
