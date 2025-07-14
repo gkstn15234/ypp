@@ -26,9 +26,7 @@
                             <i class="fas fa-cog me-1"></i>설정
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#mediaManagerModal">
-                                <i class="fas fa-images me-2"></i>미디어 관리
-                            </a></li>
+
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#draftManagerModal">
                                 <i class="fas fa-file-alt me-2"></i>임시 저장 관리
                             </a></li>
@@ -266,71 +264,7 @@
         </div>
     </div>
 
-    <!-- 미디어 관리 모달 -->
-    <div class="modal fade" id="mediaManagerModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">미디어 관리</h5>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="refreshMediaBtn">
-                            <i class="fas fa-sync-alt me-1"></i>새로고침
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm" id="uploadNewMediaBtn">
-                            <i class="fas fa-upload me-1"></i>새 이미지 업로드
-                        </button>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" id="mediaSearchInput" placeholder="이미지 검색...">
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="mediaSortSelect">
-                                <option value="date-desc">최신순</option>
-                                <option value="date-asc">오래된순</option>
-                                <option value="name-asc">이름순</option>
-                                <option value="size-desc">크기순</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-outline-secondary btn-sm" id="gridViewBtn" title="그리드 보기">
-                                    <i class="fas fa-th"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm" id="listViewBtn" title="리스트 보기">
-                                    <i class="fas fa-list"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="mediaLoadingIndicator" class="text-center py-4" style="display: none;">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <div class="mt-2">이미지를 불러오는 중...</div>
-                    </div>
-                    
-                    <div id="mediaGrid" class="media-grid">
-                        <!-- 미디어 아이템들이 여기에 동적으로 추가됩니다 -->
-                    </div>
-                    
-                    <div id="mediaEmptyState" class="text-center py-5" style="display: none;">
-                        <i class="fas fa-images fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">업로드된 이미지가 없습니다</h5>
-                        <p class="text-muted">첫 번째 이미지를 업로드해보세요!</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <div class="me-auto">
-                        <small class="text-muted" id="mediaCount">총 0개 이미지</small>
-                    </div>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- 미디어 관리 모달 제거됨 - 간단한 업로드 버튼으로 대체 -->
 
     <!-- 미리보기 모달 -->
     <div class="modal fade" id="previewModal" tabindex="-1">

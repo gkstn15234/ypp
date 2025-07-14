@@ -81,18 +81,7 @@ class SimpleEditor {
         document.getElementById('saveCloudflareSettings').addEventListener('click', () => this.saveCloudflareSettings());
         document.getElementById('publishFromPreview').addEventListener('click', () => this.publishArticle());
         
-        // 미디어 관리 이벤트
-        document.getElementById('refreshMediaBtn').addEventListener('click', () => this.loadMediaLibrary());
-        document.getElementById('uploadNewMediaBtn').addEventListener('click', () => this.showImageUpload());
-        document.getElementById('mediaSearchInput').addEventListener('input', (e) => this.filterMedia(e.target.value));
-        document.getElementById('mediaSortSelect').addEventListener('change', (e) => this.sortMedia(e.target.value));
-        document.getElementById('gridViewBtn').addEventListener('click', () => this.setMediaView('grid'));
-        document.getElementById('listViewBtn').addEventListener('click', () => this.setMediaView('list'));
-        
-        // 미디어 관리 모달 이벤트
-        document.getElementById('mediaManagerModal').addEventListener('shown.bs.modal', () => {
-            this.loadMediaLibrary();
-        });
+        // 미디어 관리 기능 제거됨 - 간단한 업로드만 유지
 
         // 임시 저장 관리 이벤트
         document.getElementById('refreshDraftsBtn').addEventListener('click', () => this.loadDraftList());
@@ -295,7 +284,7 @@ class SimpleEditor {
         }
     }
 
-    // 업로드된 이미지 추가
+    // 업로드된 이미지 추가 및 자동 삽입
     addUploadedImage(imageUrl, fileName) {
         this.uploadedImages.push({ url: imageUrl, name: fileName });
         
@@ -306,12 +295,18 @@ class SimpleEditor {
             <img src="${imageUrl}" alt="${fileName}" title="${fileName}">
             <div class="image-info">
                 <small class="text-muted">${fileName}</small>
+                <div class="image-url">
+                    <input type="text" class="form-control form-control-sm" value="${imageUrl}" readonly>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="editor.copyImageUrl('${imageUrl}')" title="URL 복사">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
             </div>
             <div class="image-actions">
-                <button class="btn btn-sm btn-outline-primary" onclick="editor.insertImageToEditor('${imageUrl}', '${fileName}')" title="에디터에 삽입">
+                <button class="btn btn-sm btn-outline-primary" onclick="editor.insertImageToEditor('${imageUrl}', '${fileName}')" title="다시 삽입">
                     <i class="fas fa-plus"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="editor.removeImage('${imageUrl}')" title="삭제">
+                <button class="btn btn-sm btn-outline-danger" onclick="editor.removeImage('${imageUrl}')" title="목록에서 제거">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -321,6 +316,20 @@ class SimpleEditor {
         
         // 에디터에 자동으로 이미지 삽입
         this.insertImageToEditor(imageUrl, fileName);
+        
+        // 성공 메시지에 URL 정보 포함
+        this.showToast(`이미지가 업로드되어 에디터에 삽입되었습니다!`, 'success');
+    }
+
+    // 이미지 URL 복사 기능
+    async copyImageUrl(imageUrl) {
+        try {
+            await navigator.clipboard.writeText(imageUrl);
+            this.showToast('이미지 URL이 클립보드에 복사되었습니다!', 'success');
+        } catch (error) {
+            console.error('URL 복사 실패:', error);
+            this.showToast('URL 복사에 실패했습니다.', 'error');
+        }
     }
 
     // 에디터에 이미지 삽입
@@ -1004,77 +1013,11 @@ class SimpleEditor {
         }
     }
 
-    // 미디어 라이브러리 로드
-    async loadMediaLibrary() {
-        const { cloudflareAccountId, cloudflareApiToken } = this.settings;
-        
-        if (!cloudflareAccountId || !cloudflareApiToken) {
-            this.showToast('Cloudflare 설정을 먼저 완료해주세요.', 'warning');
-            return;
-        }
+    // 미디어 관리 기능 제거됨 - 간단한 업로드만 유지
 
-        const loadingIndicator = document.getElementById('mediaLoadingIndicator');
-        const mediaGrid = document.getElementById('mediaGrid');
-        const emptyState = document.getElementById('mediaEmptyState');
-        
-        loadingIndicator.style.display = 'block';
-        mediaGrid.style.display = 'none';
-        emptyState.style.display = 'none';
-
-        try {
-            console.log('Cloudflare API 호출 시작:', `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1`);
-            
-            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${cloudflareApiToken}`
-                }
-            });
-
-            console.log('API 응답 상태:', response.status, response.statusText);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('API 오류 응답:', errorText);
-                throw new Error(`미디어 로드 실패: ${response.status} - ${errorText}`);
-            }
-
-            const result = await response.json();
-            console.log('API 응답 데이터:', result);
-            
-            if (!result.success) {
-                console.error('API 실패 응답:', result.errors);
-                throw new Error(`미디어 로드 실패: ${result.errors?.[0]?.message || '알 수 없는 오류'}`);
-            }
-
-            // v1 API는 result.images 형태로 반환
-            this.mediaLibrary = result.result.images || result.result || [];
-            this.filteredMedia = [...this.mediaLibrary];
-            this.renderMediaLibrary();
-            
-            document.getElementById('mediaCount').textContent = `총 ${this.mediaLibrary.length}개 이미지`;
-
-        } catch (error) {
-            console.error('미디어 로드 오류:', error);
-            
-            // 더 자세한 에러 메시지 표시
-            let errorMessage = '미디어 라이브러리를 불러올 수 없습니다.';
-            if (error.message.includes('CORS')) {
-                errorMessage = 'CORS 오류: 브라우저 보안 정책으로 인한 제한입니다.';
-            } else if (error.message.includes('401')) {
-                errorMessage = 'API 토큰이 유효하지 않습니다.';
-            } else if (error.message.includes('403')) {
-                errorMessage = 'API 토큰에 Images 권한이 없습니다.';
-            } else if (error.message.includes('404')) {
-                errorMessage = 'Account ID가 올바르지 않습니다.';
-            }
-            
-            this.showToast(errorMessage, 'error');
-            emptyState.style.display = 'block';
-        } finally {
-            loadingIndicator.style.display = 'none';
-        }
-    }
+    // 업로드 전용 모드 표시 (미사용 - 미디어 관리 모달 제거됨)
+    // 기존의 복잡한 미디어 관리 기능들이 모두 제거되었습니다.
+    // 이제 "이미지 추가" 버튼을 통한 직접 업로드만 지원합니다.
 
     // 미디어 라이브러리 렌더링
     renderMediaLibrary() {
