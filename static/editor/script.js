@@ -4,7 +4,6 @@
 
 class AutoDailyEditor {
     constructor() {
-        this.currentTheme = 'dark';
         this.articles = [];
         this.filteredArticles = [];
         this.currentFilter = 'all';
@@ -18,7 +17,6 @@ class AutoDailyEditor {
     // 🎯 초기화
     init() {
         this.setupEventListeners();
-        this.initializeTheme();
         this.initializeDateTime();
         this.setupPreviewUpdate();
         this.loadStoredData();
@@ -28,11 +26,6 @@ class AutoDailyEditor {
 
     // 🎨 이벤트 리스너 설정
     setupEventListeners() {
-        // 테마 토글
-        document.getElementById('themeToggle')?.addEventListener('click', () => {
-            this.toggleTheme();
-        });
-
         // AI 글작성 버튼
         document.getElementById('aiWriteBtn')?.addEventListener('click', () => {
             this.showAIWriteModal();
@@ -99,43 +92,7 @@ class AutoDailyEditor {
         this.setupFormValidation();
     }
 
-    // 🌙 테마 관리
-    initializeTheme() {
-        const savedTheme = localStorage.getItem('editor-theme') || 'dark';
-        this.setTheme(savedTheme);
-    }
 
-    toggleTheme() {
-        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
-        this.setTheme(newTheme);
-        
-        // 애니메이션 효과
-        document.body.style.transition = 'all 0.5s ease';
-        setTimeout(() => {
-            document.body.style.transition = '';
-        }, 500);
-    }
-
-    setTheme(theme) {
-        this.currentTheme = theme;
-        const body = document.body;
-        const html = document.documentElement;
-        const themeIcon = document.getElementById('themeIcon');
-
-        if (theme === 'light') {
-            body.classList.remove('dark-theme');
-            body.classList.add('light-theme');
-            html.setAttribute('data-theme', 'light');
-            themeIcon.className = 'fas fa-sun';
-        } else {
-            body.classList.remove('light-theme');
-            body.classList.add('dark-theme');
-            html.setAttribute('data-theme', 'dark');
-            themeIcon.className = 'fas fa-moon';
-        }
-
-        localStorage.setItem('editor-theme', theme);
-    }
 
     // ⏰ 날짜/시간 초기화
     initializeDateTime() {

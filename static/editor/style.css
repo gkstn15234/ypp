@@ -1,67 +1,26 @@
-/* 🎨 오토데일프릭스 AI 에디터 Pro - 다크 테마 */
+/* 🎨 오토데일프릭스 AI 에디터 Pro - 라이트 테마 */
 
 /* CSS 변수 정의 */
 :root {
-    /* 다크 테마 색상 */
-    --bg-primary: #0d1117;
-    --bg-secondary: #161b22;
-    --bg-tertiary: #21262d;
-    --bg-glass: rgba(255, 255, 255, 0.05);
-    --bg-glass-hover: rgba(255, 255, 255, 0.1);
+    /* 라이트 테마 색상만 사용 */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f6f8fa;
+    --bg-tertiary: #ffffff;
+    --bg-glass: rgba(0, 0, 0, 0.05);
+    --bg-glass-hover: rgba(0, 0, 0, 0.1);
     
-    --text-primary: #f0f6fc;
-    --text-secondary: #8b949e;
-    --text-muted: #6e7681;
+    --text-primary: #24292f;
+    --text-secondary: #656d76;
+    --text-muted: #8c959f;
     
-    --border-primary: #30363d;
-    --border-secondary: #21262d;
+    --border-primary: #d0d7de;
+    --border-secondary: #d8dee4;
     
-    --accent-primary: #58a6ff;
-    --accent-secondary: #f85149;
-    --accent-success: #3fb950;
-    --accent-warning: #d29922;
-    --accent-info: #79c0ff;
-    
-    /* 라이트 테마 색상 */
-    --light-bg-primary: #ffffff;
-    --light-bg-secondary: #f6f8fa;
-    --light-bg-tertiary: #ffffff;
-    --light-bg-glass: rgba(0, 0, 0, 0.05);
-    --light-bg-glass-hover: rgba(0, 0, 0, 0.1);
-    
-    --light-text-primary: #24292f;
-    --light-text-secondary: #656d76;
-    --light-text-muted: #8c959f;
-    
-    --light-border-primary: #d0d7de;
-    --light-border-secondary: #d8dee4;
-}
-
-/* 다크 테마 기본 스타일 */
-.dark-theme {
-    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-    color: var(--text-primary);
-    min-height: 100vh;
-}
-
-/* 라이트 테마 */
-.light-theme {
-    background: linear-gradient(135deg, var(--light-bg-primary) 0%, var(--light-bg-secondary) 100%);
-    color: var(--light-text-primary);
-    min-height: 100vh;
-}
-
-.light-theme {
-    --bg-primary: var(--light-bg-primary);
-    --bg-secondary: var(--light-bg-secondary);
-    --bg-tertiary: var(--light-bg-tertiary);
-    --bg-glass: var(--light-bg-glass);
-    --bg-glass-hover: var(--light-bg-glass-hover);
-    --text-primary: var(--light-text-primary);
-    --text-secondary: var(--light-text-secondary);
-    --text-muted: var(--light-text-muted);
-    --border-primary: var(--light-border-primary);
-    --border-secondary: var(--light-border-secondary);
+    --accent-primary: #0969da;
+    --accent-secondary: #d1242f;
+    --accent-success: #1a7f37;
+    --accent-warning: #bf8700;
+    --accent-info: #0969da;
 }
 
 /* 전역 스타일 */
@@ -73,6 +32,9 @@ body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
     transition: all 0.3s ease;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
 }
 
 /* 🌟 Glass Morphism 카드 */
@@ -326,47 +288,7 @@ body {
     border-radius: 0 8px 8px 0;
 }
 
-/* 🌙 테마 토글 */
-#themeToggle {
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
 
-#themeToggle::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: radial-gradient(circle, var(--accent-warning) 0%, transparent 70%);
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    transform: translate(-50%, -50%);
-}
-
-#themeToggle:hover::before {
-    width: 100%;
-    height: 100%;
-}
-
-#themeToggle i {
-    position: relative;
-    z-index: 1;
-    transition: transform 0.3s ease;
-}
-
-#themeToggle:hover i {
-    transform: rotate(15deg);
-}
 
 /* 🖼️ 이미지 미리보기 */
 .image-preview-item {
@@ -431,6 +353,7 @@ body {
 
 .glass-modal .modal-body {
     padding: 2rem;
+    color: var(--text-primary) !important;
 }
 
 .glass-modal .modal-footer {
@@ -639,9 +562,56 @@ body {
     padding-right: 40px !important;
 }
 
-.light-theme .modal .form-select {
+.modal .form-select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2324292f' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
 }
+
+/* 🎯 모달 내 모든 텍스트 요소 색상 보장 */
+.modal,
+.modal *,
+.modal p,
+.modal span,
+.modal div,
+.modal label,
+.modal small,
+.modal h1, .modal h2, .modal h3, .modal h4, .modal h5, .modal h6 {
+    color: #000000 !important;
+}
+
+.modal .text-muted {
+    color: #666666 !important;
+}
+
+.modal .text-white {
+    color: #000000 !important;
+}
+
+.modal .text-dark {
+    color: #000000 !important;
+}
+
+
+
+/* 🎯 업로드 영역 및 카드 텍스트 색상 보장 */
+.glass-card,
+.glass-card *,
+.glass-card p,
+.glass-card span,
+.glass-card div,
+.glass-card h1, .glass-card h2, .glass-card h3, .glass-card h4, .glass-card h5, .glass-card h6 {
+    color: var(--text-primary) !important;
+}
+
+.glass-card .text-white,
+.glass-card .text-light {
+    color: var(--text-primary) !important;
+}
+
+.glass-card .text-muted {
+    color: var(--text-muted) !important;
+}
+
+
 
 /* 📰 기사 관리 그리드 */
 .article-card {
