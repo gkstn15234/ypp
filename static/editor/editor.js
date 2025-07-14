@@ -1563,11 +1563,27 @@ ${content}
             
         } catch (error) {
             console.error('글 파일 파싱 오류:', error);
-            this.showToast('글 파일 분석 실패: ' + error.message, 'error');
+            console.error('에러 스택:', error.stack);
+            
+            // 더 자세한 에러 정보 표시
+            let errorMessage = error.message;
+            if (error.name === 'SyntaxError') {
+                errorMessage = 'XML/JSON 파일 형식이 올바르지 않습니다.';
+            } else if (error.message.includes('DOMParser')) {
+                errorMessage = 'XML 파일을 읽을 수 없습니다. 파일이 손상되었거나 형식이 올바르지 않습니다.';
+            }
+            
+            this.showToast('글 파일 분석 실패: ' + errorMessage, 'error');
             this.wpPostsData = null;
             document.getElementById('wpFilePreview').style.display = 'none';
             this.updateImportButtonState();
             progressDiv.style.display = 'none';
+            
+            // 상태 메시지 업데이트
+            statusDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                파일 분석 실패: ${errorMessage}
+            `;
         }
     }
 
@@ -1624,21 +1640,54 @@ ${content}
     readFileAsText(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
+            reader.onload = (e) => {
+                try {
+                    let result = e.target.result;
+                    
+                    // BOM 제거
+                    if (result.charCodeAt(0) === 0xFEFF) {
+                        result = result.slice(1);
+                    }
+                    
+                    resolve(result);
+                } catch (error) {
+                    reject(new Error('파일 내용 처리 실패: ' + error.message));
+                }
+            };
             reader.onerror = () => reject(new Error('파일 읽기 실패'));
-            reader.readAsText(file, 'utf-8');
+            
+            // 다양한 인코딩 시도
+            try {
+                reader.readAsText(file, 'utf-8');
+            } catch (error) {
+                console.warn('UTF-8 읽기 실패, 기본 인코딩으로 시도:', error);
+                reader.readAsText(file);
+            }
         });
     }
 
     parseWordPressXML(xmlText) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(xmlText, 'text/xml');
-        
-        // XML 파싱 에러 확인
-        const parserError = doc.querySelector('parsererror');
-        if (parserError) {
-            throw new Error('XML 파싱 오류: ' + parserError.textContent);
-        }
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(xmlText, 'text/xml');
+            
+            // XML 파싱 에러 확인
+            const parserError = doc.querySelector('parsererror');
+            if (parserError) {
+                throw new Error('XML 파싱 오류: ' + parserError.textContent);
+            }
+            
+            // 루트 요소 확인
+            const rootElement = doc.documentElement;
+            if (!rootElement || rootElement.tagName === 'parsererror') {
+                throw new Error('올바른 XML 형식이 아닙니다.');
+            }
+            
+            // WordPress XML인지 확인
+            const channel = doc.querySelector('channel');
+            if (!channel) {
+                throw new Error('WordPress 내보내기 XML 파일이 아닙니다.');
+            }
         
         const items = doc.querySelectorAll('item');
         const posts = [];
@@ -1710,6 +1759,11 @@ ${content}
 
         console.log(`${posts.length}개의 발행된 글을 발견했습니다.`);
         return posts;
+        
+        } catch (error) {
+            console.error('XML 파싱 중 오류:', error);
+            throw new Error(`XML 파싱 실패: ${error.message}`);
+        }
     }
 
     // 본문에서 이미지 URL 추출
