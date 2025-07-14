@@ -317,30 +317,28 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Account ID</label>
-                        <input type="text" class="form-control" id="cloudflareAccountId" placeholder="Account ID를 입력하세요">
-                        <div class="form-text">
-                            <a href="https://dash.cloudflare.com/" target="_blank">
-                                Cloudflare 대시보드에서 확인하기
-                            </a>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">API Token</label>
-                        <input type="password" class="form-control" id="cloudflareApiToken" placeholder="API Token을 입력하세요">
-                        <div class="form-text">
-                            Cloudflare Images에 대한 Edit 권한이 필요합니다
-                        </div>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Cloudflare Images 설정 완료</strong>
+                        <p class="mb-0 mt-2">이미지 업로드가 서버에서 안전하게 처리되도록 구성되었습니다. 별도의 설정이 필요하지 않습니다.</p>
                     </div>
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
-                        이미지는 Cloudflare Images에 업로드되어 CDN을 통해 빠르게 제공됩니다.
+                        <strong>기능:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>자동 이미지 최적화 및 CDN 배포</li>
+                            <li>다양한 디바이스 크기 지원</li>
+                            <li>빠른 전세계 이미지 제공</li>
+                            <li>CORS 오류 없는 안전한 업로드</li>
+                        </ul>
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fas fa-lock me-1"></i>
+                        API 키와 계정 정보는 서버 환경에서 안전하게 관리됩니다.
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary" id="saveCloudflareSettings">저장</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
                 </div>
             </div>
         </div>

@@ -80,4 +80,11 @@
   Cache-Control: public, max-age=1800, must-revalidate
 
 /authors/*
-  Cache-Control: public, max-age=3600, must-revalidate 
+  Cache-Control: public, max-age=3600, must-revalidate
+
+# API endpoints - CORS and no caching
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  Cache-Control: no-cache, no-store, must-revalidate

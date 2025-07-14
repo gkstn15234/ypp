@@ -10,9 +10,8 @@ class SimpleEditor {
         this.mediaView = 'grid';
         this.settings = {
             openaiApiKey: localStorage.getItem('openai-api-key') || '',
-            githubToken: localStorage.getItem('github-token') || '',
-            cloudflareAccountId: localStorage.getItem('cf-account-id') || '',
-            cloudflareApiToken: localStorage.getItem('cf-api-token') || ''
+            githubToken: localStorage.getItem('github-token') || ''
+            // Cloudflare 설정은 이제 서버에서 처리됩니다
         };
         
         this.init();
@@ -78,7 +77,7 @@ class SimpleEditor {
         // 모달 이벤트
         document.getElementById('saveAISettings').addEventListener('click', () => this.saveAISettings());
         document.getElementById('saveGithubSettings').addEventListener('click', () => this.saveGithubSettings());
-        document.getElementById('saveCloudflareSettings').addEventListener('click', () => this.saveCloudflareSettings());
+        // Cloudflare settings removed - now handled server-side
         document.getElementById('publishFromPreview').addEventListener('click', () => this.publishArticle());
         
         // 미디어 관리 기능 제거됨 - 간단한 업로드만 유지
@@ -240,45 +239,34 @@ class SimpleEditor {
         }
     }
 
-    // Cloudflare Images 업로드
+    // Cloudflare Images 업로드 (서버리스 함수 사용)
     async uploadToCloudflare(file) {
-        const { cloudflareAccountId, cloudflareApiToken } = this.settings;
-        
-        if (!cloudflareAccountId || !cloudflareApiToken) {
-            this.showToast('Cloudflare 설정을 먼저 완료해주세요.', 'warning');
-            throw new Error('Cloudflare 설정이 필요합니다');
-        }
-
         const formData = new FormData();
         formData.append('file', file);
 
         try {
-            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1`, {
+            const response = await fetch('/api/upload-image', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${cloudflareApiToken}`
-                },
                 body: formData
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Cloudflare 오류:', errorData);
-                throw new Error(`Cloudflare 업로드 실패: ${errorData.errors?.[0]?.message || response.status}`);
+                console.error('업로드 오류:', errorData);
+                throw new Error(`업로드 실패: ${errorData.error || response.status}`);
             }
 
             const result = await response.json();
             if (!result.success) {
-                throw new Error(`업로드 실패: ${result.errors?.[0]?.message || '알 수 없는 오류'}`);
+                throw new Error(`업로드 실패: ${result.error || '알 수 없는 오류'}`);
             }
 
             // 업로드 성공 시 최적화된 이미지 URL 반환
-            const imageUrl = result.result.variants?.[0] || result.result.url;
             this.showToast('이미지가 성공적으로 업로드되었습니다.', 'success');
-            return imageUrl;
+            return result.url;
             
         } catch (error) {
-            console.error('Cloudflare 업로드 오류:', error);
+            console.error('이미지 업로드 오류:', error);
             this.showToast(`이미지 업로드 실패: ${error.message}`, 'error');
             throw error;
         }
@@ -971,26 +959,7 @@ class SimpleEditor {
         this.showToast('GitHub 설정이 저장되었습니다.', 'success');
     }
 
-    // Cloudflare 설정 저장
-    saveCloudflareSettings() {
-        const accountId = document.getElementById('cloudflareAccountId').value.trim();
-        const apiToken = document.getElementById('cloudflareApiToken').value.trim();
-        
-        if (!accountId || !apiToken) {
-            this.showToast('Account ID와 API Token을 모두 입력해주세요.', 'error');
-            return;
-        }
-
-        this.settings.cloudflareAccountId = accountId;
-        this.settings.cloudflareApiToken = apiToken;
-        localStorage.setItem('cf-account-id', accountId);
-        localStorage.setItem('cf-api-token', apiToken);
-        
-        const modal = bootstrap.Modal.getInstance(document.getElementById('cloudflareSettingsModal'));
-        modal.hide();
-        
-        this.showToast('Cloudflare 설정이 저장되었습니다.', 'success');
-    }
+    // Cloudflare 설정은 이제 서버-사이드에서 처리됩니다
 
     // 설정 로드
     loadSettings() {
@@ -1004,13 +973,7 @@ class SimpleEditor {
             document.getElementById('githubToken').value = this.settings.githubToken;
         }
         
-        // Cloudflare 설정 로드
-        if (this.settings.cloudflareAccountId) {
-            document.getElementById('cloudflareAccountId').value = this.settings.cloudflareAccountId;
-        }
-        if (this.settings.cloudflareApiToken) {
-            document.getElementById('cloudflareApiToken').value = this.settings.cloudflareApiToken;
-        }
+        // Cloudflare 설정은 이제 서버에서 관리됩니다
     }
 
     // 미디어 관리 기능 제거됨 - 간단한 업로드만 유지
@@ -1019,66 +982,8 @@ class SimpleEditor {
     // 기존의 복잡한 미디어 관리 기능들이 모두 제거되었습니다.
     // 이제 "이미지 추가" 버튼을 통한 직접 업로드만 지원합니다.
 
-    // 미디어 라이브러리 렌더링
-    renderMediaLibrary() {
-        const mediaGrid = document.getElementById('mediaGrid');
-        const emptyState = document.getElementById('mediaEmptyState');
-        
-        if (this.filteredMedia.length === 0) {
-            mediaGrid.style.display = 'none';
-            emptyState.style.display = 'block';
-            return;
-        }
-
-        mediaGrid.style.display = 'grid';
-        emptyState.style.display = 'none';
-        mediaGrid.className = `media-grid ${this.mediaView === 'list' ? 'list-view' : ''}`;
-
-        mediaGrid.innerHTML = this.filteredMedia.map(image => `
-            <div class="media-item" data-image-id="${image.id}" onclick="editor.selectMediaItem('${image.id}')">
-                <img src="${image.variants[0]}" alt="${image.filename}" loading="lazy">
-                <div class="media-item-info">
-                    <div class="media-item-name" title="${image.filename}">${image.filename}</div>
-                    <div class="media-item-meta">
-                        <span>${this.formatFileSize(image.size)}</span>
-                        <span>${this.formatDate(image.uploaded)}</span>
-                    </div>
-                </div>
-                <div class="media-item-actions">
-                    <button class="btn btn-outline-primary" onclick="event.stopPropagation(); editor.insertMediaToEditor('${image.variants[0]}', '${image.filename}')" title="에디터에 삽입">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <button class="btn btn-outline-info" onclick="event.stopPropagation(); editor.copyImageUrl('${image.variants[0]}')" title="URL 복사">
-                        <i class="fas fa-copy"></i>
-                    </button>
-                    <button class="btn btn-outline-danger" onclick="event.stopPropagation(); editor.deleteMediaItem('${image.id}')" title="삭제">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    // 미디어 아이템 선택
-    selectMediaItem(imageId) {
-        document.querySelectorAll('.media-item').forEach(item => {
-            item.classList.remove('selected');
-        });
-        
-        const selectedItem = document.querySelector(`[data-image-id="${imageId}"]`);
-        if (selectedItem) {
-            selectedItem.classList.add('selected');
-        }
-    }
-
-    // 에디터에 미디어 삽입
-    insertMediaToEditor(imageUrl, filename) {
-        this.insertImageToEditor(imageUrl, filename);
-        
-        // 미디어 관리 모달 닫기
-        const modal = bootstrap.Modal.getInstance(document.getElementById('mediaManagerModal'));
-        modal?.hide();
-    }
+    // 이전의 미디어 라이브러리 렌더링 기능들은 제거되었습니다
+    // 이제 간단한 드래그 앤 드롭 업로드만 지원합니다
 
     // 이미지 URL 복사
     async copyImageUrl(imageUrl) {
@@ -1090,34 +995,7 @@ class SimpleEditor {
         }
     }
 
-    // 미디어 삭제
-    async deleteMediaItem(imageId) {
-        if (!confirm('이 이미지를 삭제하시겠습니까?')) {
-            return;
-        }
-
-        const { cloudflareAccountId, cloudflareApiToken } = this.settings;
-
-        try {
-            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1/${imageId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${cloudflareApiToken}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('삭제 실패');
-            }
-
-            this.showToast('이미지가 삭제되었습니다.', 'success');
-            this.loadMediaLibrary(); // 라이브러리 새로고침
-
-        } catch (error) {
-            console.error('미디어 삭제 오류:', error);
-            this.showToast('이미지 삭제에 실패했습니다.', 'error');
-        }
-    }
+    // 미디어 삭제 기능은 제거되었습니다 - Cloudflare 대시보드에서 관리하세요
 
     // 미디어 필터링
     filterMedia(searchTerm) {
@@ -1805,16 +1683,7 @@ class SimpleEditor {
         const authorMapping = document.getElementById('authorMapping').value;
         const publishImmediately = document.getElementById('publishImmediately').checked;
 
-        // Cloudflare 설정 확인 (이미지 가져오기 옵션이 켜져있는 경우)
-        if (importImages) {
-            const cloudflareAccountId = localStorage.getItem('cloudflareAccountId');
-            const cloudflareApiToken = localStorage.getItem('cloudflareApiToken');
-            
-            if (!cloudflareAccountId || !cloudflareApiToken) {
-                this.showToast('이미지 가져오기를 위해 Cloudflare 설정을 완료해주세요.', 'warning');
-                return;
-            }
-        }
+        // 이미지 가져오기는 이제 서버에서 자동으로 처리됩니다
 
         // GitHub 설정 확인 (즉시 발행 옵션이 켜져있는 경우)
         if (publishImmediately) {
