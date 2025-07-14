@@ -152,29 +152,49 @@ class AutoDailyEditor {
 
     // 👁️ 미리보기 업데이트
     setupPreviewUpdate() {
+        console.log('🔗 미리보기 이벤트 리스너 설정 시작');
+        
         const inputs = ['title', 'content', 'description', 'author', 'category'];
+        let connectedElements = 0;
+        
         inputs.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
+                console.log(`✅ ${id} 요소 연결 성공`);
+                connectedElements++;
+                
                 // input 이벤트 (기본)
-                element.addEventListener('input', () => this.updatePreview());
+                element.addEventListener('input', () => {
+                    console.log(`📝 ${id} 입력 이벤트 발생`);
+                    this.updatePreview();
+                });
                 
                 // textarea의 경우 추가 이벤트들도 등록
                 if (element.tagName === 'TEXTAREA') {
-                    element.addEventListener('keyup', () => this.updatePreview());
+                    element.addEventListener('keyup', () => {
+                        console.log(`⌨️ ${id} 키업 이벤트 발생`);
+                        this.updatePreview();
+                    });
                     element.addEventListener('paste', () => {
+                        console.log(`📋 ${id} 붙여넣기 이벤트 발생`);
                         // 붙여넣기 후 잠시 기다린 후 업데이트
                         setTimeout(() => this.updatePreview(), 10);
                     });
                 }
+            } else {
+                console.warn(`⚠️ ${id} 요소를 찾을 수 없습니다`);
             }
         });
+        
+        console.log(`🔗 총 ${connectedElements}개 요소 연결 완료`);
         
         // 초기 미리보기 렌더링
         this.updatePreview();
     }
 
     updatePreview() {
+        console.log('🔄 미리보기 업데이트 시작');
+        
         const title = document.getElementById('title')?.value || '';
         const content = document.getElementById('content')?.value || '';
         const description = document.getElementById('description')?.value || '';
@@ -183,7 +203,12 @@ class AutoDailyEditor {
         const publishDate = document.getElementById('publishDate')?.value || '';
 
         const previewContent = document.getElementById('preview');
-        if (!previewContent) return;
+        if (!previewContent) {
+            console.warn('⚠️ 미리보기 요소를 찾을 수 없습니다');
+            return;
+        }
+
+        console.log('📝 입력값:', { title, content: content.substring(0, 50) + '...', description });
 
         if (!title && !content && !description) {
             previewContent.innerHTML = `
@@ -209,9 +234,16 @@ class AutoDailyEditor {
         let markdownContent = '';
         if (content) {
             try {
-                markdownContent = marked.parse(content);
+                // marked 라이브러리 존재 확인
+                if (typeof marked !== 'undefined' && marked.parse) {
+                    markdownContent = marked.parse(content);
+                    console.log('✅ 마크다운 파싱 성공');
+                } else {
+                    console.warn('⚠️ marked 라이브러리가 로드되지 않음, 기본 텍스트 처리');
+                    markdownContent = content.replace(/\n/g, '<br>');
+                }
             } catch (error) {
-                console.warn('Markdown 파싱 오류:', error);
+                console.error('❌ Markdown 파싱 오류:', error);
                 // 마크다운 파싱이 실패하면 줄바꿈만 처리해서 표시
                 markdownContent = content.replace(/\n/g, '<br>');
             }
@@ -245,6 +277,8 @@ class AutoDailyEditor {
                 </div>
             </div>
         `;
+        
+        console.log('✅ 미리보기 업데이트 완료');
     }
 
     // 📂 기사 관리 초기화
@@ -1282,19 +1316,26 @@ author: "${author}"
 }
 
 // 🌟 전역 인스턴스 생성
-const editor = new AutoDailyEditor();
+let editor;
 
 // 🔧 전역 함수들 (HTML에서 호출용)
 function insertText(before, after = '') {
-    editor.insertText(before, after);
+    if (editor) {
+        editor.insertText(before, after);
+    }
 }
 
 // 🏁 초기화 완료 후 실행
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 오토데일프릭스 AI 에디터 Pro 로드 완료!');
     
-    // 초기 미리보기 업데이트
+    // 에디터 인스턴스 생성
+    editor = new AutoDailyEditor();
+    
+    // 초기 미리보기 업데이트 (약간의 지연 후)
     setTimeout(() => {
-        editor.updatePreview();
-    }, 100);
+        if (editor) {
+            editor.updatePreview();
+        }
+    }, 200);
 }); 
