@@ -1,202 +1,186 @@
-# 오토데일프릭스 기사 에디터
+# 오토데일프릭스 - 워드프레스 스타일 에디터
 
-로그인 없이 빠르게 기사를 작성하고 GitHub 레포지토리에 업로드할 수 있는 웹 기반 에디터입니다.
+간단하고 직관적인 워드프레스 스타일의 뉴스 기사 에디터입니다.
 
-## 🎯 주요 기능
+## 🎯 주요 특징
 
-- **🖊️ 마크다운 에디터**: 실시간 미리보기와 포맷팅 도구
-- **📸 Cloudflare Images 연동**: 드래그 앤 드롭으로 이미지 업로드
-- **👀 실시간 미리보기**: Hugo single.html 스타일 적용
-- **📁 GitHub 업로드**: API를 통한 직접 업로드
-- **💾 자동 저장**: 30초마다 임시 저장 (24시간 보관)
-- **📱 반응형 디자인**: 모바일/태블릿 지원
+### ✨ **워드프레스처럼 쉬운 사용법**
+- 직관적인 인터페이스
+- 실시간 미리보기
+- 자동 저장 (30초마다)
+- 키보드 단축키 지원
 
-## 🚀 시작하기
+### 🤖 **AI 기사 생성**
+- 주제만 입력하면 AI가 전체 기사 작성
+- OpenAI GPT-4 사용
+- 제목, 요약, 본문 자동 생성
+
+### 📸 **이미지 관리**
+- 드래그앤드롭 업로드
+- Cloudflare Images 연동
+- 자동 최적화
+
+### 🚀 **원클릭 발행**
+- GitHub에 직접 업로드
+- Cloudflare Pages 자동 배포
+- 실시간 사이트 반영
+
+## 🚀 빠른 시작
 
 ### 1. 에디터 열기
-`editor/index.html` 파일을 웹 브라우저에서 엽니다.
+```
+static/editor/index.html
+```
 
-### 2. Cloudflare Images 설정 (이미지 업로드 필요시)
-첫 이미지 업로드 시 설정 창이 나타납니다:
-- **Account ID**: Cloudflare 대시보드에서 확인
-- **API Token**: Cloudflare Images API 토큰
+### 2. 첫 기사 작성하기
 
-#### Cloudflare 설정 방법
-1. [Cloudflare 대시보드](https://dash.cloudflare.com) 로그인
-2. 우측 상단 프로필 → **API 토큰**
-3. **토큰 만들기** → **사용자 정의 토큰**
-4. 권한 설정:
-   - **계정** - Cloudflare Images:편집
-   - **영역** - 영역:읽기 (선택사항)
+#### A. 일반 작성 방법
+1. **제목 입력** → URL 자동 생성
+2. **카테고리 선택** (자동차/경제)
+3. **본문 작성** → 워드프레스 스타일 에디터
+4. **발행 버튼** → GitHub 자동 업로드
 
-### 3. GitHub 업로드 설정 (선택사항)
-1. [GitHub Settings](https://github.com/settings/tokens) → **Personal access tokens**
-2. **Generate new token (classic)**
-3. 권한 선택: `repo` (전체 리포지토리 액세스)
-4. 생성된 토큰을 에디터에서 사용
+#### B. AI 자동 작성
+1. **사이드바에서 "기사 주제" 입력**
+2. **"AI로 기사 생성" 버튼 클릭**
+3. **AI가 제목, 요약, 본문 자동 생성**
+4. **검토 후 발행**
 
-## 📝 사용법
+### 3. 설정하기
 
-### 기사 작성 단계
+#### OpenAI API (AI 기사 생성용)
+1. [OpenAI API 키 발급](https://platform.openai.com/api-keys)
+2. 에디터에서 "AI 작성" → API 키 입력
 
-1. **기사 정보 입력**
-   - 제목 (필수)
-   - 카테고리: 자동차/경제
-   - 작성자: 오은진/기타
-   - 기사 요약 (150자 이내)
-   - 태그 (최대 5개)
+#### GitHub 연동 (발행용)
+1. [GitHub 토큰 생성](https://github.com/settings/tokens)
+2. 권한: `repo` (전체 리포지토리 액세스)
+3. 발행 시 토큰 입력
 
-2. **이미지 업로드**
-   - 드래그 앤 드롭 또는 클릭하여 업로드
-   - 자동으로 Cloudflare Images에 최적화 저장
-   - 반응형 이미지 URL 자동 생성
+## ⚡ 핵심 기능
 
-3. **본문 작성**
-   - 마크다운 문법 사용
-   - 실시간 미리보기 확인
-   - 포맷팅 도구 활용
+### 워드프레스 스타일 에디터
+- **Quill.js** 사용
+- 리치 텍스트 편집
+- 실시간 포맷팅
+- 이미지 삽입
 
-4. **발행**
-   - **다운로드**: 마크다운 파일로 저장
-   - **GitHub 업로드**: 직접 레포지토리에 업로드
+### 스마트 기능들
+```javascript
+// 자동 URL 생성
+"현대 아이오닉 6 신모델 출시" 
+→ "/automotive/hyundai-ioniq-6-new-model-launch/"
 
-### 키보드 단축키
+// 글자수 실시간 카운터
+요약: 150자 제한, 실시간 표시
 
-- `Ctrl/Cmd + S`: 임시 저장
-- `Ctrl/Cmd + Enter`: 파일 다운로드
+// 자동 저장
+30초마다 임시 저장 (24시간 보관)
+```
 
-### 마크다운 포맷팅 도구
+### AI 기사 생성 예시
+```
+입력: "현대자동차 전기차 신모델"
 
-- **굵게**: `**텍스트**`
-- **기울임**: `*텍스트*`
-- **링크**: `[텍스트](URL)`
-- **제목**: `## 제목`
-- **리스트**: `- 항목`
+AI 출력:
+├── 제목: "현대자동차, 2024년 전기차 라인업 확대... 아이오닉 시리즈 강화"
+├── 요약: "현대자동차가 올해 전기차 시장 공략을 위해..."
+└── 본문: 완전한 뉴스 기사 (HTML 형식)
+```
 
 ## 📁 파일 구조
-
 ```
-editor/
-├── index.html          # 메인 에디터 페이지
-├── style.css          # 스타일시트
-├── script.js          # 메인 로직
-├── cloudflare.js      # Cloudflare Images API
-└── README.md          # 사용법 (이 파일)
+static/editor/
+├── index.html      # 메인 에디터 (워드프레스 스타일)
+├── editor.js       # 핵심 로직 (800줄로 단순화)
+├── style.css       # 워드프레스 디자인
+└── README.md       # 이 파일
 ```
 
-## 🔧 기술 스택
+## 🔧 사용법 상세
 
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **UI Framework**: Bootstrap 5
-- **Markdown Parser**: Marked.js
-- **Icons**: Font Awesome
-- **Image CDN**: Cloudflare Images
-- **Version Control**: GitHub API
+### 1. 기사 작성 워크플로우
+```
+제목 입력 → 카테고리 선택 → 본문 작성 → 이미지 추가 → 미리보기 → 발행
+```
 
-## 🎨 Cloudflare Images 활용
+### 2. 키보드 단축키
+- `Ctrl/Cmd + S`: 임시 저장
+- `Ctrl/Cmd + Enter`: 미리보기
 
-### 자동 최적화 기능
-- **WebP/AVIF 변환**: 자동 최신 포맷 제공
-- **반응형 이미지**: 디바이스별 최적 크기
-- **글로벌 CDN**: 빠른 이미지 로딩
+### 3. 자동화 기능
+- **자동 저장**: 30초마다
+- **자동 URL**: 제목 입력 시
+- **자동 배포**: GitHub 푸시 → Cloudflare Pages
 
-### 사용되는 이미지 변형
+## 🎨 워드프레스 스타일 특징
+
+### 직관적 인터페이스
+- 왼쪽: 메인 에디터
+- 오른쪽: 설정 사이드바
+- 상단: 저장/발행 버튼
+
+### 실시간 피드백
+- URL 미리보기
+- 글자수 카운터
+- 이미지 업로드 상태
+- 저장 상태 표시
+
+### 반응형 디자인
+- 모바일 최적화
+- 태블릿 지원
+- 데스크톱 풀스크린
+
+## 🚀 배포 자동화
+
+### 1단계: 에디터에서 작성
+```
+기사 작성 완료 → "발행" 버튼 클릭
+```
+
+### 2단계: GitHub 업로드
+```
+content/automotive/article-name.md 자동 생성
+```
+
+### 3단계: 자동 배포
+```
+Cloudflare Pages → Hugo 빌드 → 사이트 반영 (2-3분)
+```
+
+## 💡 사용 팁
+
+### AI 기사 생성 팁
+- **구체적인 주제 입력**: "현대차 신모델" → "현대 아이오닉 6 N 고성능 모델 출시"
+- **키워드 포함**: SEO에 좋은 키워드 자연스럽게 포함
+- **카테고리 설정**: 자동차/경제 선택하면 AI가 맞춤 작성
+
+### 이미지 업로드 팁
+- **최적 크기**: 1200x800px 권장
+- **파일 크기**: 5MB 이하
+- **포맷**: JPG, PNG, WebP 지원
+
+### 발행 전 체크리스트
+- [ ] 제목 확인 (SEO 최적화)
+- [ ] 카테고리 선택
+- [ ] 요약 작성 (150자 이내)
+- [ ] 이미지 추가
+- [ ] 미리보기 확인
+- [ ] 발행
+
+## 🔧 고급 설정
+
+### Cloudflare Images 설정 (선택사항)
 ```javascript
-// 썸네일 (300x200)
-${imageUrl}/w=300,h=200,fit=cover
-
-// 모바일 (800x600, WebP)
-${imageUrl}/w=800,h=600,fit=cover,f=webp
-
-// 데스크톱 (1200x800, WebP)
-${imageUrl}/w=1200,h=800,fit=cover,f=webp
+// 로컬스토리지에 저장
+localStorage.setItem('cf-account-id', 'your-account-id');
+localStorage.setItem('cf-api-token', 'your-api-token');
 ```
 
-## 📱 Hugo 템플릿 연동
-
-### single.html 최적화
-에디터에서 생성된 이미지는 Hugo에서 자동으로 최적화됩니다:
-
-```html
-<picture>
-    <!-- 데스크톱: 1200px 너비, WebP -->
-    <source media="(min-width: 768px)" 
-            srcset="{{ index .Params.images 0 }}/w=1200,f=webp">
-    <!-- 모바일: 800px 너비, WebP -->
-    <source media="(max-width: 767px)" 
-            srcset="{{ index .Params.images 0 }}/w=800,f=webp">
-    <!-- 기본 이미지 -->
-    <img src="{{ index .Params.images 0 }}/w=1200" 
-         alt="{{ .Title }}" loading="lazy">
-</picture>
-```
-
-## 🔄 워크플로우
-
-### 1. 기사 작성
-```
-에디터 열기 → 정보 입력 → 이미지 업로드 → 본문 작성 → 미리보기 확인
-```
-
-### 2. 발행 방법
-**A. 다운로드 후 수동 업로드**
-```
-다운로드 → Git clone → 파일 복사 → commit & push
-```
-
-**B. 직접 GitHub 업로드**
-```
-GitHub 토큰 입력 → 업로드 버튼 → 자동 commit & push
-```
-
-## 🛡️ 보안 고려사항
-
-- **토큰 저장**: Session Storage 사용 (브라우저 종료시 삭제)
-- **CORS**: GitHub API는 CORS 지원
-- **API 권한**: 최소 필요 권한만 요청
-
-## 🔧 커스터마이징
-
-### 카테고리 추가
-`script.js`의 `generateFilename` 함수에서 한글→영문 매핑 추가:
-
+### 커스텀 도메인 설정
 ```javascript
-const koreanToEnglish = {
-    '새카테고리': 'new-category',
-    // ... 기존 매핑들
-};
+// editor.js에서 baseUrl 변경
+const baseUrl = 'https://your-domain.com';
 ```
 
-### 스타일 수정
-`style.css`에서 색상, 폰트, 레이아웃 등 수정 가능
-
-### GitHub 레포지토리 변경
-`script.js`의 `uploadToGitHub` 함수에서 레포지토리 URL 수정:
-
-```javascript
-const response = await fetch('https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/contents/' + path, {
-```
-
-## 🐛 문제 해결
-
-### 이미지 업로드 실패
-1. Cloudflare Account ID와 API Token 확인
-2. 파일 크기 10MB 이하 확인
-3. 지원 형식 확인 (JPEG, PNG, GIF, WebP)
-
-### GitHub 업로드 실패
-1. Personal Access Token 권한 확인
-2. 레포지토리 접근 권한 확인
-3. 파일명 중복 확인
-
-### 미리보기 오류
-1. 브라우저 개발자 도구에서 오류 확인
-2. Marked.js 라이브러리 로딩 확인
-
-## 📞 지원
-
-문제 발생시 GitHub Issues에 문의하거나 개발팀에 연락하세요.
-
----
-
-**오토데일프릭스 기사 에디터** - 빠르고 효율적인 기사 작성을 위해 제작되었습니다. 
+이제 워드프레스만큼 쉽게 뉴스 기사를 작성하고 발행할 수 있습니다! 🎉 
