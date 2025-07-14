@@ -849,11 +849,14 @@ class SimpleEditor {
             
             const articles = [];
             
-            for (const folder of folders.filter(f => f.type === 'dir')) {
+            // 기사 카테고리 폴더만 처리 (authors, about 등 제외)
+            const articleCategories = ['automotive', 'economy'];
+            
+            for (const folder of folders.filter(f => f.type === 'dir' && articleCategories.includes(f.name))) {
                 const folderResponse = await fetch(folder.url);
                 const files = await folderResponse.json();
                 
-                files.filter(f => f.name.endsWith('.md')).forEach(file => {
+                files.filter(f => f.name.endsWith('.md') && f.name !== '_index.md').forEach(file => {
                     articles.push({
                         name: file.name,
                         category: folder.name,
@@ -875,14 +878,34 @@ class SimpleEditor {
         const container = document.getElementById('recentArticles');
         
         if (articles.length === 0) {
+            container.innerHTML = `
+                <div class="text-center text-muted">
+                    <i class="fas fa-file-alt fa-2x mb-2"></i>
+                    <p class="small">아직 작성된 기사가 없습니다</p>
+                </div>
+            `;
             return;
         }
 
+        // 카테고리별 한국어 이름 매핑
+        const categoryMap = {
+            'automotive': '자동차',
+            'economy': '경제'
+        };
+
+        // 최신 날짜순으로 정렬 (파일명의 날짜 기준)
+        articles.sort((a, b) => {
+            const dateA = this.extractDateFromFilename(a.name);
+            const dateB = this.extractDateFromFilename(b.name);
+            return dateB - dateA;
+        });
+
         container.innerHTML = articles.map(article => `
             <div class="recent-article">
-                <h6>${article.name.replace('.md', '').replace(/-/g, ' ')}</h6>
+                <h6>${this.formatArticleTitle(article.name)}</h6>
                 <div class="meta">
-                    <span class="badge ${article.category === 'automotive' ? 'bg-primary' : 'bg-success'}">${article.category === 'automotive' ? '자동차' : '경제'}</span>
+                    <span class="badge ${article.category === 'automotive' ? 'bg-primary' : 'bg-success'}">${categoryMap[article.category] || article.category}</span>
+                    <small class="text-muted ms-2">${this.formatDateFromFilename(article.name)}</small>
                 </div>
             </div>
         `).join('');
@@ -2396,6 +2419,33 @@ class SimpleEditor {
         `;
         
         resultsList.appendChild(li);
+    }
+
+    // 유틸리티 메서드들
+    formatArticleTitle(filename) {
+        return filename
+            .replace('.md', '')
+            .replace(/^\d{4}-\d{2}-\d{2}-/, '') // 날짜 제거
+            .replace(/-/g, ' ')
+            .replace(/\b\w/g, l => l.toUpperCase()); // 단어 첫글자 대문자
+    }
+
+    extractDateFromFilename(filename) {
+        const match = filename.match(/^(\d{4}-\d{2}-\d{2})/);
+        return match ? new Date(match[1]) : new Date(0);
+    }
+
+    formatDateFromFilename(filename) {
+        const match = filename.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (match) {
+            const date = new Date(match[1]);
+            return date.toLocaleDateString('ko-KR', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        return '';
     }
 }
 
