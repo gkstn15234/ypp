@@ -14,6 +14,9 @@ class SimpleEditor {
             // Cloudflare 설정은 이제 서버에서 처리됩니다
         };
         
+        // AI 이미지 업로드 관련 속성
+        this.aiUploadedImages = [];
+        
         this.init();
     }
 
@@ -23,6 +26,7 @@ class SimpleEditor {
         this.setupEventListeners();
         this.setupAutoSave();
         this.setupWordPressImport();
+        this.initAIImageUpload();
         this.loadDraft();
         this.loadRecentArticles();
         this.loadSettings();
@@ -359,7 +363,7 @@ class SimpleEditor {
         }
     }
 
-    // AI 기사 생성
+    // AI 기사 생성 (이미지 5장 포함)
     async generateAIArticle() {
         const topic = document.getElementById('aiTopic').value.trim();
         
@@ -376,20 +380,44 @@ class SimpleEditor {
         this.showLoading('AI가 기사를 생성하고 있습니다...');
 
         try {
+            // 업로드된 이미지 확인
+            if (this.aiUploadedImages.length === 0) {
+                this.showToast('먼저 이미지를 업로드해주세요. (최대 5장)', 'warning');
+                return;
+            }
+
+            // 1단계: 기사 생성
             const article = await this.generateWithOpenAI(topic);
+            
+            // 2단계: 업로드된 이미지 URL 추출
+            const imageUrls = this.aiUploadedImages.map(img => img.url);
+            
+            // 3단계: 이미지 URL을 콘텐츠에 삽입
+            const finalContent = this.insertImagesIntoContent(article.content, imageUrls);
             
             // 생성된 내용으로 폼 채우기
             document.getElementById('articleTitle').value = article.title;
             document.getElementById('description').value = article.description;
-            this.quill.root.innerHTML = article.content;
+            this.quill.root.innerHTML = finalContent;
+            
+            // 카테고리 자동 설정
+            if (article.category) {
+                const categorySelect = document.getElementById('category');
+                if (article.category.includes('자동차')) {
+                    categorySelect.value = 'automotive';
+                } else if (article.category.includes('경제')) {
+                    categorySelect.value = 'economy';
+                }
+            }
             
             this.updatePermalink(article.title);
             this.updateDescriptionCount(article.description.length);
             
-            this.showToast('AI 기사가 생성되었습니다!', 'success');
+            this.showToast('AI 기사와 이미지가 생성되었습니다!', 'success');
             
-            // 주제 입력창 초기화
+            // 입력창 및 이미지 초기화
             document.getElementById('aiTopic').value = '';
+            this.clearAIImages();
             
         } catch (error) {
             console.error('AI 생성 오류:', error);
@@ -399,27 +427,64 @@ class SimpleEditor {
         }
     }
 
-    // OpenAI API 호출
+    // OpenAI API 호출 (향상된 구조화된 콘텐츠)
     async generateWithOpenAI(topic) {
-        const category = document.getElementById('category').value;
-        const categoryName = category === 'automotive' ? '자동차' : '경제';
+        const category = this.determineCategory(topic);
         
-        const prompt = `다음 주제로 ${categoryName} 분야의 뉴스 기사를 작성해주세요:
+        // 감성 키워드 데이터베이스
+        const emotionalKeywords = {
+            '경제 뉴스': ['충격', '깜짝', '돌파', '폭등', '폭락', '대박', '급등', '급락', '흔들', '뒤집힌', '주목', '열풍', '비상', '파란불', '빨간불', '불안한', '역대급', '격변', '요동', '쏟아진'],
+            '자동차 뉴스': ['파격', '역대급', '신차', '놀라운', '혁신', '전격', '출시', '완판', '돌풍', '대기록', '돌파', '신기록', '반전', '기대', '논란', '대반전', '대변신', '완벽', '압도적', '화제의']
+        };
+
+        const selectedKeywords = this.getRandomItems(emotionalKeywords[category] || emotionalKeywords['자동차 뉴스'], 3);
+        
+        const prompt = `다음 주제로 ${category}의 뉴스 기사를 작성해주세요:
 
 주제: ${topic}
+카테고리: ${category}
 
-요구사항:
-1. 제목은 간결하고 흥미로우며 SEO에 최적화되어야 합니다
-2. 기사 요약은 150자 이내로 작성해주세요
-3. 본문은 전문적이고 정확한 정보를 포함해야 합니다
-4. HTML 형식으로 작성하되, 제목은 h2, h3 태그를 사용해주세요
-5. 한국어로 작성해주세요
+반드시 아래 HTML 구조를 따라 작성해주세요:
+1) <h1>제목</h1>
+2) <div class="vertical-bar-text">소제목1<br>소제목2</div>
+3) [IMG_PLACEHOLDER_1]
+4) <p>단락1 (3~4문장)</p>
+5) <p>단락2 (3~4문장)</p>
+6) <h2>요약 소제목 (간결하게)</h2>
+7) [IMG_PLACEHOLDER_2]
+8) <p>단락3 (3~4문장)</p>
+9) <p>단락4 (3~4문장)</p>
+10) <h2>요약 소제목 (간결하게)</h2>
+11) [IMG_PLACEHOLDER_3]
+12) <p>단락5 (3~4문장)</p>
+13) <p>단락6 (3~4문장)</p>
+14) <h2>요약 소제목 (간결하게)</h2>
+15) [IMG_PLACEHOLDER_4]
+16) <p>단락7 (3~4문장)</p>
+17) <p>단락8 (3~4문장)</p>
+18) [IMG_PLACEHOLDER_5]
 
-응답 형식:
+필수 작성 규칙:
+- 제목은 '"감성어+핵심사항"…보충설명' 형태로 작성 (예: "깜짝 실적 발표"…현대차 3분기 영업이익 2조 돌파)
+- 감성 키워드는 ${selectedKeywords.join(', ')} 등을 활용
+- 큰따옴표 안에 짧고 강렬한 문구, 문장 끝 말줄임표(…) 필수
+- 수직 막대 텍스트는 기사의 핵심을 짧게 2줄로 요약
+- 문단은 3-4문장으로, 마지막 문장은 흥미/호기심을 유발하는 질문이나 흥미로운 사실로 마무리
+- 각 소제목(h2)은 '어떻게', '왜', '얼마나' 등의 의문형이나 감탄형으로 작성
+- 일반 독자도 이해하기 쉽게 전문용어는 풀어서 설명
+- 각 단락 내 핵심 문구는 <strong> 태그로 강조
+- 통계, 수치 등 구체적 정보를 포함하여 신뢰성 확보
+- 첫 단락에 기사의 핵심을 요약하되, 흥미를 끌 수 있는 내용으로 구성
+- 맨 마지막 단락은 향후 전망이나 소비자/독자에게 유용한 조언으로 마무리
+- [IMG_PLACEHOLDER_1~5]는 그대로 유지하고 수정하지 마세요
+
+응답은 JSON 형식으로:
 {
-  "title": "기사 제목",
-  "description": "기사 요약",
-  "content": "HTML 형식의 본문 내용"
+  "title": "제목만 (h1 태그 없이)",
+  "description": "150자 이내 요약",
+  "content": "위 구조의 전체 HTML 내용",
+  "category": "${category}",
+  "slug": "seo-optimized-english-slug"
 }`;
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -429,12 +494,12 @@ class SimpleEditor {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: 'gpt-4',
+                model: 'gpt-4o',
                 messages: [
-                    { role: 'system', content: '당신은 전문 뉴스 기자입니다. 정확하고 객관적인 기사를 작성해주세요.' },
+                    { role: 'system', content: '당신은 전문 뉴스 기자입니다. 구조화된 기사를 정확하게 작성해주세요.' },
                     { role: 'user', content: prompt }
                 ],
-                max_tokens: 2000,
+                max_tokens: 3000,
                 temperature: 0.7
             })
         });
@@ -447,13 +512,17 @@ class SimpleEditor {
         const content = result.choices[0].message.content;
         
         try {
-            return JSON.parse(content);
+            const parsed = JSON.parse(content);
+            parsed.category = category; // 카테고리 보장
+            return parsed;
         } catch (e) {
             // JSON 파싱 실패 시 기본 구조로 반환
             return {
                 title: topic,
-                description: content.substring(0, 150),
-                content: content
+                description: `${topic}에 대한 상세한 분석 기사입니다.`,
+                content: `<p>${topic}에 대한 내용을 다루는 기사입니다.</p>`,
+                category: category,
+                slug: this.generateSlug(topic)
             };
         }
     }
@@ -2279,6 +2348,220 @@ class SimpleEditor {
             });
         }
         return '';
+    }
+
+    // 카테고리 자동 판별 함수
+    determineCategory(topic) {
+        const combinedText = topic.toLowerCase();
+        
+        // 경제 관련 키워드
+        const economyKeywords = [
+            '주식', '경제', '금리', '투자', '시장', '펀드', '주가', '재테크', '돈', '비트코인', '부동산', '증시',
+            '금융', '은행', '외환', '환율', '원화', '달러', '기업', '실적', '수익', '매출', '영업이익',
+            '채권', '상장', '코스피', '코스닥', '나스닥', '다우', 'S&P', '기준금리', '인플레', '디플레이션',
+            '세금', '유가', '물가', '가상화폐', '암호화폐', '전망', '실적', 'ETF', '채권', '테마주'
+        ];
+        
+        // 자동차 관련 키워드
+        const automotiveKeywords = [
+            '자동차', '신차', '전기차', '테슬라', '현대', '기아', 'BMW', '벤츠', '도요타', '폭스바겐', 'SUV', '세단',
+            '하이브리드', '자율주행', '모빌리티', '충전', '배터리', '출시', '엔진', '제네시스', '내연기관',
+            '트렁크', '휠', '타이어', '연비', '주행', '운전', '정비', '마력', '토크', '판매량', '모델',
+            '디젤', '가솔린', 'LPG', '스포츠카', 'EV', '리콜', '시승', '튜닝', '옵션', '트림'
+        ];
+        
+        // 경제 키워드 매칭 확인
+        const economyMatches = economyKeywords.filter(keyword => combinedText.includes(keyword)).length;
+        
+        // 자동차 키워드 매칭 확인
+        const automotiveMatches = automotiveKeywords.filter(keyword => combinedText.includes(keyword)).length;
+        
+        // 매칭된 키워드가 많은 카테고리 반환
+        if (economyMatches > automotiveMatches) {
+            return '경제 뉴스';
+        } else if (automotiveMatches > 0) {
+            return '자동차 뉴스';
+        }
+        
+        // 기본값은 자동차 뉴스
+        return '자동차 뉴스';
+    }
+
+    // 배열에서 랜덤 아이템 선택
+    getRandomItems(array, count) {
+        if (!array || array.length === 0) return [];
+        const shuffled = [...array].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+    }
+
+    // SEO 최적화된 슬러그 생성
+    generateSlug(title) {
+        return title
+            .toLowerCase()
+            .replace(/[^가-힣a-z0-9\s-]/g, '') // 특수문자 제거
+            .replace(/\s+/g, '-') // 공백을 하이픈으로
+            .replace(/-+/g, '-') // 중복 하이픈 제거
+            .replace(/^-|-$/g, '') // 시작/끝 하이픈 제거
+            .substring(0, 50); // 길이 제한
+    }
+
+    // 이전의 DALL-E 이미지 생성 기능들은 제거되었습니다
+    // 이제 사용자가 직접 업로드한 이미지를 사용합니다
+
+    // 콘텐츠에 이미지 삽입
+    insertImagesIntoContent(content, imageUrls) {
+        let updatedContent = content;
+        
+        // IMG_PLACEHOLDER_1~5를 실제 이미지 URL로 교체
+        for (let i = 0; i < 5; i++) {
+            const placeholder = `[IMG_PLACEHOLDER_${i + 1}]`;
+            
+            if (i < imageUrls.length) {
+                // 업로드된 이미지 사용
+                const imageUrl = imageUrls[i];
+                const imgTag = `<img src="${imageUrl}" alt="기사 관련 이미지 ${i + 1}" style="width: 100%; max-width: 800px; height: auto; margin: 20px 0; border-radius: 8px;">`;
+                updatedContent = updatedContent.replace(placeholder, imgTag);
+            } else {
+                // 이미지가 부족한 경우 플레이스홀더 제거
+                updatedContent = updatedContent.replace(placeholder, '');
+            }
+        }
+        
+        return updatedContent;
+    }
+
+    // AI 이미지 업로드 초기화
+    initAIImageUpload() {
+        const uploadArea = document.getElementById('aiImageUploadArea');
+        const fileInput = document.getElementById('aiImageInput');
+        
+        if (!uploadArea || !fileInput) return;
+
+        // 클릭 이벤트
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 파일 선택 이벤트
+        fileInput.addEventListener('change', (e) => {
+            this.handleAIImageFiles(e.target.files);
+        });
+
+        // 드래그 앤 드롭 이벤트
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            this.handleAIImageFiles(e.dataTransfer.files);
+        });
+    }
+
+    // AI 이미지 파일 처리
+    async handleAIImageFiles(files) {
+        const maxFiles = 5;
+        const currentCount = this.aiUploadedImages.length;
+        const availableSlots = maxFiles - currentCount;
+        
+        if (availableSlots <= 0) {
+            this.showToast('최대 5장까지만 업로드할 수 있습니다.', 'warning');
+            return;
+        }
+
+        const filesToProcess = Array.from(files).slice(0, availableSlots);
+        
+        // 파일 유효성 검사
+        const validFiles = filesToProcess.filter(file => {
+            if (!file.type.startsWith('image/')) {
+                this.showToast(`${file.name}은(는) 이미지 파일이 아닙니다.`, 'error');
+                return false;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+                this.showToast(`${file.name}의 크기가 너무 큽니다 (최대 5MB).`, 'error');
+                return false;
+            }
+            
+            return true;
+        });
+
+        if (validFiles.length === 0) return;
+
+        this.showLoading(`이미지 업로드 중... (${validFiles.length}개)`);
+
+        try {
+            const uploadPromises = validFiles.map(async (file) => {
+                try {
+                    const imageUrl = await this.uploadToCloudflare(file);
+                    return {
+                        url: imageUrl,
+                        name: file.name,
+                        file: file
+                    };
+                } catch (error) {
+                    console.error(`${file.name} 업로드 실패:`, error);
+                    return null;
+                }
+            });
+
+            const results = await Promise.all(uploadPromises);
+            const successful = results.filter(r => r !== null);
+
+            if (successful.length > 0) {
+                this.aiUploadedImages.push(...successful);
+                this.updateAIImagePreview();
+                this.showToast(`${successful.length}개 이미지가 업로드되었습니다.`, 'success');
+            }
+
+        } catch (error) {
+            console.error('이미지 업로드 오류:', error);
+            this.showToast('이미지 업로드에 실패했습니다.', 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // AI 이미지 미리보기 업데이트
+    updateAIImagePreview() {
+        const previewContainer = document.getElementById('aiUploadedImagesPreview');
+        if (!previewContainer) return;
+
+        previewContainer.innerHTML = this.aiUploadedImages.map((image, index) => `
+            <div class="ai-uploaded-image">
+                <img src="${image.url}" alt="${image.name}">
+                <button class="image-remove" onclick="editor.removeAIImage(${index})" title="삭제">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="image-index">${index + 1}</div>
+            </div>
+        `).join('');
+
+        // 업로드 영역 표시/숨김
+        const uploadArea = document.getElementById('aiImageUploadArea');
+        if (uploadArea) {
+            uploadArea.style.display = this.aiUploadedImages.length >= 5 ? 'none' : 'block';
+        }
+    }
+
+    // AI 이미지 제거
+    removeAIImage(index) {
+        this.aiUploadedImages.splice(index, 1);
+        this.updateAIImagePreview();
+        this.showToast('이미지가 제거되었습니다.', 'info');
+    }
+
+    // AI 이미지 모두 제거
+    clearAIImages() {
+        this.aiUploadedImages = [];
+        this.updateAIImagePreview();
     }
 }
 

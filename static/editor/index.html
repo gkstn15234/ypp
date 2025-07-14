@@ -174,18 +174,40 @@
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
+                                <label class="form-label">기사 주제</label>
                                 <input type="text" 
                                        class="form-control" 
                                        id="aiTopic" 
                                        placeholder="기사 주제를 입력하세요">
                             </div>
+                            
+                            <!-- 이미지 업로드 섹션 -->
+                            <div class="mb-3">
+                                <label class="form-label">기사 이미지 (최대 5장)</label>
+                                <div class="ai-image-upload-area" id="aiImageUploadArea">
+                                    <div class="upload-placeholder">
+                                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">이미지를 드래그하여 놓거나 클릭하여 선택</p>
+                                        <small class="text-muted">최대 5장까지 업로드 가능</small>
+                                    </div>
+                                    <input type="file" 
+                                           id="aiImageInput" 
+                                           multiple 
+                                           accept="image/*" 
+                                           style="display: none;">
+                                </div>
+                                
+                                <!-- 업로드된 이미지 미리보기 -->
+                                <div id="aiUploadedImagesPreview" class="uploaded-images-preview mt-3"></div>
+                            </div>
+                            
                             <button type="button" class="btn btn-primary btn-sm w-100" id="generateAIBtn">
                                 <i class="fas fa-magic me-1"></i>AI로 기사 생성
                             </button>
                             <div class="mt-2">
                                 <small class="text-muted">
                                     <i class="fas fa-info-circle me-1"></i>
-                                    주제만 입력하면 AI가 전체 기사를 작성합니다
+                                    주제와 이미지를 입력하면 AI가 전체 기사를 작성하고 이미지를 적절히 배치합니다
                                 </small>
                             </div>
                         </div>
