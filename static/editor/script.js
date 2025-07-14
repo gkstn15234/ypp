@@ -171,7 +171,7 @@ class AutoDailyEditor {
             previewContent.innerHTML = `
                 <div class="text-center text-muted p-5">
                     <i class="fas fa-newspaper fa-4x mb-4 text-primary"></i>
-                    <h5 class="text-light">실시간 미리보기</h5>
+                                                    <h5 class="text-dark">실시간 미리보기</h5>
                     <p class="text-muted">기사 정보를 입력하면 여기에 미리보기가 표시됩니다</p>
                 </div>
             `;
@@ -225,7 +225,7 @@ class AutoDailyEditor {
                 <div class="preview-meta mb-4">
                     <div class="d-flex align-items-center">
                         <i class="fas fa-user-circle text-primary me-2"></i>
-                        <span class="text-light">${author}</span>
+                        <span class="text-dark">${author}</span>
                     </div>
                 </div>
                 
@@ -561,25 +561,25 @@ class AutoDailyEditor {
             <div class="article-detail">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <strong class="text-light">카테고리:</strong>
+                        <strong class="text-dark">카테고리:</strong>
                         <span class="badge bg-primary ms-2">
                             ${category === 'automotive' ? '🚗 자동차' : '📈 경제'}
                         </span>
                     </div>
                     <div class="col-md-6">
-                        <strong class="text-light">작성자:</strong>
+                        <strong class="text-dark">작성자:</strong>
                         <span class="text-muted ms-2">${metadata.author || '알 수 없음'}</span>
                     </div>
                 </div>
                 
                 <div class="mb-3">
-                    <strong class="text-light">발행일:</strong>
+                                            <strong class="text-dark">발행일:</strong>
                     <span class="text-muted ms-2">${metadata.date || '날짜 없음'}</span>
                 </div>
                 
                 ${metadata.description ? `
                     <div class="mb-3">
-                        <strong class="text-light">요약:</strong>
+                        <strong class="text-dark">요약:</strong>
                         <p class="text-muted mt-1">${metadata.description}</p>
                     </div>
                 ` : ''}
@@ -942,52 +942,43 @@ author: "${author}"
         this.showNotification('OpenAI API 키가 저장되었습니다.', 'success');
     }
 
-    // 🤖 AI 기사 생성
+    // 🤖 AI 기사 생성 (이미지 URL 자동 포함)
     async generateAIArticle() {
         try {
-            // OpenAI API 키 확인
             const apiKey = localStorage.getItem('openai-api-key');
             if (!apiKey) {
                 this.showOpenAIModal();
                 return;
             }
-
-            // 입력값 검증
             const aiTitle = document.getElementById('aiTitle')?.value;
             if (!aiTitle) {
                 this.showNotification('제목을 입력해주세요.', 'error');
-            return;
-        }
-
-            // 진행률 표시
+                return;
+            }
             const progressDiv = document.getElementById('aiProgress');
             const progressBar = progressDiv.querySelector('.progress-bar');
             const progressText = document.getElementById('aiProgressText');
             const progressPercent = document.getElementById('aiProgressPercent');
-
             progressDiv.style.display = 'block';
-            
-            // OpenAI Writer 설정
             if (window.openaiWriter) {
                 window.openaiWriter.configure(apiKey);
             } else {
                 throw new Error('OpenAI Writer를 찾을 수 없습니다.');
             }
-
-            // 기사 데이터 준비
+            // 기사 데이터 준비 (이미지 URL 자동 포함)
+            const imageUrls = this.uploadedImageUrls || [];
             const articleData = {
                 title: aiTitle,
                 description: document.getElementById('aiDescription')?.value || '',
                 category: document.getElementById('aiCategory')?.value === 'auto' ? 
                     window.openaiWriter.determineEconomyOrAutomotive(aiTitle, document.getElementById('aiDescription')?.value || '', 'automotive') :
-                    document.getElementById('aiCategory')?.value || 'automotive'
+                    document.getElementById('aiCategory')?.value || 'automotive',
+                referenceContent: document.getElementById('referenceContent')?.value || '',
+                imageUrls // Cloudflare 이미지 URL 배열 전달
             };
-
-            // AI 기사 생성
             const result = await window.openaiWriter.generateArticle(articleData, (progress) => {
                 progressBar.style.width = `${progress}%`;
                 progressPercent.textContent = `${progress}%`;
-                
                 if (progress < 30) {
                     progressText.textContent = 'AI가 기사 구조를 분석하고 있습니다...';
                 } else if (progress < 70) {
@@ -998,34 +989,28 @@ author: "${author}"
                     progressText.textContent = '완료되었습니다!';
                 }
             });
-
-            // 생성된 기사를 폼에 입력
-            document.getElementById('title').value = result.title.replace(/<\/?h1[^>]*>/g, '');
+            const titleMatch = result.title.match(/<h1[^>]*>(.*?)<\/h1>/);
+            const cleanTitle = titleMatch ? titleMatch[1] : result.title.replace(/<\/?h1[^>]*>/g, '');
+            document.getElementById('title').value = cleanTitle;
             document.getElementById('category').value = articleData.category;
             document.getElementById('description').value = articleData.description;
-            document.getElementById('content').value = result.content;
-
-            // 미리보기 업데이트
+            const fullContent = `${result.title}\n\n${result.content}`;
+            document.getElementById('content').value = fullContent;
+            if (result.slug) {
+                document.getElementById('content').setAttribute('data-suggested-slug', result.slug);
+            }
             this.updatePreview();
-
-            // 모달 닫기
             const modal = bootstrap.Modal.getInstance(document.getElementById('aiWriteModal'));
             modal?.hide();
-
-            // 성공 메시지
             this.showNotification('AI 기사가 성공적으로 생성되었습니다!', 'success');
-
-            // 기사 작성 탭으로 이동
             const writeTab = document.getElementById('write-tab');
             if (writeTab) {
                 writeTab.click();
             }
-
         } catch (error) {
             console.error('AI 기사 생성 오류:', error);
             this.showNotification(`AI 기사 생성 실패: ${error.message}`, 'error');
         } finally {
-            // 진행률 숨기기
             const progressDiv = document.getElementById('aiProgress');
             progressDiv.style.display = 'none';
         }
@@ -1035,6 +1020,13 @@ author: "${author}"
     generateFilename() {
         const title = document.getElementById('title')?.value || '';
         const category = document.getElementById('category')?.value || 'automotive';
+        const contentElement = document.getElementById('content');
+        
+        // AI가 생성한 슬러그가 있으면 우선 사용
+        const suggestedSlug = contentElement?.getAttribute('data-suggested-slug');
+        if (suggestedSlug) {
+            return `${suggestedSlug}.md`;
+        }
         
         // 한글을 영문으로 변환하는 맵핑
         const koreanToEnglish = {
@@ -1171,7 +1163,7 @@ author: "${author}"
         this.showNotification('폼이 초기화되었습니다.', 'info');
     }
 
-    // 🖼️ 이미지 업로드 처리
+    // 🖼️ 이미지 업로드 처리 (Cloudflare Images 기반으로 수정)
     async handleImageUpload(files) {
         if (!files || files.length === 0) return;
 
@@ -1188,51 +1180,38 @@ author: "${author}"
         const imagePathsList = document.getElementById('imagePathsList');
 
         try {
-            // 진행률 표시
             uploadProgress.style.display = 'block';
             progressText.textContent = '이미지를 업로드하고 있습니다...';
 
-            // 슬러그 생성 (파일명용)
-            const title = document.getElementById('title')?.value || 'untitled';
-            const slug = this.generateSlugFromTitle(title);
-
-            // 이미지 업로드 (Local Image Uploader 사용)
-            const imagePaths = [];
+            // 업로드된 Cloudflare 이미지 URL 저장
+            this.uploadedImageUrls = [];
             const previewImages = [];
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                progressText.textContent = `이미지 ${i + 1}/${files.length}을 처리하고 있습니다...`;
-                
+                progressText.textContent = `이미지 ${i + 1}/${files.length}을 Cloudflare에 업로드 중...`;
                 try {
-                    const imagePath = await window.localImageUploader.uploadLocalImage(
-                        file, 
-                        slug, 
-                        i + 1,
+                    const result = await window.cloudflareImages.uploadImage(
+                        file,
                         (progress) => {
                             const totalProgress = ((i * 100) + progress) / files.length;
                             progressBar.style.width = `${totalProgress}%`;
                         }
                     );
-                    
-                    imagePaths.push(imagePath);
-                    
-                    // 미리보기 이미지 생성
-                    const preview = window.localImageUploader.getImagePreview(slug, i + 1);
-                    if (preview) {
-                        previewImages.push({
-                            path: imagePath,
-                            preview: preview,
-                            index: i + 1
-                        });
-                    }
+                    this.uploadedImageUrls.push(result.hugoUrl);
+                    // 미리보기용 썸네일(variant) 사용
+                    previewImages.push({
+                        path: result.hugoUrl,
+                        preview: result.variants.thumbnail,
+                        index: i + 1
+                    });
                 } catch (error) {
                     console.error(`이미지 ${i + 1} 업로드 실패:`, error);
                     this.showNotification(`이미지 ${i + 1} 업로드 실패: ${error.message}`, 'error');
                 }
             }
 
-            if (imagePaths.length > 0) {
+            if (this.uploadedImageUrls.length > 0) {
                 // 미리보기 표시
                 imagePreviewGrid.innerHTML = previewImages.map(img => `
                     <div class="col-6 col-md-3">
@@ -1243,20 +1222,15 @@ author: "${author}"
                     </div>
                 `).join('');
 
-                // 이미지 경로 표시
-                imagePathsList.textContent = imagePaths.join('\n');
-                
-                // 미리보기 컨테이너 표시
+                // 이미지 경로 표시 (Cloudflare URL)
+                imagePathsList.textContent = this.uploadedImageUrls.join('\n');
                 imagePreviewContainer.style.display = 'block';
-
-                this.showNotification(`${imagePaths.length}개의 이미지가 업로드되었습니다.`, 'success');
+                this.showNotification(`${this.uploadedImageUrls.length}개의 이미지가 업로드되었습니다.`, 'success');
             }
-
         } catch (error) {
             console.error('이미지 업로드 오류:', error);
             this.showNotification('이미지 업로드에 실패했습니다.', 'error');
         } finally {
-            // 진행률 숨기기
             uploadProgress.style.display = 'none';
         }
     }

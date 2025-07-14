@@ -155,22 +155,25 @@ class OpenAIWriter {
      * @returns {string} 시스템 프롬프트
      */
     generateSystemPrompt(articleData) {
-        const { title, description, category } = articleData;
-        const categoryName = category === 'automotive' ? '자동차 뉴스' : '경제 뉴스';
+        const { title, description, category, referenceContent, imageUrls } = articleData;
+        
+        // 카테고리 판별
+        const categoryType = this.determineEconomyOrAutomotive(title, description, category);
+        const categoryName = categoryType === 'automotive' ? '자동차 뉴스' : '경제 뉴스';
         
         // 감성 키워드 데이터베이스 - 카테고리별로 구분
         const emotionalKeywords = {
             '경제 뉴스': ['충격', '깜짝', '돌파', '폭등', '폭락', '대박', '급등', '급락', '흔들', '뒤집힌', '주목', '열풍', '비상', '파란불', '빨간불', '불안한', '역대급', '격변', '요동', '쏟아진'],
-            '자동차 뉴스': ['파격', '역대급', '신차', '놀라운', '혁신', '전격', '출시', '완판', '돌풍', '대기록', '돌파', '신기록', '반전', '기대', '논란', '대반전', '대변신', '완벽', '압도적', '화제의']
+            '자동차 뉴스': ['파격', '역대급', '신차', '놀라운', '혁신', '전격', '출시', '완판', '돌풍', '대기록', '돌파', '신기록', '반전', '기대', '논란', '대반전', '대변신', '완벽', '압도적', '화제의', '완전히 새로운']
         };
 
-        // 이미지 태그 생성
-        const imgTags = [
-            '<img src="/images/IMG_PLACEHOLDER_1.jpg" alt="ALT_PLACEHOLDER_1"/>',
-            '<img src="/images/IMG_PLACEHOLDER_2.jpg" alt="ALT_PLACEHOLDER_2"/>',
-            '<img src="/images/IMG_PLACEHOLDER_3.jpg" alt="ALT_PLACEHOLDER_3"/>',
-            '<img src="/images/IMG_PLACEHOLDER_4.jpg" alt="ALT_PLACEHOLDER_4"/>'
-        ];
+        // 이미지 태그 생성 (Cloudflare 이미지 URL 우선)
+        let imgTags;
+        if (Array.isArray(imageUrls) && imageUrls.length > 0) {
+            imgTags = [0, 1].map(idx => `<img src=\"${imageUrls[idx] || imageUrls[0]}\" alt=\"${this.getOptimizedAltText(title, categoryType, idx)}\"/>`);
+        } else {
+            imgTags = ['IMG_URL_1', 'IMG_URL_2'].map((url, idx) => `<img src=\"${url}\" alt=\"${this.getOptimizedAltText(title, categoryType, idx)}\"/>`);
+        }
 
         return `다음 기사를 오토데일프릭스 스타일로 재작성해 주세요. 반드시 아래 HTML 구조를 따릅니다.
 
@@ -184,31 +187,30 @@ class OpenAIWriter {
 8) <p>단락3 (3~4문장)</p>
 9) <p>단락4 (3~4문장)</p>
 10) <h2>요약 소제목 (간결하게)</h2>
-11) ${imgTags[2]}
-12) <p>단락5 (3~4문장)</p>
-13) <p>단락6 (3~4문장)</p>
-14) <h2>요약 소제목 (간결하게)</h2>
-15) ${imgTags[3]}
-16) <p>단락7 (3~4문장)</p>
-17) <p>단락8 (3~4문장)</p>
+11) <p>단락5 (3~4문장)</p>
+12) <p>단락6 (3~4문장)</p>
+13) <h2>요약 소제목 (간결하게)</h2>
+14) <p>단락7 (3~4문장)</p>
+15) <p>단락8 (3~4문장)</p>
 
 제목: ${title}
 요약: ${description}
 카테고리: ${categoryName}
+${referenceContent ? `\n참고 자료:\n${referenceContent}\n` : ''}
 
 필수 작성 규칙:
-- 제목은 '"감성어+핵심사항"…보충설명' 형태로 작성 (예: "깜짝 실적 발표"…현대차 3분기 영업이익 2조 돌파)
+- 제목은 '"감성어+핵심사항"…보충설명' 형태로 작성 (예: "완전히 새로운 차원"…현대 IONIQ 9, 3열 전기 SUV 시장 혁신)
 - 감성 키워드는 ${this.getRandomItems(emotionalKeywords[categoryName], 3).join(', ')} 등을 활용
 - 큰따옴표 안에 짧고 강렬한 문구, 문장 끝 말줄임표(…) 필수
 - 수직 막대 텍스트는 기사의 핵심을 짧게 2줄로 요약
 - 문단은 3-4문장으로, 마지막 문장은 흥미/호기심을 유발하는 질문이나 흥미로운 사실로 마무리
-- 각 소제목(h2)은 '어떻게', '왜', '얼마나' 등의 의문형이나 감탄형으로 작성
+- 각 소제목(h2)은 '어떻게', '왜', '얼마나' 등의 의문형이나 감탄형으로 작성 (예: 혁신적인 실내 공간 설계의 비밀)
 - 일반 독자도 이해하기 쉽게 전문용어는 풀어서 설명
-- 각 단락 내 핵심 문구는 <strong> 태그로 강조
+- 각 단락 내 핵심 문구는 <strong> 태그로 강조 (예: **110.3kWh 대용량 배터리**)
 - 통계, 수치 등 구체적 정보를 포함하여 신뢰성 확보
 - 첫 단락에 기사의 핵심을 요약하되, 흥미를 끌 수 있는 내용으로 구성
 - 맨 마지막 단락은 향후 전망이나 소비자/독자에게 유용한 조언으로 마무리
-- <img> 태그는 플레이스홀더를 그대로 사용하고 수정·삭제하지 마세요.
+- <img> 태그 src 값은 IMG_URL_1~2 플레이스홀더를 그대로 사용하고 수정·삭제하지 마세요.
 - 태그 섹션, 관련 기사 섹션, SNS 공유 버튼을 포함하지 마세요.
 - 코드 아이콘(</>)이나 기타 HTML 태그를 콘텐츠의 시작이나 끝에 추가하지 마세요.
 
@@ -221,7 +223,7 @@ ${title}
 - 최대 5-6단어 이내 (짧을수록 좋음)
 - 주요 키워드를 맨 앞에 배치
 - 특수문자·따옴표 제거, 소문자, 띄어쓰기→하이픈, 중복 하이픈 제거
-- 영문 슬러그 예시: hyundai-motor-record-profit, stock-market-crash, new-ev-revolution
+- 영문 슬러그 예시: hyundai-ioniq-9-three-row-electric-suv, hyundai-2025-lineup-innovation
 
 응답은 반드시 JSON 형식으로만 제공하세요:
 {
@@ -347,15 +349,12 @@ ${title}
      * @returns {string} 처리된 콘텐츠
      */
     processImagePlaceholders(content, slug, title, category) {
-        // 이미지 플레이스홀더 교체
-        for (let i = 1; i <= 4; i++) {
-            const placeholder = `IMG_PLACEHOLDER_${i}`;
-            const altPlaceholder = `ALT_PLACEHOLDER_${i}`;
-            const imagePath = `${slug}-${i}.jpg`;
-            const altText = this.getOptimizedAltText(title, category, i - 1);
+        // 이미지 플레이스홀더 교체 (프로젝트 양식에 맞춤 - 2개 이미지만)
+        for (let i = 1; i <= 2; i++) {
+            const placeholder = `IMG_URL_${i}`;
+            const imagePath = `https://images.unsplash.com/photo-placeholder-${i}?w=1600&h=900&fit=crop&q=95`;
             
             content = content.replace(new RegExp(placeholder, 'g'), imagePath);
-            content = content.replace(new RegExp(altPlaceholder, 'g'), altText);
         }
         
         return content;
