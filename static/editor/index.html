@@ -174,11 +174,17 @@
                         </div>
                         <div class="card-body">
                             <div class="mb-3">
-                                <label class="form-label">기사 주제</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="aiTopic" 
-                                       placeholder="기사 주제를 입력하세요">
+                                <label class="form-label">기사 내용</label>
+                                <textarea class="form-control" 
+                                          id="aiContent" 
+                                          rows="8" 
+                                          placeholder="구조화하고 싶은 기사 내용을 입력하세요. AI가 자동으로 제목, 소제목, 단락 구성을 정리하고 이미지를 배치합니다."></textarea>
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-lightbulb me-1"></i>
+                                        원문 그대로 붙여넣으셔도 됩니다. AI가 읽기 쉽게 구조화해드립니다.
+                                    </small>
+                                </div>
                             </div>
                             
                             <!-- 이미지 업로드 섹션 -->
@@ -202,12 +208,12 @@
                             </div>
                             
                             <button type="button" class="btn btn-primary btn-sm w-100" id="generateAIBtn">
-                                <i class="fas fa-magic me-1"></i>AI로 기사 생성
+                                <i class="fas fa-magic me-1"></i>AI로 기사 구조화
                             </button>
                             <div class="mt-2">
                                 <small class="text-muted">
                                     <i class="fas fa-info-circle me-1"></i>
-                                    주제와 이미지를 입력하면 AI가 전체 기사를 작성하고 이미지를 적절히 배치합니다
+                                    기사 내용과 이미지를 입력하면 AI가 구조화된 형식으로 변환하고 이미지를 적절히 배치합니다
                                 </small>
                             </div>
                         </div>

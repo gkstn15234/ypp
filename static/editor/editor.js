@@ -363,12 +363,12 @@ class SimpleEditor {
         }
     }
 
-    // AI 기사 생성 (이미지 5장 포함)
+    // AI 기사 구조화 (사용자 내용 + 이미지)
     async generateAIArticle() {
-        const topic = document.getElementById('aiTopic').value.trim();
+        const content = document.getElementById('aiContent').value.trim();
         
-        if (!topic) {
-            this.showToast('기사 주제를 입력해주세요.', 'error');
+        if (!content) {
+            this.showToast('구조화할 기사 내용을 입력해주세요.', 'error');
             return;
         }
 
@@ -377,7 +377,7 @@ class SimpleEditor {
             return;
         }
 
-        this.showLoading('AI가 기사를 생성하고 있습니다...');
+        this.showLoading('AI가 기사를 구조화하고 있습니다...');
 
         try {
             // 업로드된 이미지 확인
@@ -386,8 +386,8 @@ class SimpleEditor {
                 return;
             }
 
-            // 1단계: 기사 생성
-            const article = await this.generateWithOpenAI(topic);
+            // 1단계: 기사 구조화
+            const article = await this.restructureContentWithOpenAI(content);
             
             // 2단계: 업로드된 이미지 URL 추출
             const imageUrls = this.aiUploadedImages.map(img => img.url);
@@ -413,23 +413,23 @@ class SimpleEditor {
             this.updatePermalink(article.title);
             this.updateDescriptionCount(article.description.length);
             
-            this.showToast('AI 기사와 이미지가 생성되었습니다!', 'success');
+            this.showToast('기사가 구조화되고 이미지가 배치되었습니다!', 'success');
             
             // 입력창 및 이미지 초기화
-            document.getElementById('aiTopic').value = '';
+            document.getElementById('aiContent').value = '';
             this.clearAIImages();
             
         } catch (error) {
-            console.error('AI 생성 오류:', error);
-            this.showToast('AI 기사 생성에 실패했습니다.', 'error');
+            console.error('AI 구조화 오류:', error);
+            this.showToast('기사 구조화에 실패했습니다.', 'error');
         } finally {
             this.hideLoading();
         }
     }
 
-    // OpenAI API 호출 (향상된 구조화된 콘텐츠)
-    async generateWithOpenAI(topic) {
-        const category = this.determineCategory(topic);
+    // OpenAI API 호출 (기사 내용 구조화)
+    async restructureContentWithOpenAI(content) {
+        const category = this.determineCategory(content);
         
         // 감성 키워드 데이터베이스
         const emotionalKeywords = {
@@ -439,9 +439,11 @@ class SimpleEditor {
 
         const selectedKeywords = this.getRandomItems(emotionalKeywords[category] || emotionalKeywords['자동차 뉴스'], 3);
         
-        const prompt = `다음 주제로 ${category}의 뉴스 기사를 작성해주세요:
+        const prompt = `다음 기사 내용을 ${category} 스타일의 구조화된 뉴스 기사로 재작성해주세요:
 
-주제: ${topic}
+원문 내용:
+${content}
+
 카테고리: ${category}
 
 반드시 아래 HTML 구조를 따라 작성해주세요:
@@ -464,19 +466,22 @@ class SimpleEditor {
 17) <p>단락8 (3~4문장)</p>
 18) [IMG_PLACEHOLDER_5]
 
-필수 작성 규칙:
+구조화 규칙:
+- 원문의 핵심 정보와 사실을 유지하되, 더 읽기 쉽고 매력적으로 재구성
 - 제목은 '"감성어+핵심사항"…보충설명' 형태로 작성 (예: "깜짝 실적 발표"…현대차 3분기 영업이익 2조 돌파)
-- 감성 키워드는 ${selectedKeywords.join(', ')} 등을 활용
+- 감성 키워드는 ${selectedKeywords.join(', ')} 등을 활용하여 제목을 매력적으로 만들기
 - 큰따옴표 안에 짧고 강렬한 문구, 문장 끝 말줄임표(…) 필수
-- 수직 막대 텍스트는 기사의 핵심을 짧게 2줄로 요약
-- 문단은 3-4문장으로, 마지막 문장은 흥미/호기심을 유발하는 질문이나 흥미로운 사실로 마무리
+- 수직 막대 텍스트는 원문의 핵심을 짧게 2줄로 요약
+- 원문을 8개 단락으로 나누어 재구성 (각 단락 3-4문장)
+- 마지막 문장은 흥미/호기심을 유발하는 질문이나 흥미로운 사실로 마무리
 - 각 소제목(h2)은 '어떻게', '왜', '얼마나' 등의 의문형이나 감탄형으로 작성
 - 일반 독자도 이해하기 쉽게 전문용어는 풀어서 설명
 - 각 단락 내 핵심 문구는 <strong> 태그로 강조
-- 통계, 수치 등 구체적 정보를 포함하여 신뢰성 확보
-- 첫 단락에 기사의 핵심을 요약하되, 흥미를 끌 수 있는 내용으로 구성
+- 원문의 통계, 수치 등을 그대로 유지하여 신뢰성 확보
+- 첫 단락에 원문의 핵심을 요약하되, 흥미를 끌 수 있는 내용으로 구성
 - 맨 마지막 단락은 향후 전망이나 소비자/독자에게 유용한 조언으로 마무리
 - [IMG_PLACEHOLDER_1~5]는 그대로 유지하고 수정하지 마세요
+- 원문의 사실과 정보를 왜곡하지 말고 정확하게 전달
 
 응답은 JSON 형식으로:
 {
@@ -496,11 +501,11 @@ class SimpleEditor {
             body: JSON.stringify({
                 model: 'gpt-4o',
                 messages: [
-                    { role: 'system', content: '당신은 전문 뉴스 기자입니다. 구조화된 기사를 정확하게 작성해주세요.' },
+                    { role: 'system', content: '당신은 전문 뉴스 에디터입니다. 주어진 기사 내용을 구조화된 형식으로 재작성하되, 원문의 사실과 정보를 정확하게 유지해주세요.' },
                     { role: 'user', content: prompt }
                 ],
                 max_tokens: 3000,
-                temperature: 0.7
+                temperature: 0.3
             })
         });
 
@@ -517,12 +522,13 @@ class SimpleEditor {
             return parsed;
         } catch (e) {
             // JSON 파싱 실패 시 기본 구조로 반환
+            const title = content.substring(0, 50) + (content.length > 50 ? '...' : '');
             return {
-                title: topic,
-                description: `${topic}에 대한 상세한 분석 기사입니다.`,
-                content: `<p>${topic}에 대한 내용을 다루는 기사입니다.</p>`,
+                title: title,
+                description: content.substring(0, 150) + (content.length > 150 ? '...' : ''),
+                content: `<p>${content}</p>`,
                 category: category,
-                slug: this.generateSlug(topic)
+                slug: this.generateSlug(title)
             };
         }
     }
