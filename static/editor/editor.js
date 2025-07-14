@@ -1022,25 +1022,33 @@ class SimpleEditor {
         emptyState.style.display = 'none';
 
         try {
-            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v2`, {
+            console.log('Cloudflare API 호출 시작:', `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1`);
+            
+            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${cloudflareApiToken}`,
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${cloudflareApiToken}`
                 }
             });
 
+            console.log('API 응답 상태:', response.status, response.statusText);
+
             if (!response.ok) {
-                throw new Error(`미디어 로드 실패: ${response.status}`);
+                const errorText = await response.text();
+                console.error('API 오류 응답:', errorText);
+                throw new Error(`미디어 로드 실패: ${response.status} - ${errorText}`);
             }
 
             const result = await response.json();
+            console.log('API 응답 데이터:', result);
             
             if (!result.success) {
-                throw new Error('미디어 로드 실패');
+                console.error('API 실패 응답:', result.errors);
+                throw new Error(`미디어 로드 실패: ${result.errors?.[0]?.message || '알 수 없는 오류'}`);
             }
 
-            this.mediaLibrary = result.result.images || [];
+            // v1 API는 result.images 형태로 반환
+            this.mediaLibrary = result.result.images || result.result || [];
             this.filteredMedia = [...this.mediaLibrary];
             this.renderMediaLibrary();
             
@@ -1048,7 +1056,20 @@ class SimpleEditor {
 
         } catch (error) {
             console.error('미디어 로드 오류:', error);
-            this.showToast('미디어 라이브러리를 불러올 수 없습니다.', 'error');
+            
+            // 더 자세한 에러 메시지 표시
+            let errorMessage = '미디어 라이브러리를 불러올 수 없습니다.';
+            if (error.message.includes('CORS')) {
+                errorMessage = 'CORS 오류: 브라우저 보안 정책으로 인한 제한입니다.';
+            } else if (error.message.includes('401')) {
+                errorMessage = 'API 토큰이 유효하지 않습니다.';
+            } else if (error.message.includes('403')) {
+                errorMessage = 'API 토큰에 Images 권한이 없습니다.';
+            } else if (error.message.includes('404')) {
+                errorMessage = 'Account ID가 올바르지 않습니다.';
+            }
+            
+            this.showToast(errorMessage, 'error');
             emptyState.style.display = 'block';
         } finally {
             loadingIndicator.style.display = 'none';
