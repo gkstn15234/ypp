@@ -1496,10 +1496,19 @@ ${content}
 
     // 워드프레스 가져오기 기능
     setupWordPressImport() {
+        console.log('setupWordPressImport 호출됨');
+        
         const wpPostsFileInput = document.getElementById('wpPostsFile');
         const wpImagesFileInput = document.getElementById('wpImagesFile');
         const startImportBtn = document.getElementById('startWpImport');
         const selectAllCheckbox = document.getElementById('selectAllPosts');
+        
+        console.log('워드프레스 가져오기 DOM 요소 확인:', {
+            wpPostsFileInput: !!wpPostsFileInput,
+            wpImagesFileInput: !!wpImagesFileInput,
+            startImportBtn: !!startImportBtn,
+            selectAllCheckbox: !!selectAllCheckbox
+        });
         
         if (wpPostsFileInput) {
             wpPostsFileInput.addEventListener('change', (e) => this.handleWpPostsFileSelect(e));
@@ -1511,6 +1520,8 @@ ${content}
         
         if (startImportBtn) {
             startImportBtn.addEventListener('click', () => this.startWordPressImport());
+        } else {
+            console.error('startWpImport 버튼을 찾을 수 없습니다!');
         }
         
         if (selectAllCheckbox) {
@@ -1538,6 +1549,8 @@ ${content}
         progressDiv.style.display = 'block';
 
         try {
+            console.log('파일 처리 시작:', file.name, '크기:', file.size);
+            
             // 파일 크기 검증 (50MB 제한)
             if (file.size > 50 * 1024 * 1024) {
                 throw new Error(`파일이 너무 큽니다: ${file.name} (최대 50MB)`);
@@ -1548,15 +1561,21 @@ ${content}
                 throw new Error(`지원하지 않는 파일 형식: ${file.name}`);
             }
 
+            console.log('파일 파싱 시작...');
             const posts = await this.parseWordPressFile(file);
+            console.log('파싱 완료, 발견된 글 수:', posts.length);
             
             if (posts.length === 0) {
                 throw new Error('가져올 수 있는 발행된 글이 없습니다.');
             }
 
             this.wpPostsData = posts;
+            console.log('wpPostsData 설정 완료:', this.wpPostsData.length);
+            
             this.displayWordPressPosts(posts);
             this.updateImportButtonState();
+            
+            console.log('버튼 상태 업데이트 완료');
             progressDiv.style.display = 'none';
             
             this.showToast(`${posts.length}개의 글을 발견했습니다.`, 'success');
@@ -1622,7 +1641,21 @@ ${content}
 
     updateImportButtonState() {
         const startImportBtn = document.getElementById('startWpImport');
-        startImportBtn.disabled = !this.wpPostsData || this.wpPostsData.length === 0;
+        const hasData = this.wpPostsData && this.wpPostsData.length > 0;
+        
+        console.log('버튼 상태 업데이트:', {
+            wpPostsData: this.wpPostsData,
+            length: this.wpPostsData ? this.wpPostsData.length : 0,
+            hasData: hasData,
+            buttonExists: !!startImportBtn
+        });
+        
+        if (startImportBtn) {
+            startImportBtn.disabled = !hasData;
+            console.log('버튼 disabled 상태:', startImportBtn.disabled);
+        } else {
+            console.error('startWpImport 버튼을 찾을 수 없습니다!');
+        }
     }
 
     async parseWordPressFile(file) {
@@ -2054,12 +2087,23 @@ ${content}
     }
 
     displayWordPressPosts(posts) {
+        console.log('displayWordPressPosts 호출됨, posts 수:', posts.length);
+        
         const preview = document.getElementById('wpFilePreview');
         const postsList = document.getElementById('wpPostsList');
         
-        if (!preview || !postsList) return;
+        console.log('DOM 요소 확인:', {
+            preview: !!preview,
+            postsList: !!postsList
+        });
+        
+        if (!preview || !postsList) {
+            console.error('필요한 DOM 요소를 찾을 수 없습니다!');
+            return;
+        }
 
         postsList.innerHTML = '';
+        console.log('기존 목록 초기화 완료');
         
         posts.forEach((post, index) => {
             const row = document.createElement('tr');
@@ -2087,6 +2131,11 @@ ${content}
 
         this.wordPressPosts = posts;
         preview.style.display = 'block';
+        
+        console.log('글 목록 표시 완료:', {
+            wordPressPosts: this.wordPressPosts.length,
+            previewVisible: preview.style.display === 'block'
+        });
     }
 
     toggleAllPosts(checked) {
