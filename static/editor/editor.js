@@ -5,6 +5,9 @@ class SimpleEditor {
     constructor() {
         this.quill = null;
         this.uploadedImages = [];
+        this.mediaLibrary = [];
+        this.filteredMedia = [];
+        this.mediaView = 'grid';
         this.settings = {
             openaiApiKey: localStorage.getItem('openai-api-key') || '',
             githubToken: localStorage.getItem('github-token') || '',
@@ -20,8 +23,10 @@ class SimpleEditor {
         this.setupQuillEditor();
         this.setupEventListeners();
         this.setupAutoSave();
+        this.setupWordPressImport();
         this.loadDraft();
         this.loadRecentArticles();
+        this.loadSettings();
     }
 
     // Quill 에디터 설정
@@ -73,7 +78,28 @@ class SimpleEditor {
         // 모달 이벤트
         document.getElementById('saveAISettings').addEventListener('click', () => this.saveAISettings());
         document.getElementById('saveGithubSettings').addEventListener('click', () => this.saveGithubSettings());
+        document.getElementById('saveCloudflareSettings').addEventListener('click', () => this.saveCloudflareSettings());
         document.getElementById('publishFromPreview').addEventListener('click', () => this.publishArticle());
+        
+        // 미디어 관리 이벤트
+        document.getElementById('refreshMediaBtn').addEventListener('click', () => this.loadMediaLibrary());
+        document.getElementById('uploadNewMediaBtn').addEventListener('click', () => this.showImageUpload());
+        document.getElementById('mediaSearchInput').addEventListener('input', (e) => this.filterMedia(e.target.value));
+        document.getElementById('mediaSortSelect').addEventListener('change', (e) => this.sortMedia(e.target.value));
+        document.getElementById('gridViewBtn').addEventListener('click', () => this.setMediaView('grid'));
+        document.getElementById('listViewBtn').addEventListener('click', () => this.setMediaView('list'));
+        
+        // 미디어 관리 모달 이벤트
+        document.getElementById('mediaManagerModal').addEventListener('shown.bs.modal', () => {
+            this.loadMediaLibrary();
+        });
+
+        // 임시 저장 관리 이벤트
+        document.getElementById('refreshDraftsBtn').addEventListener('click', () => this.loadDraftList());
+        document.getElementById('cleanOldDraftsBtn').addEventListener('click', () => this.cleanOldDrafts());
+        document.getElementById('draftManagerModal').addEventListener('shown.bs.modal', () => {
+            this.loadDraftList();
+        });
 
         // 이미지 업로드
         document.getElementById('imageInput').addEventListener('change', (e) => this.handleImageUpload(e.target.files));
@@ -175,22 +201,48 @@ class SimpleEditor {
     async handleImageUpload(files) {
         if (!files.length) return;
 
-        this.showLoading('이미지 업로드 중...');
+        const validFiles = Array.from(files).filter(file => {
+            if (!file.type.startsWith('image/')) {
+                this.showToast(`${file.name}은(는) 이미지 파일이 아닙니다.`, 'warning');
+                return false;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+                this.showToast(`${file.name}의 크기가 너무 큽니다 (최대 5MB).`, 'error');
+                return false;
+            }
+            
+            return true;
+        });
+
+        if (validFiles.length === 0) return;
+
+        this.showLoading(`이미지 업로드 중... (${validFiles.length}개)`);
         
         try {
-            for (const file of files) {
-                if (!file.type.startsWith('image/')) {
-                    continue;
+            const uploadPromises = validFiles.map(async (file, index) => {
+                try {
+                    const imageUrl = await this.uploadToCloudflare(file);
+                    this.addUploadedImage(imageUrl, file.name);
+                    return { success: true, file: file.name, url: imageUrl };
+                } catch (error) {
+                    console.error(`${file.name} 업로드 실패:`, error);
+                    return { success: false, file: file.name, error: error.message };
                 }
+            });
 
-                if (file.size > 5 * 1024 * 1024) { // 5MB 제한
-                    this.showToast('파일 크기는 5MB 이하만 가능합니다.', 'error');
-                    continue;
-                }
+            const results = await Promise.all(uploadPromises);
+            const successful = results.filter(r => r.success);
+            const failed = results.filter(r => !r.success);
 
-                const imageUrl = await this.uploadToCloudflare(file);
-                this.addUploadedImage(imageUrl, file.name);
+            if (successful.length > 0) {
+                this.showToast(`${successful.length}개 이미지가 성공적으로 업로드되었습니다.`, 'success');
             }
+            
+            if (failed.length > 0) {
+                this.showToast(`${failed.length}개 이미지 업로드에 실패했습니다.`, 'error');
+            }
+
         } catch (error) {
             console.error('이미지 업로드 오류:', error);
             this.showToast('이미지 업로드에 실패했습니다.', 'error');
@@ -204,27 +256,43 @@ class SimpleEditor {
         const { cloudflareAccountId, cloudflareApiToken } = this.settings;
         
         if (!cloudflareAccountId || !cloudflareApiToken) {
-            // 설정이 없으면 로컬 URL 생성 (데모용)
-            return URL.createObjectURL(file);
+            this.showToast('Cloudflare 설정을 먼저 완료해주세요.', 'warning');
+            throw new Error('Cloudflare 설정이 필요합니다');
         }
 
         const formData = new FormData();
         formData.append('file', file);
 
-        const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${cloudflareApiToken}`
-            },
-            body: formData
-        });
+        try {
+            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${cloudflareApiToken}`
+                },
+                body: formData
+            });
 
-        if (!response.ok) {
-            throw new Error('Cloudflare 업로드 실패');
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Cloudflare 오류:', errorData);
+                throw new Error(`Cloudflare 업로드 실패: ${errorData.errors?.[0]?.message || response.status}`);
+            }
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(`업로드 실패: ${result.errors?.[0]?.message || '알 수 없는 오류'}`);
+            }
+
+            // 업로드 성공 시 최적화된 이미지 URL 반환
+            const imageUrl = result.result.variants?.[0] || result.result.url;
+            this.showToast('이미지가 성공적으로 업로드되었습니다.', 'success');
+            return imageUrl;
+            
+        } catch (error) {
+            console.error('Cloudflare 업로드 오류:', error);
+            this.showToast(`이미지 업로드 실패: ${error.message}`, 'error');
+            throw error;
         }
-
-        const result = await response.json();
-        return result.result.variants[0]; // 첫 번째 변형 사용
     }
 
     // 업로드된 이미지 추가
@@ -235,17 +303,37 @@ class SimpleEditor {
         const imageDiv = document.createElement('div');
         imageDiv.className = 'uploaded-image fade-in';
         imageDiv.innerHTML = `
-            <img src="${imageUrl}" alt="${fileName}">
-            <button class="remove-btn" onclick="editor.removeImage('${imageUrl}')">
-                <i class="fas fa-times"></i>
-            </button>
+            <img src="${imageUrl}" alt="${fileName}" title="${fileName}">
+            <div class="image-info">
+                <small class="text-muted">${fileName}</small>
+            </div>
+            <div class="image-actions">
+                <button class="btn btn-sm btn-outline-primary" onclick="editor.insertImageToEditor('${imageUrl}', '${fileName}')" title="에디터에 삽입">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="editor.removeImage('${imageUrl}')" title="삭제">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         `;
         
         container.appendChild(imageDiv);
         
-        // 에디터에 이미지 삽입
-        const range = this.quill.getSelection();
-        this.quill.insertEmbed(range ? range.index : 0, 'image', imageUrl);
+        // 에디터에 자동으로 이미지 삽입
+        this.insertImageToEditor(imageUrl, fileName);
+    }
+
+    // 에디터에 이미지 삽입
+    insertImageToEditor(imageUrl, fileName) {
+        const range = this.quill.getSelection() || { index: this.quill.getLength() };
+        
+        // 이미지 삽입
+        this.quill.insertEmbed(range.index, 'image', imageUrl);
+        
+        // 이미지 다음 줄로 커서 이동
+        this.quill.setSelection(range.index + 1);
+        
+        this.showToast('이미지가 에디터에 삽입되었습니다.', 'success');
     }
 
     // 이미지 제거
@@ -534,8 +622,8 @@ class SimpleEditor {
         return response.json();
     }
 
-    // 임시 저장
-    saveDraft(silent = false) {
+    // 임시 저장 (GitHub 기반)
+    async saveDraft(silent = false) {
         const draft = {
             title: document.getElementById('articleTitle').value,
             description: document.getElementById('description').value,
@@ -547,19 +635,108 @@ class SimpleEditor {
             timestamp: new Date().toISOString()
         };
 
-        localStorage.setItem('article-draft', JSON.stringify(draft));
-        
-        if (!silent) {
-            this.showToast('임시 저장되었습니다.', 'success');
+        try {
+            // 로컬 스토리지에도 백업 저장 (즉시 복구용)
+            localStorage.setItem('article-draft', JSON.stringify(draft));
+            
+            // GitHub에 임시 저장 (영구 보관용)
+            if (this.settings.githubToken) {
+                await this.saveDraftToGitHub(draft);
+                if (!silent) {
+                    this.showToast('임시 저장되었습니다. (클라우드 동기화 완료)', 'success');
+                }
+            } else {
+                if (!silent) {
+                    this.showToast('임시 저장되었습니다. (로컬만)', 'warning');
+                }
+            }
+        } catch (error) {
+            console.error('임시 저장 오류:', error);
+            // 로컬 저장은 성공했으므로 경고만 표시
+            if (!silent) {
+                this.showToast('로컬에 임시 저장되었습니다. (클라우드 동기화 실패)', 'warning');
+            }
         }
     }
 
-    // 임시 저장 불러오기
-    loadDraft() {
-        const draft = localStorage.getItem('article-draft');
-        if (!draft) return;
-
+    // GitHub에 임시 저장
+    async saveDraftToGitHub(draft) {
+        const draftId = this.generateDraftId();
+        const filename = `draft-${draftId}.json`;
+        const path = `drafts/${filename}`;
+        
+        const encodedContent = btoa(unescape(encodeURIComponent(JSON.stringify(draft, null, 2))));
+        
+        // 기존 임시 저장 파일이 있는지 확인
+        let sha = null;
         try {
+            const existingResponse = await fetch(`https://api.github.com/repos/gkstn15234/123/contents/${path}`, {
+                headers: {
+                    'Authorization': `token ${this.settings.githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (existingResponse.ok) {
+                const existingData = await existingResponse.json();
+                sha = existingData.sha;
+            }
+        } catch (error) {
+            // 파일이 없으면 새로 생성
+        }
+
+        const response = await fetch(`https://api.github.com/repos/gkstn15234/123/contents/${path}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${this.settings.githubToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Save draft: ${draft.title || 'Untitled'}`,
+                content: encodedContent,
+                branch: 'main',
+                ...(sha && { sha }) // 기존 파일이 있으면 SHA 포함
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`GitHub 임시 저장 실패: ${response.status}`);
+        }
+
+        // 현재 임시 저장 ID를 로컬에 저장
+        localStorage.setItem('current-draft-id', draftId);
+        
+        return response.json();
+    }
+
+    // 임시 저장 ID 생성
+    generateDraftId() {
+        // 기존 ID가 있으면 재사용, 없으면 새로 생성
+        let draftId = localStorage.getItem('current-draft-id');
+        if (!draftId) {
+            draftId = Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+        return draftId;
+    }
+
+    // 임시 저장 불러오기 (GitHub 우선)
+    async loadDraft() {
+        try {
+            // 먼저 GitHub에서 불러오기 시도
+            if (this.settings.githubToken) {
+                const cloudDraft = await this.loadDraftFromGitHub();
+                if (cloudDraft) {
+                    this.restoreFromDraft(cloudDraft);
+                    this.showToast('클라우드에서 임시 저장 데이터를 불러왔습니다.', 'info');
+                    return;
+                }
+            }
+            
+            // GitHub에 없으면 로컬에서 불러오기
+            const draft = localStorage.getItem('article-draft');
+            if (!draft) return;
+
             const data = JSON.parse(draft);
             
             // 24시간 이내 저장된 것만 불러오기
@@ -572,29 +749,76 @@ class SimpleEditor {
                 return;
             }
 
-            // 폼에 데이터 복원
-            document.getElementById('articleTitle').value = data.title || '';
-            document.getElementById('description').value = data.description || '';
-            document.getElementById('category').value = data.category || 'automotive';
-            document.getElementById('author').value = data.author || 'oh-eun-jin';
-            document.getElementById('tags').value = data.tags || '';
-            this.quill.root.innerHTML = data.content || '';
-            
-            if (data.images && data.images.length > 0) {
-                this.uploadedImages = data.images;
-                this.renderUploadedImages();
-            }
-
-            if (data.title) {
-                this.updatePermalink(data.title);
-            }
-            
-            if (data.description) {
-                this.updateDescriptionCount(data.description.length);
-            }
+            this.restoreFromDraft(data);
+            this.showToast('로컬에서 임시 저장 데이터를 불러왔습니다.', 'info');
 
         } catch (error) {
             console.error('임시 저장 데이터 로드 오류:', error);
+        }
+    }
+
+    // GitHub에서 임시 저장 불러오기
+    async loadDraftFromGitHub() {
+        const draftId = localStorage.getItem('current-draft-id');
+        if (!draftId) return null;
+
+        const filename = `draft-${draftId}.json`;
+        const path = `drafts/${filename}`;
+
+        try {
+            const response = await fetch(`https://api.github.com/repos/gkstn15234/123/contents/${path}`, {
+                headers: {
+                    'Authorization': `token ${this.settings.githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!response.ok) {
+                return null; // 파일이 없거나 접근 실패
+            }
+
+            const data = await response.json();
+            const content = atob(data.content);
+            const draft = JSON.parse(content);
+
+            // 7일 이내 저장된 것만 불러오기 (클라우드는 더 오래 보관)
+            const saveTime = new Date(draft.timestamp);
+            const now = new Date();
+            const diffDays = (now - saveTime) / (1000 * 60 * 60 * 24);
+            
+            if (diffDays > 7) {
+                return null;
+            }
+
+            return draft;
+
+        } catch (error) {
+            console.error('GitHub 임시 저장 로드 오류:', error);
+            return null;
+        }
+    }
+
+    // 임시 저장 데이터로 폼 복원
+    restoreFromDraft(data) {
+        // 폼에 데이터 복원
+        document.getElementById('articleTitle').value = data.title || '';
+        document.getElementById('description').value = data.description || '';
+        document.getElementById('category').value = data.category || 'automotive';
+        document.getElementById('author').value = data.author || 'oh-eun-jin';
+        document.getElementById('tags').value = data.tags || '';
+        this.quill.root.innerHTML = data.content || '';
+        
+        if (data.images && data.images.length > 0) {
+            this.uploadedImages = data.images;
+            this.renderUploadedImages();
+        }
+
+        if (data.title) {
+            this.updatePermalink(data.title);
+        }
+        
+        if (data.description) {
+            this.updateDescriptionCount(data.description.length);
         }
     }
 
@@ -715,6 +939,552 @@ class SimpleEditor {
         this.showToast('GitHub 설정이 저장되었습니다.', 'success');
     }
 
+    // Cloudflare 설정 저장
+    saveCloudflareSettings() {
+        const accountId = document.getElementById('cloudflareAccountId').value.trim();
+        const apiToken = document.getElementById('cloudflareApiToken').value.trim();
+        
+        if (!accountId || !apiToken) {
+            this.showToast('Account ID와 API Token을 모두 입력해주세요.', 'error');
+            return;
+        }
+
+        this.settings.cloudflareAccountId = accountId;
+        this.settings.cloudflareApiToken = apiToken;
+        localStorage.setItem('cf-account-id', accountId);
+        localStorage.setItem('cf-api-token', apiToken);
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('cloudflareSettingsModal'));
+        modal.hide();
+        
+        this.showToast('Cloudflare 설정이 저장되었습니다.', 'success');
+    }
+
+    // 설정 로드
+    loadSettings() {
+        // OpenAI API 키 로드
+        if (this.settings.openaiApiKey) {
+            document.getElementById('openaiApiKey').value = this.settings.openaiApiKey;
+        }
+        
+        // GitHub 토큰 로드
+        if (this.settings.githubToken) {
+            document.getElementById('githubToken').value = this.settings.githubToken;
+        }
+        
+        // Cloudflare 설정 로드
+        if (this.settings.cloudflareAccountId) {
+            document.getElementById('cloudflareAccountId').value = this.settings.cloudflareAccountId;
+        }
+        if (this.settings.cloudflareApiToken) {
+            document.getElementById('cloudflareApiToken').value = this.settings.cloudflareApiToken;
+        }
+    }
+
+    // 미디어 라이브러리 로드
+    async loadMediaLibrary() {
+        const { cloudflareAccountId, cloudflareApiToken } = this.settings;
+        
+        if (!cloudflareAccountId || !cloudflareApiToken) {
+            this.showToast('Cloudflare 설정을 먼저 완료해주세요.', 'warning');
+            return;
+        }
+
+        const loadingIndicator = document.getElementById('mediaLoadingIndicator');
+        const mediaGrid = document.getElementById('mediaGrid');
+        const emptyState = document.getElementById('mediaEmptyState');
+        
+        loadingIndicator.style.display = 'block';
+        mediaGrid.style.display = 'none';
+        emptyState.style.display = 'none';
+
+        try {
+            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v2`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${cloudflareApiToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`미디어 로드 실패: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error('미디어 로드 실패');
+            }
+
+            this.mediaLibrary = result.result.images || [];
+            this.filteredMedia = [...this.mediaLibrary];
+            this.renderMediaLibrary();
+            
+            document.getElementById('mediaCount').textContent = `총 ${this.mediaLibrary.length}개 이미지`;
+
+        } catch (error) {
+            console.error('미디어 로드 오류:', error);
+            this.showToast('미디어 라이브러리를 불러올 수 없습니다.', 'error');
+            emptyState.style.display = 'block';
+        } finally {
+            loadingIndicator.style.display = 'none';
+        }
+    }
+
+    // 미디어 라이브러리 렌더링
+    renderMediaLibrary() {
+        const mediaGrid = document.getElementById('mediaGrid');
+        const emptyState = document.getElementById('mediaEmptyState');
+        
+        if (this.filteredMedia.length === 0) {
+            mediaGrid.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        mediaGrid.style.display = 'grid';
+        emptyState.style.display = 'none';
+        mediaGrid.className = `media-grid ${this.mediaView === 'list' ? 'list-view' : ''}`;
+
+        mediaGrid.innerHTML = this.filteredMedia.map(image => `
+            <div class="media-item" data-image-id="${image.id}" onclick="editor.selectMediaItem('${image.id}')">
+                <img src="${image.variants[0]}" alt="${image.filename}" loading="lazy">
+                <div class="media-item-info">
+                    <div class="media-item-name" title="${image.filename}">${image.filename}</div>
+                    <div class="media-item-meta">
+                        <span>${this.formatFileSize(image.size)}</span>
+                        <span>${this.formatDate(image.uploaded)}</span>
+                    </div>
+                </div>
+                <div class="media-item-actions">
+                    <button class="btn btn-outline-primary" onclick="event.stopPropagation(); editor.insertMediaToEditor('${image.variants[0]}', '${image.filename}')" title="에디터에 삽입">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="btn btn-outline-info" onclick="event.stopPropagation(); editor.copyImageUrl('${image.variants[0]}')" title="URL 복사">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="event.stopPropagation(); editor.deleteMediaItem('${image.id}')" title="삭제">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 미디어 아이템 선택
+    selectMediaItem(imageId) {
+        document.querySelectorAll('.media-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        const selectedItem = document.querySelector(`[data-image-id="${imageId}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('selected');
+        }
+    }
+
+    // 에디터에 미디어 삽입
+    insertMediaToEditor(imageUrl, filename) {
+        this.insertImageToEditor(imageUrl, filename);
+        
+        // 미디어 관리 모달 닫기
+        const modal = bootstrap.Modal.getInstance(document.getElementById('mediaManagerModal'));
+        modal?.hide();
+    }
+
+    // 이미지 URL 복사
+    async copyImageUrl(imageUrl) {
+        try {
+            await navigator.clipboard.writeText(imageUrl);
+            this.showToast('이미지 URL이 클립보드에 복사되었습니다.', 'success');
+        } catch (error) {
+            this.showToast('URL 복사에 실패했습니다.', 'error');
+        }
+    }
+
+    // 미디어 삭제
+    async deleteMediaItem(imageId) {
+        if (!confirm('이 이미지를 삭제하시겠습니까?')) {
+            return;
+        }
+
+        const { cloudflareAccountId, cloudflareApiToken } = this.settings;
+
+        try {
+            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/images/v1/${imageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${cloudflareApiToken}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('삭제 실패');
+            }
+
+            this.showToast('이미지가 삭제되었습니다.', 'success');
+            this.loadMediaLibrary(); // 라이브러리 새로고침
+
+        } catch (error) {
+            console.error('미디어 삭제 오류:', error);
+            this.showToast('이미지 삭제에 실패했습니다.', 'error');
+        }
+    }
+
+    // 미디어 필터링
+    filterMedia(searchTerm) {
+        if (!searchTerm.trim()) {
+            this.filteredMedia = [...this.mediaLibrary];
+        } else {
+            this.filteredMedia = this.mediaLibrary.filter(image => 
+                image.filename.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+        this.renderMediaLibrary();
+        document.getElementById('mediaCount').textContent = `총 ${this.filteredMedia.length}개 이미지`;
+    }
+
+    // 미디어 정렬
+    sortMedia(sortType) {
+        this.filteredMedia.sort((a, b) => {
+            switch (sortType) {
+                case 'date-desc':
+                    return new Date(b.uploaded) - new Date(a.uploaded);
+                case 'date-asc':
+                    return new Date(a.uploaded) - new Date(b.uploaded);
+                case 'name-asc':
+                    return a.filename.localeCompare(b.filename);
+                case 'size-desc':
+                    return b.size - a.size;
+                default:
+                    return 0;
+            }
+        });
+        this.renderMediaLibrary();
+    }
+
+    // 미디어 뷰 설정
+    setMediaView(viewType) {
+        this.mediaView = viewType;
+        
+        // 버튼 활성화 상태 업데이트
+        document.getElementById('gridViewBtn').classList.toggle('active', viewType === 'grid');
+        document.getElementById('listViewBtn').classList.toggle('active', viewType === 'list');
+        
+        this.renderMediaLibrary();
+    }
+
+    // 파일 크기 포맷팅
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // 날짜 포맷팅
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+    }
+
+    // 임시 저장 목록 로드
+    async loadDraftList() {
+        const loadingIndicator = document.getElementById('draftLoadingIndicator');
+        const draftList = document.getElementById('draftList');
+        const emptyState = document.getElementById('draftEmptyState');
+        
+        loadingIndicator.style.display = 'block';
+        draftList.style.display = 'none';
+        emptyState.style.display = 'none';
+
+        try {
+            const drafts = [];
+            
+            // 로컬 임시 저장 추가
+            const localDraft = localStorage.getItem('article-draft');
+            if (localDraft) {
+                try {
+                    const data = JSON.parse(localDraft);
+                    drafts.push({
+                        id: 'local',
+                        type: 'local',
+                        title: data.title || '제목 없음',
+                        timestamp: data.timestamp,
+                        description: data.description || '',
+                        category: data.category || 'automotive'
+                    });
+                } catch (error) {
+                    console.error('로컬 임시 저장 파싱 오류:', error);
+                }
+            }
+
+            // GitHub 임시 저장 목록 로드
+            if (this.settings.githubToken) {
+                const cloudDrafts = await this.loadCloudDraftList();
+                drafts.push(...cloudDrafts);
+            }
+
+            this.renderDraftList(drafts);
+            document.getElementById('draftCount').textContent = `총 ${drafts.length}개 임시저장`;
+
+        } catch (error) {
+            console.error('임시 저장 목록 로드 오류:', error);
+            this.showToast('임시 저장 목록을 불러올 수 없습니다.', 'error');
+            emptyState.style.display = 'block';
+        } finally {
+            loadingIndicator.style.display = 'none';
+        }
+    }
+
+    // GitHub 임시 저장 목록 로드
+    async loadCloudDraftList() {
+        try {
+            const response = await fetch('https://api.github.com/repos/gkstn15234/123/contents/drafts', {
+                headers: {
+                    'Authorization': `token ${this.settings.githubToken}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!response.ok) {
+                return []; // drafts 폴더가 없으면 빈 배열 반환
+            }
+
+            const files = await response.json();
+            const drafts = [];
+
+            for (const file of files.filter(f => f.name.startsWith('draft-') && f.name.endsWith('.json'))) {
+                try {
+                    const fileResponse = await fetch(file.download_url);
+                    const content = await fileResponse.text();
+                    const draft = JSON.parse(content);
+                    
+                    drafts.push({
+                        id: file.name.replace('draft-', '').replace('.json', ''),
+                        type: 'cloud',
+                        title: draft.title || '제목 없음',
+                        timestamp: draft.timestamp,
+                        description: draft.description || '',
+                        category: draft.category || 'automotive',
+                        sha: file.sha
+                    });
+                } catch (error) {
+                    console.error(`임시 저장 파일 ${file.name} 파싱 오류:`, error);
+                }
+            }
+
+            return drafts;
+        } catch (error) {
+            console.error('클라우드 임시 저장 목록 로드 오류:', error);
+            return [];
+        }
+    }
+
+    // 임시 저장 목록 렌더링
+    renderDraftList(drafts) {
+        const draftList = document.getElementById('draftList');
+        const emptyState = document.getElementById('draftEmptyState');
+        
+        if (drafts.length === 0) {
+            draftList.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        draftList.style.display = 'block';
+        emptyState.style.display = 'none';
+
+        // 최신순으로 정렬
+        drafts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        draftList.innerHTML = drafts.map(draft => `
+            <div class="draft-item border rounded p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${draft.title}</h6>
+                        <p class="text-muted small mb-2">${draft.description || '요약 없음'}</p>
+                        <div class="d-flex gap-2">
+                            <span class="badge ${draft.category === 'automotive' ? 'bg-primary' : 'bg-success'}">${draft.category === 'automotive' ? '자동차' : '경제'}</span>
+                            <span class="badge ${draft.type === 'cloud' ? 'bg-info' : 'bg-secondary'}">${draft.type === 'cloud' ? '클라우드' : '로컬'}</span>
+                            <small class="text-muted">${this.formatDate(draft.timestamp)}</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm" onclick="editor.loadSpecificDraft('${draft.id}', '${draft.type}')" title="불러오기">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="editor.deleteSpecificDraft('${draft.id}', '${draft.type}')" title="삭제">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 특정 임시 저장 불러오기
+    async loadSpecificDraft(draftId, type) {
+        try {
+            let draft = null;
+
+            if (type === 'local') {
+                const localDraft = localStorage.getItem('article-draft');
+                if (localDraft) {
+                    draft = JSON.parse(localDraft);
+                }
+            } else if (type === 'cloud') {
+                const filename = `draft-${draftId}.json`;
+                const path = `drafts/${filename}`;
+
+                const response = await fetch(`https://api.github.com/repos/gkstn15234/123/contents/${path}`, {
+                    headers: {
+                        'Authorization': `token ${this.settings.githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const content = atob(data.content);
+                    draft = JSON.parse(content);
+                    
+                    // 클라우드에서 불러온 것을 현재 작업으로 설정
+                    localStorage.setItem('current-draft-id', draftId);
+                }
+            }
+
+            if (draft) {
+                this.restoreFromDraft(draft);
+                this.showToast('임시 저장 데이터를 불러왔습니다.', 'success');
+                
+                // 모달 닫기
+                const modal = bootstrap.Modal.getInstance(document.getElementById('draftManagerModal'));
+                modal?.hide();
+            } else {
+                this.showToast('임시 저장 데이터를 찾을 수 없습니다.', 'error');
+            }
+
+        } catch (error) {
+            console.error('임시 저장 불러오기 오류:', error);
+            this.showToast('임시 저장 데이터를 불러올 수 없습니다.', 'error');
+        }
+    }
+
+    // 특정 임시 저장 삭제
+    async deleteSpecificDraft(draftId, type) {
+        if (!confirm('이 임시 저장을 삭제하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            if (type === 'local') {
+                localStorage.removeItem('article-draft');
+                localStorage.removeItem('current-draft-id');
+            } else if (type === 'cloud') {
+                const filename = `draft-${draftId}.json`;
+                const path = `drafts/${filename}`;
+
+                // 파일 정보 먼저 가져오기 (SHA 필요)
+                const getResponse = await fetch(`https://api.github.com/repos/gkstn15234/123/contents/${path}`, {
+                    headers: {
+                        'Authorization': `token ${this.settings.githubToken}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (getResponse.ok) {
+                    const fileData = await getResponse.json();
+                    
+                    // 파일 삭제
+                    const deleteResponse = await fetch(`https://api.github.com/repos/gkstn15234/123/contents/${path}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `token ${this.settings.githubToken}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Delete draft: ${draftId}`,
+                            sha: fileData.sha,
+                            branch: 'main'
+                        })
+                    });
+
+                    if (!deleteResponse.ok) {
+                        throw new Error('클라우드 임시 저장 삭제 실패');
+                    }
+                }
+            }
+
+            this.showToast('임시 저장이 삭제되었습니다.', 'success');
+            this.loadDraftList(); // 목록 새로고침
+
+        } catch (error) {
+            console.error('임시 저장 삭제 오류:', error);
+            this.showToast('임시 저장 삭제에 실패했습니다.', 'error');
+        }
+    }
+
+    // 오래된 임시 저장 정리
+    async cleanOldDrafts() {
+        if (!confirm('7일 이상 된 임시 저장을 모두 삭제하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const now = new Date();
+            let deletedCount = 0;
+
+            // 로컬 임시 저장 확인
+            const localDraft = localStorage.getItem('article-draft');
+            if (localDraft) {
+                try {
+                    const data = JSON.parse(localDraft);
+                    const saveTime = new Date(data.timestamp);
+                    const diffDays = (now - saveTime) / (1000 * 60 * 60 * 24);
+                    
+                    if (diffDays > 7) {
+                        localStorage.removeItem('article-draft');
+                        deletedCount++;
+                    }
+                } catch (error) {
+                    // 파싱 오류 시 삭제
+                    localStorage.removeItem('article-draft');
+                    deletedCount++;
+                }
+            }
+
+            // 클라우드 임시 저장 정리
+            if (this.settings.githubToken) {
+                const cloudDrafts = await this.loadCloudDraftList();
+                
+                for (const draft of cloudDrafts) {
+                    const saveTime = new Date(draft.timestamp);
+                    const diffDays = (now - saveTime) / (1000 * 60 * 60 * 24);
+                    
+                    if (diffDays > 7) {
+                        await this.deleteSpecificDraft(draft.id, 'cloud');
+                        deletedCount++;
+                    }
+                }
+            }
+
+            this.showToast(`${deletedCount}개의 오래된 임시 저장을 정리했습니다.`, 'success');
+            this.loadDraftList(); // 목록 새로고침
+
+        } catch (error) {
+            console.error('임시 저장 정리 오류:', error);
+            this.showToast('임시 저장 정리에 실패했습니다.', 'error');
+        }
+    }
+
     // 로딩 표시
     showLoading(text = '처리 중...') {
         const overlay = document.getElementById('loadingOverlay');
@@ -768,6 +1538,864 @@ class SimpleEditor {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);
         }, 3000);
+    }
+
+    // 워드프레스 가져오기 기능
+    setupWordPressImport() {
+        const wpFileInput = document.getElementById('wpExportFile');
+        const startImportBtn = document.getElementById('startWpImport');
+        const selectAllCheckbox = document.getElementById('selectAllPosts');
+        
+        if (wpFileInput) {
+            wpFileInput.addEventListener('change', (e) => this.handleWpFileSelect(e));
+        }
+        
+        if (startImportBtn) {
+            startImportBtn.addEventListener('click', () => this.startWordPressImport());
+        }
+        
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', (e) => this.toggleAllPosts(e.target.checked));
+        }
+    }
+
+    async handleWpFileSelect(event) {
+        const files = event.target.files;
+        if (!files.length) {
+            document.getElementById('wpFilePreview').style.display = 'none';
+            document.getElementById('startWpImport').disabled = true;
+            return;
+        }
+
+        // 로딩 상태 표시
+        const statusDiv = document.getElementById('wpImportStatus');
+        const progressDiv = document.getElementById('wpImportProgress');
+        
+        statusDiv.textContent = '파일을 분석하는 중...';
+        progressDiv.style.display = 'block';
+
+        try {
+            const parsedPosts = [];
+            let totalFiles = files.length;
+            let processedFiles = 0;
+            
+            for (const file of files) {
+                // 파일 크기 검증 (50MB 제한)
+                if (file.size > 50 * 1024 * 1024) {
+                    throw new Error(`파일이 너무 큽니다: ${file.name} (최대 50MB)`);
+                }
+
+                // 파일 형식 검증
+                if (!file.name.match(/\.(xml|json)$/i)) {
+                    throw new Error(`지원하지 않는 파일 형식: ${file.name}`);
+                }
+
+                statusDiv.textContent = `파일 분석 중: ${file.name} (${processedFiles + 1}/${totalFiles})`;
+                
+                const posts = await this.parseWordPressFile(file);
+                parsedPosts.push(...posts);
+                processedFiles++;
+
+                // 진행률 업데이트
+                const progress = (processedFiles / totalFiles) * 100;
+                document.getElementById('wpImportProgressBar').style.width = `${progress}%`;
+            }
+
+            if (parsedPosts.length === 0) {
+                throw new Error('가져올 수 있는 발행된 글이 없습니다.');
+            }
+
+            this.displayWordPressPosts(parsedPosts);
+            document.getElementById('startWpImport').disabled = false;
+            progressDiv.style.display = 'none';
+            
+            this.showToast(`${parsedPosts.length}개의 글을 발견했습니다.`, 'success');
+            
+        } catch (error) {
+            console.error('파일 파싱 오류:', error);
+            this.showToast('파일 분석 실패: ' + error.message, 'error');
+            document.getElementById('wpFilePreview').style.display = 'none';
+            document.getElementById('startWpImport').disabled = true;
+            progressDiv.style.display = 'none';
+        }
+    }
+
+    async parseWordPressFile(file) {
+        const text = await this.readFileAsText(file);
+        
+        if (file.name.endsWith('.xml')) {
+            return this.parseWordPressXML(text);
+        } else if (file.name.endsWith('.json')) {
+            return this.parseWordPressJSON(text);
+        } else {
+            throw new Error('지원되지 않는 파일 형식입니다.');
+        }
+    }
+
+    readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject(new Error('파일 읽기 실패'));
+            reader.readAsText(file, 'utf-8');
+        });
+    }
+
+    parseWordPressXML(xmlText) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xmlText, 'text/xml');
+        
+        const items = doc.querySelectorAll('item');
+        const posts = [];
+        const attachments = [];
+
+        // 먼저 모든 첨부파일 정보 수집
+        items.forEach(item => {
+            const postType = this.getElementText(item, 'wp:post_type');
+            const status = this.getElementText(item, 'wp:status');
+            
+            if (postType === 'attachment') {
+                const attachment = {
+                    id: this.getElementText(item, 'wp:post_id'),
+                    title: this.getElementText(item, 'title'),
+                    url: this.getElementText(item, 'wp:attachment_url'),
+                    parent: this.getElementText(item, 'wp:post_parent'),
+                    description: this.getElementText(item, 'content:encoded'),
+                    alt: this.getElementText(item, 'wp:postmeta wp:meta_value'), // _wp_attachment_image_alt
+                    caption: this.getElementText(item, 'excerpt:encoded')
+                };
+                attachments.push(attachment);
+            }
+        });
+
+        // 포스트 파싱 및 첨부파일 연결
+        items.forEach(item => {
+            const postType = this.getElementText(item, 'wp:post_type');
+            const status = this.getElementText(item, 'wp:status');
+            
+            if (postType === 'post' && status === 'publish') {
+                const postId = this.getElementText(item, 'wp:post_id');
+                const relatedAttachments = attachments.filter(att => att.parent === postId);
+                
+                const post = {
+                    id: postId,
+                    title: this.getElementText(item, 'title'),
+                    content: this.getElementText(item, 'content:encoded'),
+                    excerpt: this.getElementText(item, 'excerpt:encoded'),
+                    author: this.getElementText(item, 'dc:creator'),
+                    pubDate: this.getElementText(item, 'pubDate'),
+                    categories: this.extractCategories(item),
+                    tags: this.extractTags(item),
+                    slug: this.getElementText(item, 'wp:post_name'),
+                    status: status,
+                    attachments: relatedAttachments,
+                    featuredImage: this.extractFeaturedImage(item, attachments)
+                };
+                posts.push(post);
+            }
+        });
+
+        return posts;
+    }
+
+    extractFeaturedImage(item, attachments) {
+        // _thumbnail_id 메타값 찾기
+        const metaElements = item.querySelectorAll('wp\\:postmeta, postmeta');
+        for (const meta of metaElements) {
+            const key = this.getElementText(meta, 'wp:meta_key') || this.getElementText(meta, 'meta_key');
+            const value = this.getElementText(meta, 'wp:meta_value') || this.getElementText(meta, 'meta_value');
+            
+            if (key === '_thumbnail_id' && value) {
+                const featuredAttachment = attachments.find(att => att.id === value);
+                return featuredAttachment ? featuredAttachment.url : null;
+            }
+        }
+        return null;
+    }
+
+    parseWordPressJSON(jsonText) {
+        try {
+            const data = JSON.parse(jsonText);
+            
+            // WP REST API 형식 또는 WP CLI 형식 지원
+            const posts = data.posts || data || [];
+            
+            return posts.filter(post => post.status === 'publish').map(post => ({
+                title: post.title?.rendered || post.title,
+                content: post.content?.rendered || post.content,
+                excerpt: post.excerpt?.rendered || post.excerpt,
+                author: post.author_name || post.author,
+                pubDate: post.date || post.post_date,
+                categories: post.categories || [],
+                tags: post.tags || [],
+                slug: post.slug || post.post_name,
+                status: post.status
+            }));
+        } catch (error) {
+            throw new Error('JSON 파싱 실패: ' + error.message);
+        }
+    }
+
+    getElementText(parent, selector) {
+        const element = parent.querySelector(selector);
+        return element ? element.textContent : '';
+    }
+
+    extractCategories(item) {
+        const categories = [];
+        const categoryElements = item.querySelectorAll('category[domain="category"]');
+        categoryElements.forEach(cat => {
+            const nicename = cat.getAttribute('nicename');
+            if (nicename) categories.push(nicename);
+        });
+        return categories;
+    }
+
+    extractTags(item) {
+        const tags = [];
+        const tagElements = item.querySelectorAll('category[domain="post_tag"]');
+        tagElements.forEach(tag => {
+            const nicename = tag.getAttribute('nicename');
+            if (nicename) tags.push(nicename);
+        });
+        return tags;
+    }
+
+    displayWordPressPosts(posts) {
+        const preview = document.getElementById('wpFilePreview');
+        const postsList = document.getElementById('wpPostsList');
+        
+        if (!preview || !postsList) return;
+
+        postsList.innerHTML = '';
+        
+        posts.forEach((post, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <input type="checkbox" class="form-check-input post-checkbox" 
+                           data-index="${index}" checked>
+                </td>
+                <td>
+                    <div class="fw-bold">${this.escapeHtml(post.title)}</div>
+                    <small class="text-muted">${this.escapeHtml(post.slug)}</small>
+                </td>
+                <td>
+                    <span class="badge bg-secondary">${post.categories.join(', ') || '미분류'}</span>
+                </td>
+                <td>
+                    <small>${new Date(post.pubDate).toLocaleDateString('ko-KR')}</small>
+                </td>
+                <td>
+                    <span class="badge bg-success">${post.status}</span>
+                </td>
+            `;
+            postsList.appendChild(row);
+        });
+
+        this.wordPressPosts = posts;
+        preview.style.display = 'block';
+    }
+
+    toggleAllPosts(checked) {
+        const checkboxes = document.querySelectorAll('.post-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = checked;
+        });
+    }
+
+    async startWordPressImport() {
+        const selectedPosts = this.getSelectedPosts();
+        if (!selectedPosts.length) {
+            this.showToast('가져올 글을 선택해주세요.', 'warning');
+            return;
+        }
+
+        // 설정 검증
+        const importImages = document.getElementById('importImages').checked;
+        const convertToHugo = document.getElementById('convertToHugo').checked;
+        const categoryMapping = document.getElementById('categoryMapping').value;
+        const authorMapping = document.getElementById('authorMapping').value;
+        const publishImmediately = document.getElementById('publishImmediately').checked;
+
+        // Cloudflare 설정 확인 (이미지 가져오기 옵션이 켜져있는 경우)
+        if (importImages) {
+            const cloudflareAccountId = localStorage.getItem('cloudflareAccountId');
+            const cloudflareApiToken = localStorage.getItem('cloudflareApiToken');
+            
+            if (!cloudflareAccountId || !cloudflareApiToken) {
+                this.showToast('이미지 가져오기를 위해 Cloudflare 설정을 완료해주세요.', 'warning');
+                return;
+            }
+        }
+
+        // GitHub 설정 확인 (즉시 발행 옵션이 켜져있는 경우)
+        if (publishImmediately) {
+            const githubToken = localStorage.getItem('githubToken');
+            if (!githubToken) {
+                this.showToast('즉시 발행을 위해 GitHub 연동을 완료해주세요.', 'warning');
+                return;
+            }
+        }
+
+        const progressDiv = document.getElementById('wpImportProgress');
+        const progressBar = document.getElementById('wpImportProgressBar');
+        const statusDiv = document.getElementById('wpImportStatus');
+        const resultsDiv = document.getElementById('wpImportResults');
+        const resultsList = document.getElementById('wpImportResultsList');
+
+        // UI 초기화
+        progressDiv.style.display = 'block';
+        resultsDiv.style.display = 'none';
+        resultsList.innerHTML = '';
+        document.getElementById('startWpImport').disabled = true;
+
+        let successCount = 0;
+        let errorCount = 0;
+        let skippedCount = 0;
+        const startTime = Date.now();
+
+        try {
+            for (let i = 0; i < selectedPosts.length; i++) {
+                const post = selectedPosts[i];
+                const progress = ((i + 1) / selectedPosts.length) * 100;
+                
+                progressBar.style.width = `${progress}%`;
+                statusDiv.textContent = `처리 중: ${this.truncateText(post.title, 30)} (${i + 1}/${selectedPosts.length})`;
+
+                try {
+                    // 중복 확인
+                    const isDuplicate = await this.checkDuplicatePost(post);
+                    if (isDuplicate) {
+                        skippedCount++;
+                        this.addImportResult(post.title, 'warning', '이미 존재하는 글입니다 (건너뜀).');
+                        continue;
+                    }
+
+                    await this.importSinglePost(post, {
+                        importImages,
+                        convertToHugo,
+                        categoryMapping,
+                        authorMapping,
+                        publishImmediately
+                    });
+                    
+                    successCount++;
+                    this.addImportResult(post.title, 'success', 
+                        publishImmediately ? '성공적으로 발행했습니다.' : '임시저장에 성공했습니다.');
+                    
+                } catch (error) {
+                    errorCount++;
+                    const errorMsg = this.getReadableErrorMessage(error);
+                    this.addImportResult(post.title, 'error', errorMsg);
+                    console.error(`${post.title} 가져오기 실패:`, error);
+                }
+
+                // API 제한 방지를 위한 적응형 지연
+                const delay = importImages ? 1000 : 500;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+
+        } catch (error) {
+            console.error('가져오기 프로세스 오류:', error);
+            this.showToast('가져오기 중 심각한 오류가 발생했습니다: ' + error.message, 'error');
+        } finally {
+            // 완료 처리
+            const endTime = Date.now();
+            const duration = Math.round((endTime - startTime) / 1000);
+            
+            statusDiv.textContent = `완료 (${duration}초): 성공 ${successCount}개, 실패 ${errorCount}개, 건너뜀 ${skippedCount}개`;
+            resultsDiv.style.display = 'block';
+            document.getElementById('startWpImport').disabled = false;
+            
+            // 결과에 따른 메시지
+            if (errorCount === 0 && skippedCount === 0) {
+                this.showToast(`모든 글을 성공적으로 가져왔습니다! (${successCount}개)`, 'success');
+            } else if (successCount > 0) {
+                this.showToast(`가져오기 완료: 성공 ${successCount}개, 실패 ${errorCount}개, 건너뜀 ${skippedCount}개`, 'warning');
+            } else {
+                this.showToast('가져오기에 실패했습니다. 설정을 확인해주세요.', 'error');
+            }
+        }
+    }
+
+    async checkDuplicatePost(post) {
+        // 간단한 중복 확인 로직 (제목 기반)
+        // 실제로는 GitHub API를 통해 파일 존재 여부를 확인할 수 있음
+        try {
+            const date = new Date(post.pubDate);
+            const slug = post.slug || this.generateSlug(post.title);
+            const filename = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${slug}.md`;
+            
+            // 로컬 스토리지에서 최근 업로드된 파일명 확인
+            const recentUploads = JSON.parse(localStorage.getItem('recentUploads') || '[]');
+            return recentUploads.includes(filename);
+        } catch (error) {
+            return false; // 에러 시 중복이 아닌 것으로 간주
+        }
+    }
+
+    getReadableErrorMessage(error) {
+        if (error.message.includes('fetch')) {
+            return '네트워크 연결 오류';
+        } else if (error.message.includes('unauthorized') || error.message.includes('401')) {
+            return 'GitHub 토큰이 유효하지 않습니다';
+        } else if (error.message.includes('rate limit')) {
+            return 'API 요청 한도 초과 (잠시 후 다시 시도)';
+        } else if (error.message.includes('Cloudflare')) {
+            return 'Cloudflare 이미지 업로드 실패';
+        } else {
+            return error.message || '알 수 없는 오류';
+        }
+    }
+
+    truncateText(text, maxLength) {
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+
+    getSelectedPosts() {
+        const checkboxes = document.querySelectorAll('.post-checkbox:checked');
+        const selectedPosts = [];
+        
+        checkboxes.forEach(checkbox => {
+            const index = parseInt(checkbox.dataset.index);
+            if (this.wordPressPosts && this.wordPressPosts[index]) {
+                selectedPosts.push(this.wordPressPosts[index]);
+            }
+        });
+        
+        return selectedPosts;
+    }
+
+    async importSinglePost(post, options) {
+        // 이미지 처리 및 URL 매핑 정보 수집
+        let content = post.content;
+        let imageUrlMap = new Map(); // 원본 URL -> Cloudflare URL 매핑
+        
+        if (options.importImages) {
+            const result = await this.processPostImagesWithMapping(content, post);
+            content = result.content;
+            imageUrlMap = result.urlMap;
+        }
+
+        // Hugo 형식으로 변환
+        if (options.convertToHugo) {
+            content = this.convertToHugoFormat(content);
+        }
+
+        // 카테고리 매핑
+        const category = this.mapCategory(post.categories, options.categoryMapping);
+        
+        // 이미지 URL 업데이트된 포스트 객체 생성
+        const updatedPost = {
+            ...post,
+            content,
+            processedImages: this.updateImageUrls(post, imageUrlMap)
+        };
+        
+        // 메타데이터 생성
+        const frontMatter = this.generateFrontMatter(updatedPost, {
+            category,
+            author: options.authorMapping
+        });
+
+        // 파일명 생성
+        const date = new Date(post.pubDate);
+        const slug = post.slug || this.generateSlug(post.title);
+        const filename = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${slug}.md`;
+
+        // 최종 콘텐츠
+        const finalContent = frontMatter + '\n\n' + content;
+
+        // GitHub에 업로드
+        if (options.publishImmediately) {
+            await this.uploadToGitHub(finalContent, filename, category);
+        } else {
+            // 임시저장으로 처리
+            const draftData = {
+                title: post.title,
+                content: finalContent,
+                filename: filename,
+                category: category,
+                created: new Date().toISOString()
+            };
+            await this.saveDraftToGitHub(draftData);
+        }
+    }
+
+    async processPostImagesWithMapping(content, post) {
+        const imageData = [];
+        const urlMap = new Map();
+
+        // 본문 이미지 수집
+        const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
+        let match;
+        while ((match = imgRegex.exec(content)) !== null) {
+            const originalUrl = match[1];
+            if (originalUrl.startsWith('http')) {
+                imageData.push({
+                    originalUrl,
+                    promise: this.downloadAndUploadImage(originalUrl)
+                });
+            }
+        }
+
+        // Featured Image 처리
+        if (post.featuredImage && post.featuredImage.startsWith('http')) {
+            imageData.push({
+                originalUrl: post.featuredImage,
+                promise: this.downloadAndUploadImage(post.featuredImage)
+            });
+        }
+
+        // 첨부파일 이미지 처리
+        if (post.attachments) {
+            post.attachments.forEach(attachment => {
+                if (this.isImageFile(attachment.url) && attachment.url.startsWith('http')) {
+                    imageData.push({
+                        originalUrl: attachment.url,
+                        promise: this.downloadAndUploadImage(attachment.url)
+                    });
+                }
+            });
+        }
+
+        // 모든 이미지 업로드 완료 대기
+        const uploadResults = await Promise.allSettled(imageData.map(data => data.promise));
+        
+        // URL 매핑 생성 및 본문 URL 교체
+        let processedContent = content;
+        uploadResults.forEach((result, index) => {
+            if (result.status === 'fulfilled' && result.value) {
+                const originalUrl = imageData[index].originalUrl;
+                const cloudflareUrl = result.value;
+                urlMap.set(originalUrl, cloudflareUrl);
+                processedContent = processedContent.replace(new RegExp(this.escapeRegex(originalUrl), 'g'), cloudflareUrl);
+            }
+        });
+
+        return {
+            content: processedContent,
+            urlMap
+        };
+    }
+
+    updateImageUrls(post, urlMap) {
+        const images = [];
+        
+        // Featured Image URL 업데이트
+        if (post.featuredImage) {
+            const updatedUrl = urlMap.get(post.featuredImage) || post.featuredImage;
+            images.push(updatedUrl);
+        }
+
+        // 본문 이미지 URL 업데이트
+        const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
+        let match;
+        const addedUrls = new Set(images);
+        
+        while ((match = imgRegex.exec(post.content)) !== null) {
+            const originalUrl = match[1];
+            const updatedUrl = urlMap.get(originalUrl) || originalUrl;
+            
+            if (!addedUrls.has(updatedUrl) && images.length < 3) {
+                images.push(updatedUrl);
+                addedUrls.add(updatedUrl);
+            }
+        }
+
+        // 첨부파일 이미지 URL 업데이트
+        if (post.attachments) {
+            post.attachments.forEach(attachment => {
+                if (this.isImageFile(attachment.url)) {
+                    const updatedUrl = urlMap.get(attachment.url) || attachment.url;
+                    
+                    if (!addedUrls.has(updatedUrl) && images.length < 3) {
+                        images.push(updatedUrl);
+                        addedUrls.add(updatedUrl);
+                    }
+                }
+            });
+        }
+
+        return images;
+    }
+
+    escapeRegex(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    async processPostImages(content) {
+        // WordPress 이미지 URL 찾기
+        const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
+        let match;
+        const imageData = [];
+
+        while ((match = imgRegex.exec(content)) !== null) {
+            const originalUrl = match[1];
+            
+            // 외부 이미지인 경우 Cloudflare로 업로드
+            if (originalUrl.startsWith('http')) {
+                imageData.push({
+                    originalUrl,
+                    promise: this.downloadAndUploadImage(originalUrl)
+                });
+            }
+        }
+
+        // 모든 이미지 처리 완료 대기
+        const uploadResults = await Promise.allSettled(imageData.map(data => data.promise));
+        
+        // URL 교체
+        let processedContent = content;
+        uploadResults.forEach((result, index) => {
+            if (result.status === 'fulfilled' && result.value) {
+                const originalUrl = imageData[index].originalUrl;
+                processedContent = processedContent.replace(originalUrl, result.value);
+            }
+        });
+
+        return processedContent;
+    }
+
+    async downloadAndUploadImage(imageUrl) {
+        try {
+            // 이미지 다운로드
+            const response = await fetch(imageUrl);
+            if (!response.ok) throw new Error('이미지 다운로드 실패');
+            
+            const blob = await response.blob();
+            const filename = this.extractFilenameFromUrl(imageUrl);
+            
+            // Cloudflare에 업로드
+            const uploadedUrl = await this.uploadToCloudflare(new File([blob], filename));
+            return uploadedUrl;
+            
+        } catch (error) {
+            console.error('이미지 처리 실패:', imageUrl, error);
+            return imageUrl; // 원본 URL 유지
+        }
+    }
+
+    extractFilenameFromUrl(url) {
+        const pathname = new URL(url).pathname;
+        const filename = pathname.split('/').pop();
+        return filename || 'image.jpg';
+    }
+
+    convertToHugoFormat(content) {
+        // WordPress 특화 태그를 Hugo 형식으로 변환
+        let converted = content;
+        
+        // [caption] 단축코드 처리
+        converted = converted.replace(/\[caption[^\]]*\](.*?)\[\/caption\]/gs, (match, content) => {
+            const imgMatch = content.match(/<img[^>]+>/);
+            const captionMatch = content.match(/>(.*?)$/s);
+            
+            if (imgMatch && captionMatch) {
+                return `${imgMatch[0]}\n*${captionMatch[1].trim()}*`;
+            }
+            return content;
+        });
+
+        // WordPress 갤러리를 단순 이미지 리스트로 변환
+        converted = converted.replace(/\[gallery[^\]]*\]/g, '<!-- WordPress Gallery -->');
+        
+        // 불필요한 WordPress 클래스 제거
+        converted = converted.replace(/class="[^"]*wp-[^"]*"/g, '');
+        
+        return converted;
+    }
+
+    mapCategory(categories, mapping) {
+        if (mapping === 'auto' && categories.length > 0) {
+            // 기본 카테고리 매핑 로직
+            const categoryMap = {
+                'automotive': 'automotive',
+                'car': 'automotive',
+                'vehicle': 'automotive',
+                'economy': 'economy',
+                'business': 'economy',
+                'finance': 'economy',
+                'technology': 'technology',
+                'tech': 'technology',
+                'lifestyle': 'lifestyle',
+                'life': 'lifestyle'
+            };
+            
+            for (const cat of categories) {
+                const mapped = categoryMap[cat.toLowerCase()];
+                if (mapped) return mapped;
+            }
+            
+            return categories[0]; // 첫 번째 카테고리 사용
+        }
+        
+        return mapping === 'auto' ? 'automotive' : mapping;
+    }
+
+    generateFrontMatter(post, options) {
+        const date = new Date(post.pubDate);
+        
+        // 현재 프로젝트 구조에 맞춘 Front Matter 생성
+        const frontMatter = [
+            '---',
+            `title: "${this.escapeYaml(post.title)}"`,
+            `description: "${this.escapeYaml(this.extractDescription(post))}"`,
+            `date: ${date.toISOString()}`,
+            `draft: false`,
+            `categories: ["${this.getKoreanCategoryName(options.category)}"]`,
+            `tags: [${post.tags.map(tag => `"${this.escapeYaml(tag)}"`).join(', ')}]`
+        ];
+
+        // 이미지 배열 추가 (현재 프로젝트 구조와 동일)
+        const images = this.generateImageArray(post);
+        if (images.length > 0) {
+            frontMatter.push(`images: [`);
+            images.forEach(img => {
+                frontMatter.push(`  "${img}"`);
+            });
+            frontMatter.push(`]`);
+        }
+
+        frontMatter.push(`author: "${this.mapAuthorName(post.author)}"`);
+        frontMatter.push('---');
+        
+        return frontMatter.join('\n');
+    }
+
+    getKoreanCategoryName(category) {
+        const categoryMap = {
+            'automotive': '자동차',
+            'economy': '경제',
+            'technology': '기술',
+            'lifestyle': '라이프스타일',
+            'politics': '정치',
+            'society': '사회',
+            'culture': '문화',
+            'sports': '스포츠'
+        };
+        
+        return categoryMap[category] || '자동차';
+    }
+
+    generateImageArray(post) {
+        // 이미 처리된 이미지 배열이 있으면 사용
+        if (post.processedImages) {
+            return post.processedImages;
+        }
+
+        const images = [];
+        
+        // 대표 이미지 (Featured Image) 먼저 추가
+        if (post.featuredImage) {
+            images.push(post.featuredImage);
+        }
+
+        // 본문에서 이미지 추출
+        const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
+        let match;
+        while ((match = imgRegex.exec(post.content)) !== null) {
+            const imgUrl = match[1];
+            if (!images.includes(imgUrl) && images.length < 3) {
+                images.push(imgUrl);
+            }
+        }
+
+        // 첨부파일에서 이미지 추가 (최대 3개까지)
+        if (post.attachments) {
+            post.attachments.forEach(attachment => {
+                if (this.isImageFile(attachment.url) && !images.includes(attachment.url) && images.length < 3) {
+                    images.push(attachment.url);
+                }
+            });
+        }
+
+        return images;
+    }
+
+    isImageFile(url) {
+        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+        const urlLower = url.toLowerCase();
+        return imageExtensions.some(ext => urlLower.includes(ext));
+    }
+
+    mapAuthorName(wpAuthor) {
+        // 한국어 작성자명을 영문 slug로 매핑
+        const authorMap = {
+            '오은진': 'oh-eun-jin',
+            '김철수': 'kim-chul-su',
+            '박영희': 'park-young-hee',
+            '이민수': 'lee-min-su',
+            '정하나': 'jung-ha-na'
+        };
+        
+        // 워드프레스 작성자명이 한국어인 경우 매핑
+        if (authorMap[wpAuthor]) {
+            return authorMap[wpAuthor];
+        }
+        
+        // 영문인 경우 소문자로 변환하고 공백을 하이픈으로 변경
+        return wpAuthor.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    }
+
+    extractDescription(post) {
+        // excerpt가 있으면 사용, 없으면 내용에서 추출
+        if (post.excerpt && post.excerpt.trim()) {
+            return this.stripHtml(post.excerpt).substring(0, 160);
+        }
+        
+        const plainText = this.stripHtml(post.content);
+        return plainText.substring(0, 160);
+    }
+
+    stripHtml(html) {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        return div.textContent || div.innerText || '';
+    }
+
+    escapeYaml(text) {
+        if (!text) return '';
+        return text.replace(/"/g, '\\"').replace(/\n/g, ' ').trim();
+    }
+
+    escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    addImportResult(title, type, message) {
+        const resultsList = document.getElementById('wpImportResultsList');
+        if (!resultsList) return;
+
+        const li = document.createElement('li');
+        li.className = `import-result ${type}`;
+        
+        let icon;
+        switch(type) {
+            case 'success':
+                icon = 'fa-check-circle text-success';
+                break;
+            case 'warning':
+                icon = 'fa-exclamation-triangle text-warning';
+                break;
+            case 'error':
+                icon = 'fa-exclamation-circle text-danger';
+                break;
+            default:
+                icon = 'fa-info-circle text-info';
+        }
+        
+        li.innerHTML = `
+            <i class="fas ${icon} me-2"></i>
+            <strong>${this.escapeHtml(title)}</strong>: ${this.escapeHtml(message)}
+        `;
+        
+        resultsList.appendChild(li);
     }
 }
 
