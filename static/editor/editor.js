@@ -34,6 +34,15 @@ class SimpleEditor {
 
     // Quill 에디터 설정
     setupQuillEditor() {
+        // MutationEvent 경고 억제
+        const originalConsoleWarn = console.warn;
+        console.warn = function(message) {
+            if (typeof message === 'string' && message.includes('DOMNodeInserted')) {
+                return; // DOMNodeInserted 경고 무시
+            }
+            return originalConsoleWarn.apply(console, arguments);
+        };
+
         const toolbarOptions = [
             ['bold', 'italic', 'underline', 'strike'],
             ['blockquote', 'code-block'],
@@ -51,6 +60,11 @@ class SimpleEditor {
                 toolbar: toolbarOptions
             }
         });
+
+        // 콘솔 경고 복원
+        setTimeout(() => {
+            console.warn = originalConsoleWarn;
+        }, 1000);
 
         // 이미지 업로드 핸들러
         this.quill.getModule('toolbar').addHandler('image', () => {
@@ -1677,8 +1691,34 @@ ${content}
     }
 
     getElementText(parent, selector) {
-        const element = parent.querySelector(selector);
-        return element ? element.textContent : '';
+        try {
+            // 복합 네임스페이스 선택자 처리 (예: 'wp:postmeta wp:meta_value')
+            if (selector.includes(' ') && selector.includes(':')) {
+                const parts = selector.split(' ');
+                let currentElement = parent;
+                
+                for (const part of parts) {
+                    const elements = currentElement.getElementsByTagName(part);
+                    if (elements.length === 0) return '';
+                    currentElement = elements[0];
+                }
+                
+                return currentElement.textContent || '';
+            }
+            
+            // 단일 XML 네임스페이스가 포함된 경우 getElementsByTagName 사용
+            if (selector.includes(':')) {
+                const elements = parent.getElementsByTagName(selector);
+                return elements.length > 0 ? elements[0].textContent : '';
+            }
+            
+            // 일반 CSS 선택자
+            const element = parent.querySelector(selector);
+            return element ? element.textContent : '';
+        } catch (error) {
+            console.warn(`선택자 오류: ${selector}`, error);
+            return '';
+        }
     }
 
     extractCategories(item) {
