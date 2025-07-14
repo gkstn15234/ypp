@@ -1496,12 +1496,17 @@ ${content}
 
     // 워드프레스 가져오기 기능
     setupWordPressImport() {
-        const wpFileInput = document.getElementById('wpExportFile');
+        const wpPostsFileInput = document.getElementById('wpPostsFile');
+        const wpImagesFileInput = document.getElementById('wpImagesFile');
         const startImportBtn = document.getElementById('startWpImport');
         const selectAllCheckbox = document.getElementById('selectAllPosts');
         
-        if (wpFileInput) {
-            wpFileInput.addEventListener('change', (e) => this.handleWpFileSelect(e));
+        if (wpPostsFileInput) {
+            wpPostsFileInput.addEventListener('change', (e) => this.handleWpPostsFileSelect(e));
+        }
+        
+        if (wpImagesFileInput) {
+            wpImagesFileInput.addEventListener('change', (e) => this.handleWpImagesFileSelect(e));
         }
         
         if (startImportBtn) {
@@ -1511,13 +1516,17 @@ ${content}
         if (selectAllCheckbox) {
             selectAllCheckbox.addEventListener('change', (e) => this.toggleAllPosts(e.target.checked));
         }
+        
+        // 워드프레스 데이터 저장용
+        this.wpPostsData = null;
+        this.wpImagesData = null;
     }
 
-    async handleWpFileSelect(event) {
-        const files = event.target.files;
-        if (!files.length) {
-            document.getElementById('wpFilePreview').style.display = 'none';
-            document.getElementById('startWpImport').disabled = true;
+    async handleWpPostsFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            this.wpPostsData = null;
+            this.updateImportButtonState();
             return;
         }
 
@@ -1525,53 +1534,79 @@ ${content}
         const statusDiv = document.getElementById('wpImportStatus');
         const progressDiv = document.getElementById('wpImportProgress');
         
-        statusDiv.textContent = '파일을 분석하는 중...';
+        statusDiv.textContent = '글 파일을 분석하는 중...';
         progressDiv.style.display = 'block';
 
         try {
-            const parsedPosts = [];
-            let totalFiles = files.length;
-            let processedFiles = 0;
-            
-            for (const file of files) {
-                // 파일 크기 검증 (50MB 제한)
-                if (file.size > 50 * 1024 * 1024) {
-                    throw new Error(`파일이 너무 큽니다: ${file.name} (최대 50MB)`);
-                }
-
-                // 파일 형식 검증
-                if (!file.name.match(/\.(xml|json)$/i)) {
-                    throw new Error(`지원하지 않는 파일 형식: ${file.name}`);
-                }
-
-                statusDiv.textContent = `파일 분석 중: ${file.name} (${processedFiles + 1}/${totalFiles})`;
-                
-                const posts = await this.parseWordPressFile(file);
-                parsedPosts.push(...posts);
-                processedFiles++;
-
-                // 진행률 업데이트
-                const progress = (processedFiles / totalFiles) * 100;
-                document.getElementById('wpImportProgressBar').style.width = `${progress}%`;
+            // 파일 크기 검증 (50MB 제한)
+            if (file.size > 50 * 1024 * 1024) {
+                throw new Error(`파일이 너무 큽니다: ${file.name} (최대 50MB)`);
             }
 
-            if (parsedPosts.length === 0) {
+            // 파일 형식 검증
+            if (!file.name.match(/\.(xml|json)$/i)) {
+                throw new Error(`지원하지 않는 파일 형식: ${file.name}`);
+            }
+
+            const posts = await this.parseWordPressFile(file);
+            
+            if (posts.length === 0) {
                 throw new Error('가져올 수 있는 발행된 글이 없습니다.');
             }
 
-            this.displayWordPressPosts(parsedPosts);
-            document.getElementById('startWpImport').disabled = false;
+            this.wpPostsData = posts;
+            this.displayWordPressPosts(posts);
+            this.updateImportButtonState();
             progressDiv.style.display = 'none';
             
-            this.showToast(`${parsedPosts.length}개의 글을 발견했습니다.`, 'success');
+            this.showToast(`${posts.length}개의 글을 발견했습니다.`, 'success');
             
         } catch (error) {
-            console.error('파일 파싱 오류:', error);
-            this.showToast('파일 분석 실패: ' + error.message, 'error');
+            console.error('글 파일 파싱 오류:', error);
+            this.showToast('글 파일 분석 실패: ' + error.message, 'error');
+            this.wpPostsData = null;
             document.getElementById('wpFilePreview').style.display = 'none';
-            document.getElementById('startWpImport').disabled = true;
+            this.updateImportButtonState();
             progressDiv.style.display = 'none';
         }
+    }
+
+    async handleWpImagesFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) {
+            this.wpImagesData = null;
+            this.showToast('이미지 파일이 선택 해제되었습니다.', 'info');
+            return;
+        }
+
+        try {
+            // 파일 크기 검증 (50MB 제한)
+            if (file.size > 50 * 1024 * 1024) {
+                throw new Error(`파일이 너무 큽니다: ${file.name} (최대 50MB)`);
+            }
+
+            // XML 파일만 지원
+            if (!file.name.match(/\.xml$/i)) {
+                throw new Error(`이미지 파일은 XML 형식만 지원됩니다: ${file.name}`);
+            }
+
+            this.showToast('이미지 파일을 분석하는 중...', 'info');
+            
+            const images = await this.parseWordPressImagesXML(file);
+            this.wpImagesData = images;
+            
+            this.showToast(`${images.length}개의 이미지 정보를 발견했습니다.`, 'success');
+            
+        } catch (error) {
+            console.error('이미지 파일 파싱 오류:', error);
+            this.showToast('이미지 파일 분석 실패: ' + error.message, 'error');
+            this.wpImagesData = null;
+        }
+    }
+
+    updateImportButtonState() {
+        const startImportBtn = document.getElementById('startWpImport');
+        startImportBtn.disabled = !this.wpPostsData || this.wpPostsData.length === 0;
     }
 
     async parseWordPressFile(file) {
@@ -1599,28 +1634,47 @@ ${content}
         const parser = new DOMParser();
         const doc = parser.parseFromString(xmlText, 'text/xml');
         
+        // XML 파싱 에러 확인
+        const parserError = doc.querySelector('parsererror');
+        if (parserError) {
+            throw new Error('XML 파싱 오류: ' + parserError.textContent);
+        }
+        
         const items = doc.querySelectorAll('item');
         const posts = [];
         const attachments = [];
 
-        // 먼저 모든 첨부파일 정보 수집
+        console.log(`총 ${items.length}개의 아이템을 발견했습니다.`);
+
+        // 먼저 모든 첨부파일 정보 수집 (글 XML에서)
         items.forEach(item => {
             const postType = this.getElementText(item, 'wp:post_type');
             const status = this.getElementText(item, 'wp:status');
             
             if (postType === 'attachment') {
+                const attachmentUrl = this.getElementText(item, 'wp:attachment_url');
                 const attachment = {
                     id: this.getElementText(item, 'wp:post_id'),
                     title: this.getElementText(item, 'title'),
-                    url: this.getElementText(item, 'wp:attachment_url'),
+                    url: attachmentUrl,
                     parent: this.getElementText(item, 'wp:post_parent'),
                     description: this.getElementText(item, 'content:encoded'),
-                    alt: this.getElementText(item, 'wp:postmeta wp:meta_value'), // _wp_attachment_image_alt
-                    caption: this.getElementText(item, 'excerpt:encoded')
+                    alt: this.getPostMeta(item, '_wp_attachment_image_alt'),
+                    caption: this.getElementText(item, 'excerpt:encoded'),
+                    filename: this.extractFilenameFromUrl(attachmentUrl),
+                    mimeType: this.getPostMeta(item, '_wp_attached_file_mime_type') || this.getMimeTypeFromUrl(attachmentUrl),
+                    fileSize: this.getPostMeta(item, '_wp_attachment_file_size'),
+                    metadata: this.extractImageMetadata(item)
                 };
-                attachments.push(attachment);
+                
+                // 이미지 파일만 필터링
+                if (attachmentUrl && this.isImageFile(attachmentUrl)) {
+                    attachments.push(attachment);
+                }
             }
         });
+
+        console.log(`${attachments.length}개의 이미지 첨부파일을 발견했습니다.`);
 
         // 포스트 파싱 및 첨부파일 연결
         items.forEach(item => {
@@ -1631,10 +1685,11 @@ ${content}
                 const postId = this.getElementText(item, 'wp:post_id');
                 const relatedAttachments = attachments.filter(att => att.parent === postId);
                 
+                const content = this.getElementText(item, 'content:encoded');
                 const post = {
                     id: postId,
                     title: this.getElementText(item, 'title'),
-                    content: this.getElementText(item, 'content:encoded'),
+                    content: content,
                     excerpt: this.getElementText(item, 'excerpt:encoded'),
                     author: this.getElementText(item, 'dc:creator'),
                     pubDate: this.getElementText(item, 'pubDate'),
@@ -1643,13 +1698,101 @@ ${content}
                     slug: this.getElementText(item, 'wp:post_name'),
                     status: status,
                     attachments: relatedAttachments,
-                    featuredImage: this.extractFeaturedImage(item, attachments)
+                    featuredImage: this.extractFeaturedImage(item, attachments),
+                    // 본문에서 추가 이미지 URL 추출
+                    contentImages: this.extractImagesFromContent(content),
+                    // 갤러리 이미지 추출
+                    galleryImages: this.extractGalleryImages(content, attachments)
                 };
                 posts.push(post);
             }
         });
 
+        console.log(`${posts.length}개의 발행된 글을 발견했습니다.`);
         return posts;
+    }
+
+    // 본문에서 이미지 URL 추출
+    extractImagesFromContent(content) {
+        const images = [];
+        const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
+        let match;
+        
+        while ((match = imgRegex.exec(content)) !== null) {
+            const imgUrl = match[1];
+            if (imgUrl && imgUrl.startsWith('http')) {
+                images.push({
+                    url: imgUrl,
+                    alt: this.extractImageAlt(match[0]),
+                    caption: this.extractImageCaption(match[0]),
+                    filename: this.extractFilenameFromUrl(imgUrl)
+                });
+            }
+        }
+        
+        return images;
+    }
+
+    // 갤러리 이미지 추출
+    extractGalleryImages(content, attachments) {
+        const galleryImages = [];
+        const galleryRegex = /\[gallery[^\]]*ids="([^"]+)"[^\]]*\]/g;
+        let match;
+        
+        while ((match = galleryRegex.exec(content)) !== null) {
+            const ids = match[1].split(',');
+            ids.forEach(id => {
+                const attachment = attachments.find(att => att.id === id.trim());
+                if (attachment) {
+                    galleryImages.push(attachment);
+                }
+            });
+        }
+        
+        return galleryImages;
+    }
+
+    // 이미지 메타데이터 추출
+    extractImageMetadata(item) {
+        const metadata = {};
+        const metaElements = item.querySelectorAll('wp\\:postmeta, postmeta');
+        
+        metaElements.forEach(meta => {
+            const key = this.getElementText(meta, 'wp:meta_key') || this.getElementText(meta, 'meta_key');
+            const value = this.getElementText(meta, 'wp:meta_value') || this.getElementText(meta, 'meta_value');
+            
+            if (key && key.startsWith('_wp_attachment_')) {
+                metadata[key] = value;
+            }
+        });
+        
+        return metadata;
+    }
+
+    // 이미지 alt 텍스트 추출
+    extractImageAlt(imgTag) {
+        const altMatch = imgTag.match(/alt="([^"]*)"/);
+        return altMatch ? altMatch[1] : '';
+    }
+
+    // 이미지 캡션 추출
+    extractImageCaption(imgTag) {
+        const captionMatch = imgTag.match(/title="([^"]*)"/);
+        return captionMatch ? captionMatch[1] : '';
+    }
+
+    // URL에서 MIME 타입 추정
+    getMimeTypeFromUrl(url) {
+        const extension = url.split('.').pop().toLowerCase();
+        const mimeTypes = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'gif': 'image/gif',
+            'webp': 'image/webp',
+            'svg': 'image/svg+xml'
+        };
+        return mimeTypes[extension] || 'image/jpeg';
     }
 
     extractFeaturedImage(item, attachments) {
@@ -1688,6 +1831,121 @@ ${content}
         } catch (error) {
             throw new Error('JSON 파싱 실패: ' + error.message);
         }
+    }
+
+    async parseWordPressImagesXML(file) {
+        const text = await this.readFileAsText(file);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/xml');
+        
+        const items = doc.querySelectorAll('item');
+        const images = [];
+
+        items.forEach(item => {
+            const postType = this.getElementText(item, 'wp:post_type');
+            
+            if (postType === 'attachment') {
+                const image = {
+                    id: this.getElementText(item, 'wp:post_id'),
+                    title: this.getElementText(item, 'title'),
+                    url: this.getElementText(item, 'wp:attachment_url'),
+                    parent: this.getElementText(item, 'wp:post_parent'),
+                    description: this.getElementText(item, 'content:encoded'),
+                    caption: this.getElementText(item, 'excerpt:encoded'),
+                    filename: this.extractFilenameFromUrl(this.getElementText(item, 'wp:attachment_url')),
+                    mimeType: this.getElementText(item, 'wp:postmeta wp:meta_value'),
+                    fileSize: this.getPostMeta(item, '_wp_attached_file'),
+                    altText: this.getPostMeta(item, '_wp_attachment_image_alt')
+                };
+                
+                // 이미지 파일만 필터링
+                if (image.url && (image.mimeType?.startsWith('image/') || 
+                    image.filename?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i))) {
+                    images.push(image);
+                }
+            }
+        });
+
+        return images;
+    }
+
+    extractFilenameFromUrl(url) {
+        if (!url) return '';
+        return url.split('/').pop().split('?')[0];
+    }
+
+    getPostMeta(item, metaKey) {
+        const metaItems = item.querySelectorAll('wp\\:postmeta, postmeta');
+        for (const meta of metaItems) {
+            const key = this.getElementText(meta, 'wp:meta_key');
+            if (key === metaKey) {
+                return this.getElementText(meta, 'wp:meta_value');
+            }
+        }
+        return '';
+    }
+
+    combineImageDataWithPosts(posts) {
+        if (!this.wpImagesData) return;
+
+        posts.forEach(post => {
+            // 포스트 ID로 연결된 이미지들 찾기
+            const relatedImages = this.wpImagesData.filter(img => img.parent === post.id);
+            
+            // 기존 attachments와 병합
+            if (relatedImages.length > 0) {
+                const existingAttachments = post.attachments || [];
+                const newAttachments = relatedImages.map(img => ({
+                    id: img.id,
+                    title: img.title,
+                    url: img.url,
+                    parent: img.parent,
+                    description: img.description,
+                    alt: img.altText,
+                    caption: img.caption,
+                    filename: img.filename,
+                    mimeType: img.mimeType
+                }));
+                
+                // 중복 제거 (ID 기준)
+                const allAttachments = [...existingAttachments];
+                newAttachments.forEach(newImg => {
+                    if (!allAttachments.find(existing => existing.id === newImg.id)) {
+                        allAttachments.push(newImg);
+                    }
+                });
+                
+                post.attachments = allAttachments;
+                
+                // 글 내용에서 이미지 URL 매핑 정보 업데이트
+                this.updateImageUrlsInContent(post, relatedImages);
+            }
+        });
+    }
+
+    updateImageUrlsInContent(post, imageData) {
+        if (!post.content || !imageData.length) return;
+
+        let content = post.content;
+        
+        imageData.forEach(img => {
+            if (img.url && img.filename) {
+                // 다양한 이미지 URL 패턴 대응
+                const patterns = [
+                    img.url,  // 전체 URL
+                    img.filename,  // 파일명만
+                    img.url.replace(/https?:\/\/[^\/]+/, ''),  // 도메인 제거한 경로
+                ];
+                
+                patterns.forEach(pattern => {
+                    if (pattern && content.includes(pattern)) {
+                        // 원본 URL을 임시 플레이스홀더로 표시 (나중에 Cloudflare URL로 교체)
+                        post.imageUrlMap = post.imageUrlMap || new Map();
+                        post.imageUrlMap.set(pattern, `{{CLOUDFLARE_IMAGE_${img.id}}}`);
+                    }
+                });
+            }
+        });
     }
 
     getElementText(parent, selector) {
@@ -1798,7 +2056,11 @@ ${content}
         const authorMapping = document.getElementById('authorMapping').value;
         const publishImmediately = document.getElementById('publishImmediately').checked;
 
-        // 이미지 가져오기는 이제 서버에서 자동으로 처리됩니다
+        // 이미지 데이터 결합 (별도 이미지 XML이 있는 경우)
+        if (this.wpImagesData && this.wpImagesData.length > 0) {
+            this.combineImageDataWithPosts(selectedPosts);
+            this.showToast(`${this.wpImagesData.length}개의 추가 이미지 정보를 연결했습니다.`, 'info');
+        }
 
         // GitHub 설정 확인 (즉시 발행 옵션이 켜져있는 경우)
         if (publishImmediately) {
@@ -1821,50 +2083,105 @@ ${content}
         resultsList.innerHTML = '';
         document.getElementById('startWpImport').disabled = true;
 
+        // 진행 상황 카운터 초기화
+        document.getElementById('wpImportTotalCount').textContent = selectedPosts.length;
+        document.getElementById('wpImportProcessedCount').textContent = '0';
+        document.getElementById('wpImportSuccessCount').textContent = '0';
+        document.getElementById('wpImportErrorCount').textContent = '0';
+        document.getElementById('wpImportSkippedCount').textContent = '0';
+        document.getElementById('wpImportProgressText').textContent = '0%';
+
         let successCount = 0;
         let errorCount = 0;
         let skippedCount = 0;
         const startTime = Date.now();
 
         try {
-            for (let i = 0; i < selectedPosts.length; i++) {
-                const post = selectedPosts[i];
-                const progress = ((i + 1) / selectedPosts.length) * 100;
-                
-                progressBar.style.width = `${progress}%`;
-                statusDiv.textContent = `처리 중: ${this.truncateText(post.title, 30)} (${i + 1}/${selectedPosts.length})`;
+            // 병렬 처리를 위한 배치 크기 설정
+            const batchSize = importImages ? 3 : 5; // 이미지 처리 시 더 작은 배치
+            
+            for (let i = 0; i < selectedPosts.length; i += batchSize) {
+                const batch = selectedPosts.slice(i, i + batchSize);
+                const batchPromises = batch.map(async (post, batchIndex) => {
+                    const globalIndex = i + batchIndex;
+                    const progress = ((globalIndex + 1) / selectedPosts.length) * 100;
+                    
+                    // 진행 상황 업데이트
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.setAttribute('aria-valuenow', Math.round(progress));
+                    document.getElementById('wpImportProgressText').textContent = `${Math.round(progress)}%`;
+                    document.getElementById('wpImportProcessedCount').textContent = globalIndex + 1;
+                    
+                    statusDiv.innerHTML = `
+                        <i class="fas fa-sync-alt fa-spin me-2"></i>
+                        처리 중: <strong>${this.truncateText(post.title, 30)}</strong> 
+                        <span class="badge bg-primary">${globalIndex + 1}/${selectedPosts.length}</span>
+                    `;
 
-                try {
-                    // 중복 확인
-                    const isDuplicate = await this.checkDuplicatePost(post);
-                    if (isDuplicate) {
-                        skippedCount++;
-                        this.addImportResult(post.title, 'warning', '이미 존재하는 글입니다 (건너뜀).');
-                        continue;
+                    try {
+                        // 중복 확인
+                        const isDuplicate = await this.checkDuplicatePost(post);
+                        if (isDuplicate) {
+                            return { status: 'skipped', post, message: '이미 존재하는 글입니다 (건너뜀).' };
+                        }
+
+                        await this.importSinglePost(post, {
+                            importImages,
+                            convertToHugo,
+                            categoryMapping,
+                            authorMapping,
+                            publishImmediately
+                        });
+                        
+                        return { 
+                            status: 'success', 
+                            post, 
+                            message: publishImmediately ? '성공적으로 발행했습니다.' : '임시저장에 성공했습니다.' 
+                        };
+                        
+                    } catch (error) {
+                        const errorMsg = this.getReadableErrorMessage(error);
+                        console.error(`${post.title} 가져오기 실패:`, error);
+                        return { status: 'error', post, message: errorMsg, error };
                     }
+                });
 
-                    await this.importSinglePost(post, {
-                        importImages,
-                        convertToHugo,
-                        categoryMapping,
-                        authorMapping,
-                        publishImmediately
-                    });
-                    
-                    successCount++;
-                    this.addImportResult(post.title, 'success', 
-                        publishImmediately ? '성공적으로 발행했습니다.' : '임시저장에 성공했습니다.');
-                    
-                } catch (error) {
-                    errorCount++;
-                    const errorMsg = this.getReadableErrorMessage(error);
-                    this.addImportResult(post.title, 'error', errorMsg);
-                    console.error(`${post.title} 가져오기 실패:`, error);
+                // 배치 처리 완료 대기
+                const batchResults = await Promise.allSettled(batchPromises);
+                
+                // 결과 처리
+                batchResults.forEach(result => {
+                    if (result.status === 'fulfilled' && result.value) {
+                        const { status, post, message } = result.value;
+                        
+                        switch (status) {
+                            case 'success':
+                                successCount++;
+                                document.getElementById('wpImportSuccessCount').textContent = successCount;
+                                this.addImportResult(post.title, 'success', message);
+                                break;
+                            case 'error':
+                                errorCount++;
+                                document.getElementById('wpImportErrorCount').textContent = errorCount;
+                                this.addImportResult(post.title, 'error', message);
+                                break;
+                            case 'skipped':
+                                skippedCount++;
+                                document.getElementById('wpImportSkippedCount').textContent = skippedCount;
+                                this.addImportResult(post.title, 'warning', message);
+                                break;
+                        }
+                    } else {
+                        errorCount++;
+                        this.addImportResult('알 수 없는 글', 'error', '처리 중 오류가 발생했습니다.');
+                    }
+                });
+
+                // 배치 간 지연 (API 제한 방지)
+                if (i + batchSize < selectedPosts.length) {
+                    const delay = importImages ? 2000 : 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
                 }
-
-                // API 제한 방지를 위한 적응형 지연
-                const delay = importImages ? 1000 : 500;
-                await new Promise(resolve => setTimeout(resolve, delay));
             }
 
         } catch (error) {
@@ -1875,7 +2192,21 @@ ${content}
             const endTime = Date.now();
             const duration = Math.round((endTime - startTime) / 1000);
             
-            statusDiv.textContent = `완료 (${duration}초): 성공 ${successCount}개, 실패 ${errorCount}개, 건너뜀 ${skippedCount}개`;
+            // 진행 상황 완료 표시
+            progressBar.style.width = '100%';
+            progressBar.setAttribute('aria-valuenow', '100');
+            progressBar.classList.remove('progress-bar-animated');
+            document.getElementById('wpImportProgressText').textContent = '100%';
+            
+            // 완료 메시지 표시
+            const completionClass = errorCount === 0 ? 'alert-success' : (successCount > 0 ? 'alert-warning' : 'alert-danger');
+            statusDiv.className = `alert ${completionClass}`;
+            statusDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>가져오기 완료!</strong> (${duration}초 소요)
+                <br><small>성공 ${successCount}개, 실패 ${errorCount}개, 건너뜀 ${skippedCount}개</small>
+            `;
+            
             resultsDiv.style.display = 'block';
             document.getElementById('startWpImport').disabled = false;
             
@@ -1998,57 +2329,175 @@ ${content}
     async processPostImagesWithMapping(content, post) {
         const imageData = [];
         const urlMap = new Map();
+        const processedUrls = new Set();
 
-        // 본문 이미지 수집
-        const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
-        let match;
-        while ((match = imgRegex.exec(content)) !== null) {
-            const originalUrl = match[1];
-            if (originalUrl.startsWith('http')) {
-                imageData.push({
-                    originalUrl,
-                    promise: this.downloadAndUploadImage(originalUrl)
-                });
-            }
-        }
+        console.log(`이미지 처리 시작: ${post.title}`);
 
-        // Featured Image 처리
+        // 1단계: Featured Image 처리 (우선순위 높음)
         if (post.featuredImage && post.featuredImage.startsWith('http')) {
+            const featuredAttachment = post.attachments?.find(att => att.url === post.featuredImage);
             imageData.push({
                 originalUrl: post.featuredImage,
-                promise: this.downloadAndUploadImage(post.featuredImage)
+                attachmentInfo: featuredAttachment,
+                type: 'featured',
+                promise: this.downloadAndUploadImageWithMetadata(post.featuredImage, featuredAttachment)
             });
+            processedUrls.add(post.featuredImage);
         }
 
-        // 첨부파일 이미지 처리
-        if (post.attachments) {
+        // 2단계: 첨부파일 이미지 처리 (메타데이터 포함)
+        if (post.attachments && post.attachments.length > 0) {
             post.attachments.forEach(attachment => {
-                if (this.isImageFile(attachment.url) && attachment.url.startsWith('http')) {
+                if (this.isImageFile(attachment.url) && 
+                    attachment.url.startsWith('http') && 
+                    !processedUrls.has(attachment.url)) {
+                    
                     imageData.push({
                         originalUrl: attachment.url,
-                        promise: this.downloadAndUploadImage(attachment.url)
+                        attachmentInfo: attachment,
+                        type: 'attachment',
+                        promise: this.downloadAndUploadImageWithMetadata(attachment.url, attachment)
                     });
+                    processedUrls.add(attachment.url);
                 }
             });
         }
 
-        // 모든 이미지 업로드 완료 대기
-        const uploadResults = await Promise.allSettled(imageData.map(data => data.promise));
+        // 3단계: 갤러리 이미지 처리
+        if (post.galleryImages && post.galleryImages.length > 0) {
+            post.galleryImages.forEach(galleryImage => {
+                if (galleryImage.url && 
+                    galleryImage.url.startsWith('http') && 
+                    !processedUrls.has(galleryImage.url)) {
+                    
+                    imageData.push({
+                        originalUrl: galleryImage.url,
+                        attachmentInfo: galleryImage,
+                        type: 'gallery',
+                        promise: this.downloadAndUploadImageWithMetadata(galleryImage.url, galleryImage)
+                    });
+                    processedUrls.add(galleryImage.url);
+                }
+            });
+        }
+
+        // 4단계: 본문 이미지 수집 (contentImages 활용)
+        if (post.contentImages && post.contentImages.length > 0) {
+            post.contentImages.forEach(contentImage => {
+                if (contentImage.url && 
+                    contentImage.url.startsWith('http') && 
+                    !processedUrls.has(contentImage.url)) {
+                    
+                    imageData.push({
+                        originalUrl: contentImage.url,
+                        attachmentInfo: contentImage,
+                        type: 'content',
+                        promise: this.downloadAndUploadImageWithMetadata(contentImage.url, contentImage)
+                    });
+                    processedUrls.add(contentImage.url);
+                }
+            });
+        }
+
+        // 5단계: 본문에서 직접 추출한 이미지 처리 (누락된 것들)
+        const imgRegex = /<img[^>]+src="([^"]+)"[^>]*>/g;
+        let match;
+        while ((match = imgRegex.exec(content)) !== null) {
+            const originalUrl = match[1];
+            if (originalUrl.startsWith('http') && !processedUrls.has(originalUrl)) {
+                imageData.push({
+                    originalUrl,
+                    type: 'inline',
+                    promise: this.downloadAndUploadImage(originalUrl)
+                });
+                processedUrls.add(originalUrl);
+            }
+        }
+
+        // 6단계: 별도 이미지 XML에서 가져온 이미지 정보 처리
+        if (post.imageUrlMap) {
+            for (const [originalUrl, placeholder] of post.imageUrlMap) {
+                if (!processedUrls.has(originalUrl)) {
+                    const attachmentInfo = post.attachments?.find(att => 
+                        att.url === originalUrl || att.filename === originalUrl.split('/').pop()
+                    );
+                    
+                    if (attachmentInfo) {
+                        imageData.push({
+                            originalUrl,
+                            attachmentInfo,
+                            type: 'xml_mapping',
+                            promise: this.downloadAndUploadImageWithMetadata(originalUrl, attachmentInfo)
+                        });
+                        processedUrls.add(originalUrl);
+                    }
+                }
+            }
+        }
+
+        console.log(`총 ${imageData.length}개의 이미지를 처리합니다.`);
+
+        // 모든 이미지 업로드 완료 대기 (배치 처리)
+        const batchSize = 5;
+        const uploadResults = [];
+        
+        for (let i = 0; i < imageData.length; i += batchSize) {
+            const batch = imageData.slice(i, i + batchSize);
+            const batchResults = await Promise.allSettled(batch.map(data => data.promise));
+            uploadResults.push(...batchResults);
+            
+            // 배치 간 지연 (API 제한 방지)
+            if (i + batchSize < imageData.length) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
         
         // URL 매핑 생성 및 본문 URL 교체
         let processedContent = content;
+        let successCount = 0;
+        let failCount = 0;
+        
         uploadResults.forEach((result, index) => {
-            if (result.status === 'fulfilled' && result.value) {
+            if (result.status === 'fulfilled' && result.value && result.value !== imageData[index].originalUrl) {
                 const originalUrl = imageData[index].originalUrl;
                 const cloudflareUrl = result.value;
                 urlMap.set(originalUrl, cloudflareUrl);
-                processedContent = processedContent.replace(new RegExp(this.escapeRegex(originalUrl), 'g'), cloudflareUrl);
+                
+                // 다양한 패턴의 URL 교체
+                const patterns = [
+                    originalUrl,
+                    originalUrl.replace(/https?:\/\/[^\/]+/, ''), // 도메인 제거
+                    originalUrl.split('/').pop(), // 파일명만
+                    originalUrl.replace(/^https?:\/\//, '//'), // 프로토콜 제거
+                ];
+                
+                patterns.forEach(pattern => {
+                    if (pattern && processedContent.includes(pattern)) {
+                        const regex = new RegExp(this.escapeRegex(pattern), 'g');
+                        const matches = processedContent.match(regex);
+                        if (matches) {
+                            processedContent = processedContent.replace(regex, cloudflareUrl);
+                        }
+                    }
+                });
+                
+                successCount++;
+            } else {
+                failCount++;
+                console.warn(`이미지 업로드 실패: ${imageData[index].originalUrl}`);
             }
         });
 
+        console.log(`이미지 처리 완료: 성공 ${successCount}개, 실패 ${failCount}개`);
+
         return {
             content: processedContent,
-            urlMap
+            urlMap,
+            stats: {
+                total: imageData.length,
+                success: successCount,
+                failed: failCount
+            }
         };
     }
 
@@ -2130,13 +2579,34 @@ ${content}
         return processedContent;
     }
 
-    async downloadAndUploadImage(imageUrl) {
+    async downloadAndUploadImage(imageUrl, retryCount = 0) {
+        const maxRetries = 3;
+        
         try {
-            // 이미지 다운로드
-            const response = await fetch(imageUrl);
-            if (!response.ok) throw new Error('이미지 다운로드 실패');
+            // 이미지 다운로드 (타임아웃 설정)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 타임아웃
+            
+            const response = await fetch(imageUrl, {
+                signal: controller.signal,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
             
             const blob = await response.blob();
+            
+            // 이미지 파일인지 확인
+            if (!blob.type.startsWith('image/')) {
+                throw new Error('이미지 파일이 아닙니다');
+            }
+            
             const filename = this.extractFilenameFromUrl(imageUrl);
             
             // Cloudflare에 업로드
@@ -2144,8 +2614,75 @@ ${content}
             return uploadedUrl;
             
         } catch (error) {
-            console.error('이미지 처리 실패:', imageUrl, error);
+            console.error(`이미지 처리 실패 (${retryCount + 1}/${maxRetries}):`, imageUrl, error);
+            
+            // 재시도 로직
+            if (retryCount < maxRetries) {
+                const delay = Math.pow(2, retryCount) * 1000; // 지수 백오프
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return this.downloadAndUploadImage(imageUrl, retryCount + 1);
+            }
+            
             return imageUrl; // 원본 URL 유지
+        }
+    }
+
+    // WordPress 이미지 다운로드 및 업로드 (메타데이터 포함)
+    async downloadAndUploadImageWithMetadata(imageUrl, attachmentInfo, retryCount = 0) {
+        const maxRetries = 3;
+        
+        try {
+            // 이미지 다운로드 (타임아웃 설정)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 타임아웃
+            
+            const response = await fetch(imageUrl, {
+                signal: controller.signal,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const blob = await response.blob();
+            
+            // 이미지 파일인지 확인
+            if (!blob.type.startsWith('image/')) {
+                throw new Error('이미지 파일이 아닙니다');
+            }
+            
+            const filename = attachmentInfo?.filename || this.extractFilenameFromUrl(imageUrl);
+            
+            // 메타데이터가 포함된 파일 객체 생성
+            const file = new File([blob], filename, { type: blob.type });
+            
+            // Cloudflare에 업로드
+            const uploadedUrl = await this.uploadToCloudflare(file);
+            
+            // 성공 로그
+            console.log(`이미지 업로드 성공: ${filename} -> ${uploadedUrl}`);
+            
+            return uploadedUrl;
+            
+        } catch (error) {
+            console.error(`이미지 처리 실패 (${retryCount + 1}/${maxRetries}):`, imageUrl, error);
+            
+            // 재시도 로직
+            if (retryCount < maxRetries) {
+                const delay = Math.pow(2, retryCount) * 1000; // 지수 백오프
+                console.log(`${delay}ms 후 재시도...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return this.downloadAndUploadImageWithMetadata(imageUrl, attachmentInfo, retryCount + 1);
+            }
+            
+            // 최종 실패 시 원본 URL 반환
+            console.warn(`이미지 업로드 최종 실패, 원본 URL 유지: ${imageUrl}`);
+            return imageUrl;
         }
     }
 
@@ -2344,29 +2881,49 @@ ${content}
         if (!resultsList) return;
 
         const li = document.createElement('li');
-        li.className = `import-result ${type}`;
+        li.className = `import-result ${type} border-start border-3 ps-3 py-2 mb-2`;
         
-        let icon;
+        let icon, badgeClass, borderClass;
         switch(type) {
             case 'success':
                 icon = 'fa-check-circle text-success';
+                badgeClass = 'bg-success';
+                borderClass = 'border-success';
                 break;
             case 'warning':
                 icon = 'fa-exclamation-triangle text-warning';
+                badgeClass = 'bg-warning';
+                borderClass = 'border-warning';
                 break;
             case 'error':
                 icon = 'fa-exclamation-circle text-danger';
+                badgeClass = 'bg-danger';
+                borderClass = 'border-danger';
                 break;
             default:
                 icon = 'fa-info-circle text-info';
+                badgeClass = 'bg-info';
+                borderClass = 'border-info';
         }
         
+        li.classList.add(borderClass);
+        
         li.innerHTML = `
-            <i class="fas ${icon} me-2"></i>
-            <strong>${this.escapeHtml(title)}</strong>: ${this.escapeHtml(message)}
+            <div class="d-flex align-items-start">
+                <i class="fas ${icon} me-2 mt-1"></i>
+                <div class="flex-grow-1">
+                    <div class="fw-bold">${this.escapeHtml(title)}</div>
+                    <small class="text-muted">${this.escapeHtml(message)}</small>
+                </div>
+                <span class="badge ${badgeClass} ms-2">${type === 'success' ? '성공' : type === 'warning' ? '건너뜀' : '실패'}</span>
+            </div>
         `;
         
         resultsList.appendChild(li);
+        
+        // 자동 스크롤
+        const container = resultsList.parentElement;
+        container.scrollTop = container.scrollHeight;
     }
 
     // 유틸리티 메서드들
