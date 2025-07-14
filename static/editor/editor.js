@@ -528,19 +528,19 @@ ${content}
         }
 
         const result = await response.json();
-        const content = result.choices[0].message.content;
+        const responseContent = result.choices[0].message.content;
         
         try {
-            const parsed = JSON.parse(content);
+            const parsed = JSON.parse(responseContent);
             parsed.category = category; // 카테고리 보장
             return parsed;
         } catch (e) {
             // JSON 파싱 실패 시 기본 구조로 반환
-            const title = content.substring(0, 50) + (content.length > 50 ? '...' : '');
+            const title = responseContent.substring(0, 50) + (responseContent.length > 50 ? '...' : '');
             return {
                 title: title,
-                description: content.substring(0, 150) + (content.length > 150 ? '...' : ''),
-                content: `<p>${content}</p>`,
+                description: responseContent.substring(0, 150) + (responseContent.length > 150 ? '...' : ''),
+                content: `<p>${responseContent}</p>`,
                 category: category,
                 slug: this.generateSlug(title)
             };
@@ -864,8 +864,8 @@ ${content}
             }
 
             const data = await response.json();
-            const content = atob(data.content);
-            const draft = JSON.parse(content);
+            const draftContent = atob(data.content);
+            const draft = JSON.parse(draftContent);
 
             // 7일 이내 저장된 것만 불러오기 (클라우드는 더 오래 보관)
             const saveTime = new Date(draft.timestamp);
@@ -1217,8 +1217,8 @@ ${content}
             for (const file of files.filter(f => f.name.startsWith('draft-') && f.name.endsWith('.json'))) {
                 try {
                     const fileResponse = await fetch(file.download_url);
-                    const content = await fileResponse.text();
-                    const draft = JSON.parse(content);
+                    const fileContent = await fileResponse.text();
+                    const draft = JSON.parse(fileContent);
                     
                     drafts.push({
                         id: file.name.replace('draft-', '').replace('.json', ''),
@@ -1306,8 +1306,8 @@ ${content}
 
                 if (response.ok) {
                     const data = await response.json();
-                    const content = atob(data.content);
-                    draft = JSON.parse(content);
+                    const decodedContent = atob(data.content);
+                    draft = JSON.parse(decodedContent);
                     
                     // 클라우드에서 불러온 것을 현재 작업으로 설정
                     localStorage.setItem('current-draft-id', draftId);
@@ -1823,11 +1823,11 @@ ${content}
                 const postId = this.getElementText(item, 'wp:post_id');
                 const relatedAttachments = attachments.filter(att => att.parent === postId);
                 
-                const content = this.getElementText(item, 'content:encoded');
+                const postContent = this.getElementText(item, 'content:encoded');
                 const post = {
                     id: postId,
                     title: this.getElementText(item, 'title'),
-                    content: content,
+                    content: postContent,
                     excerpt: this.getElementText(item, 'excerpt:encoded'),
                     author: this.getElementText(item, 'dc:creator'),
                     pubDate: this.getElementText(item, 'pubDate'),
@@ -1838,9 +1838,9 @@ ${content}
                     attachments: relatedAttachments,
                     featuredImage: this.extractFeaturedImage(item, attachments),
                     // 본문에서 추가 이미지 URL 추출
-                    contentImages: this.extractImagesFromContent(content),
+                    contentImages: this.extractImagesFromContent(postContent),
                     // 갤러리 이미지 추출
-                    galleryImages: this.extractGalleryImages(content, attachments)
+                    galleryImages: this.extractGalleryImages(postContent, attachments)
                 };
                 posts.push(post);
             }
@@ -2856,14 +2856,14 @@ ${content}
         let converted = content;
         
         // [caption] 단축코드 처리
-        converted = converted.replace(/\[caption[^\]]*\](.*?)\[\/caption\]/gs, (match, content) => {
-            const imgMatch = content.match(/<img[^>]+>/);
-            const captionMatch = content.match(/>(.*?)$/s);
+        converted = converted.replace(/\[caption[^\]]*\](.*?)\[\/caption\]/gs, (match, captionContent) => {
+            const imgMatch = captionContent.match(/<img[^>]+>/);
+            const captionMatch = captionContent.match(/>(.*?)$/s);
             
             if (imgMatch && captionMatch) {
                 return `${imgMatch[0]}\n*${captionMatch[1].trim()}*`;
             }
-            return content;
+            return captionContent;
         });
 
         // WordPress 갤러리를 단순 이미지 리스트로 변환
