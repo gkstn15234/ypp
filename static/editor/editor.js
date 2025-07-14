@@ -2742,35 +2742,32 @@ ${content}
         const maxRetries = 3;
         
         try {
-            // 이미지 다운로드 (타임아웃 설정)
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 타임아웃
-            
-            const response = await fetch(imageUrl, {
-                signal: controller.signal,
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                }
-            });
-            
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const blob = await response.blob();
-            
-            // 이미지 파일인지 확인
-            if (!blob.type.startsWith('image/')) {
-                throw new Error('이미지 파일이 아닙니다');
-            }
-            
             const filename = this.extractFilenameFromUrl(imageUrl);
             
-            // Cloudflare에 업로드
-            const uploadedUrl = await this.uploadToCloudflare(new File([blob], filename));
-            return uploadedUrl;
+            // 서버사이드 프록시를 통해 이미지 다운로드 및 업로드
+            const response = await fetch('/api/download-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    imageUrl: imageUrl,
+                    filename: filename
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`서버 응답 오류: ${errorData.error || response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(`업로드 실패: ${result.error || '알 수 없는 오류'}`);
+            }
+
+            return result.url;
             
         } catch (error) {
             console.error(`이미지 처리 실패 (${retryCount + 1}/${maxRetries}):`, imageUrl, error);
@@ -2791,42 +2788,35 @@ ${content}
         const maxRetries = 3;
         
         try {
-            // 이미지 다운로드 (타임아웃 설정)
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 타임아웃
-            
-            const response = await fetch(imageUrl, {
-                signal: controller.signal,
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-                }
-            });
-            
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const blob = await response.blob();
-            
-            // 이미지 파일인지 확인
-            if (!blob.type.startsWith('image/')) {
-                throw new Error('이미지 파일이 아닙니다');
-            }
-            
             const filename = attachmentInfo?.filename || this.extractFilenameFromUrl(imageUrl);
             
-            // 메타데이터가 포함된 파일 객체 생성
-            const file = new File([blob], filename, { type: blob.type });
+            // 서버사이드 프록시를 통해 이미지 다운로드 및 업로드
+            const response = await fetch('/api/download-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    imageUrl: imageUrl,
+                    filename: filename
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`서버 응답 오류: ${errorData.error || response.status}`);
+            }
+
+            const result = await response.json();
             
-            // Cloudflare에 업로드
-            const uploadedUrl = await this.uploadToCloudflare(file);
-            
+            if (!result.success) {
+                throw new Error(`업로드 실패: ${result.error || '알 수 없는 오류'}`);
+            }
+
             // 성공 로그
-            console.log(`이미지 업로드 성공: ${filename} -> ${uploadedUrl}`);
+            console.log(`이미지 업로드 성공: ${filename} -> ${result.url}`);
             
-            return uploadedUrl;
+            return result.url;
             
         } catch (error) {
             console.error(`이미지 처리 실패 (${retryCount + 1}/${maxRetries}):`, imageUrl, error);
