@@ -1497,6 +1497,7 @@ ${content}
     // 워드프레스 가져오기 기능
     setupWordPressImport() {
         console.log('setupWordPressImport 호출됨');
+        console.log('DOM 로딩 상태:', document.readyState);
         
         const wpPostsFileInput = document.getElementById('wpPostsFile');
         const wpImagesFileInput = document.getElementById('wpImagesFile');
@@ -1509,6 +1510,18 @@ ${content}
             startImportBtn: !!startImportBtn,
             selectAllCheckbox: !!selectAllCheckbox
         });
+        
+        // 모달이 존재하는지 확인
+        const modal = document.getElementById('wordpressImportModal');
+        console.log('워드프레스 모달 존재:', !!modal);
+        
+        if (startImportBtn) {
+            console.log('초기 버튼 상태:', {
+                disabled: startImportBtn.disabled,
+                className: startImportBtn.className,
+                innerHTML: startImportBtn.innerHTML
+            });
+        }
         
         if (wpPostsFileInput) {
             wpPostsFileInput.addEventListener('change', (e) => this.handleWpPostsFileSelect(e));
@@ -1531,6 +1544,15 @@ ${content}
         // 워드프레스 데이터 저장용
         this.wpPostsData = null;
         this.wpImagesData = null;
+        
+        // 모달 이벤트 리스너 추가
+        const wpModal = document.getElementById('wordpressImportModal');
+        if (wpModal) {
+            wpModal.addEventListener('shown.bs.modal', () => {
+                console.log('워드프레스 모달이 열렸습니다');
+                this.updateImportButtonState();
+            });
+        }
     }
 
     async handleWpPostsFileSelect(event) {
@@ -1573,9 +1595,18 @@ ${content}
             console.log('wpPostsData 설정 완료:', this.wpPostsData.length);
             
             this.displayWordPressPosts(posts);
-            this.updateImportButtonState();
             
+            // 버튼 상태 업데이트 전후 확인
+            console.log('버튼 상태 업데이트 시작');
+            this.updateImportButtonState();
             console.log('버튼 상태 업데이트 완료');
+            
+            // 1초 후 다시 한 번 확인
+            setTimeout(() => {
+                console.log('1초 후 버튼 상태 재확인');
+                this.updateImportButtonState();
+            }, 1000);
+            
             progressDiv.style.display = 'none';
             
             this.showToast(`${posts.length}개의 글을 발견했습니다.`, 'success');
@@ -1651,10 +1682,35 @@ ${content}
         });
         
         if (startImportBtn) {
+            const wasDisabled = startImportBtn.disabled;
             startImportBtn.disabled = !hasData;
-            console.log('버튼 disabled 상태:', startImportBtn.disabled);
+            console.log('버튼 상태 변경:', {
+                이전상태: wasDisabled,
+                현재상태: startImportBtn.disabled,
+                hasData: hasData,
+                버튼텍스트: startImportBtn.textContent.trim()
+            });
+            
+            // 버튼 텍스트와 스타일 업데이트
+            if (hasData) {
+                startImportBtn.innerHTML = '<i class="fas fa-download me-1"></i>가져오기 시작';
+                startImportBtn.classList.remove('btn-secondary');
+                startImportBtn.classList.add('btn-primary');
+            } else {
+                startImportBtn.innerHTML = '<i class="fas fa-download me-1"></i>가져오기 시작';
+                startImportBtn.classList.remove('btn-primary');
+                startImportBtn.classList.add('btn-secondary');
+            }
         } else {
             console.error('startWpImport 버튼을 찾을 수 없습니다!');
+            
+            // DOM 전체에서 버튼 찾기 시도
+            const allButtons = document.querySelectorAll('button');
+            console.log('페이지의 모든 버튼:', Array.from(allButtons).map(btn => ({
+                id: btn.id,
+                text: btn.textContent.trim(),
+                disabled: btn.disabled
+            })));
         }
     }
 
