@@ -152,7 +152,7 @@
                             <article class="sidebar-news-item">
                                 <div class="sidebar-news-thumb">
                                     {{ if .Params.images }}
-                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" width="120" height="80" loading="lazy">
                                     {{ else }}
                                     <div class="no-image">
                                         <i class="fas fa-car"></i>
@@ -219,7 +219,7 @@
                 <article class="related-article">
                     <div class="related-article-thumb">
                         {{ if .Params.images }}
-                        <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
+                        <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" width="280" height="180" loading="lazy">
                         {{ else }}
                         <div class="no-image">
                             <i class="fas fa-newspaper"></i>
