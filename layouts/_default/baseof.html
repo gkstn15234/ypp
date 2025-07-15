@@ -144,40 +144,93 @@
     
     <!-- Critical JavaScript (Inline) -->
     <script>
-        // Critical JavaScript for First Paint
+        // Critical JavaScript for First Paint and CLS Prevention
         (function() {
-            // Image lazy loading polyfill
-            if ('loading' in HTMLImageElement.prototype) {
+            // Image optimization for CLS prevention
+            function optimizeImages() {
                 const images = document.querySelectorAll('img[loading="lazy"]');
+                
                 images.forEach(img => {
-                    img.src = img.dataset.src || img.src;
+                    // Add skeleton loading effect
+                    if (!img.complete) {
+                        img.parentElement.classList.add('image-skeleton');
+                    }
+                    
+                    // Handle image load
+                    img.addEventListener('load', function() {
+                        this.classList.add('loaded');
+                        this.parentElement.classList.remove('image-skeleton');
+                    });
+                    
+                    // Handle image error
+                    img.addEventListener('error', function() {
+                        this.parentElement.classList.remove('image-skeleton');
+                        // Keep original error handling if exists
+                        if (this.onerror) {
+                            this.onerror();
+                        }
+                    });
                 });
+            }
+            
+            // Image lazy loading polyfill with CLS prevention
+            if ('loading' in HTMLImageElement.prototype) {
+                optimizeImages();
             } else {
                 // Fallback for browsers without native lazy loading
                 const script = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.3/dist/lazyload.min.js';
                 script.onload = function() {
                     new LazyLoad({
-                        elements_selector: 'img[loading="lazy"]'
+                        elements_selector: 'img[loading="lazy"]',
+                        callback_loaded: function(element) {
+                            element.classList.add('loaded');
+                            element.parentElement.classList.remove('image-skeleton');
+                        }
                     });
                 };
                 document.head.appendChild(script);
             }
             
-            // Critical performance monitoring
-            if ('performance' in window) {
-                window.addEventListener('load', function() {
-                    setTimeout(function() {
-                        const perfData = performance.getEntriesByType('navigation')[0];
-                        if (perfData) {
-                            console.log('Performance metrics:', {
-                                FCP: perfData.loadEventStart - perfData.fetchStart,
-                                LCP: perfData.loadEventEnd - perfData.fetchStart,
-                                TTI: perfData.domInteractive - perfData.fetchStart
-                            });
+            // Prevent layout shift during font loading
+            if ('fontDisplay' in document.documentElement.style) {
+                document.documentElement.style.fontDisplay = 'swap';
+            }
+            
+            // Early DOM manipulation for CLS prevention
+            document.addEventListener('DOMContentLoaded', function() {
+                // Ensure all images have proper dimensions
+                const allImages = document.querySelectorAll('img');
+                allImages.forEach(img => {
+                    if (!img.getAttribute('width') || !img.getAttribute('height')) {
+                        // Set default dimensions for images without explicit dimensions
+                        if (img.closest('.main-news-image')) {
+                            img.setAttribute('width', '600');
+                            img.setAttribute('height', '400');
+                        } else if (img.closest('.side-news-image, .secondary-news-image, .right-news-image, .bottom-news-image')) {
+                            img.setAttribute('width', '300');
+                            img.setAttribute('height', '200');
+                        } else {
+                            img.setAttribute('width', '280');
+                            img.setAttribute('height', '180');
                         }
-                    }, 0);
+                    }
                 });
+                
+                // Initialize skeleton loading for slow images
+                optimizeImages();
+            });
+            
+            // Performance monitoring
+            if ('PerformanceObserver' in window) {
+                const observer = new PerformanceObserver(function(list) {
+                    for (const entry of list.getEntries()) {
+                        if (entry.entryType === 'layout-shift' && entry.value > 0.1) {
+                            console.warn('Layout shift detected:', entry.value);
+                        }
+                    }
+                });
+                observer.observe({ entryTypes: ['layout-shift'] });
             }
         })();
     </script>
