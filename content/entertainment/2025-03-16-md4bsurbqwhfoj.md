@@ -3,10 +3,10 @@ title: "실내 공기 속 보이지 않는 위험, 라돈의 위협과 예방법
 description: "라돈(Radon)은 자연적으로 발생하는 방사성 기체로, 무색·무취이기 때문에 눈에 보이지도 않고 냄새로 감지할 수도 없습니다. 주로 토양, 암석, 건축 자재에서 발생하며, 건물 바닥의 틈이나 배관을 통해 실내로 유입됩니다. 특히 지하층, 환기가 부족한 공간, 노후 건축"
 date: 2025-03-16T16:17:08+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 tags: ["라돈", "라돈의위험성"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/03/라돈의위험성-1.webp", "https://ingihgoyonet.site/wp-content/uploads/2025/03/폐건강.webp", "https://ingihgoyonet.site/wp-content/uploads/2025/03/포름알데히드-1.jpg"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <h2 >라돈, 조용한 실내 살인자로 불리는 이유</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/03/라돈의위험성-1.webp" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">라돈(Radon)은 자연적으로 발생하는 <strong>방사성 기체</strong>로, 무색·무취이기 때문에 눈에 보이지도 않고 냄새로 감지할 수도 없습니다. 주로 <strong>토양, 암석, 건축 자재</strong>에서 발생하며, 건물 바닥의 틈이나 배관을 통해 실내로 유입됩니다. 특히 <strong>지하층, 환기가 부족한 공간, 노후 건축물</strong>에서 라돈 농도가 높게 측정 될 가능성이 큽니다.</p> <h2 >라돈 노출이 건강에 미치는 영향</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/03/폐건강.webp" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">라돈을 들이마시면 폐 속에 쌓이게 되고, 이 과정에서 방사선을 내뿜는 알파 입자가 나오는데, 이 입자가 폐 세포를 손상시키면서 폐암 위험을 높입니다. 실제로 <strong>세계보건기구(WHO)</strong>와 <strong>미국 환경보호청(EPA)</strong>는 라돈을 흡연 다음으로 폐암을 유발하는 주요 원인으로 보고하고 있습니다. 특히, 오랫동안 높은 농도의 라돈에 노출되면 폐암 위험이 최대 16%까지 증가할 수 있다고 알려져 있습니다.</p> <h2 >라돈 노출을 줄이기 위한 방법</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/03/포름알데히드-1.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">라돈 노출을 줄이려면 먼저 <strong>실내 환기</strong>를 자주 하고, 특히 지하 공간이나 밀폐된 공간의 공기를 순환시키는 것이 중요합니다. 라돈 농도를 확인하기 위해 측정 기기를 사용하고, 기준치를 초과하면 라돈 저감 장치를 설치하는 것이 좋습니다. 또한, 건물 바닥이나 벽의 균열을 막아 라돈이 실내로 유입되는 것을 방지하는 것도 효과적인 방법입니다.</p> <p style="font-size:18px">전문가들은 "라돈은 눈에 보이지 않지만, 지속적인 관리와 예방 조치를 통해 충분히 위험을 줄일 수 있다"며 "정기적인 측정과 환기로 실내 공기 질을 개선하는 것이 중요하다"고 조언하고 있습니다.</p> <p style="font-size:18px">라돈은 우리가 쉽게 인식하기 어려운 존재이지만, 올바른 정보와 예방책을 통해 건강을 지킬 수 있습니다. 실내 공기 질 관리에 대한 관심과 노력이 더욱 필요한 시점입니다. 조금만 더 라돈에 대해서 엄격하게 생각해 보는 건 어떨까요?</p>

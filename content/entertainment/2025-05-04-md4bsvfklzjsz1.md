@@ -3,10 +3,10 @@ title: "몸도, 뇌도 반응한다 슈퍼푸드 연어의 효능"
 description: "부드러운 식감과 고소한 풍미로 사랑받는 연어는 단순한 고급 식재료를 넘어 ‘건강식’으로 주목받고 있습니다. 특히 오메가-3 지방산과 단백질이 풍부해, 꾸준히 섭취할 경우 다양한 건강상의 이점을 기대할 수 있습니다."
 date: 2025-05-04T18:09:16+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 tags: ["연어효능"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/05/연어-2-1024x683.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/05/연어효능-1024x682.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/05/연어두뇌-1024x678.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/05/연어초밥-1024x683.jpg"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <p style="font-size:18px">부드러운 식감과 고소한 풍미로 사랑받는 연어는 단순한 고급 식재료를 넘어 ‘건강식’으로 주목받고 있습니다. 특히 오메가-3 지방산과 단백질이 풍부해, 꾸준히 섭취할 경우 다양한 건강상의 이점을 기대할 수 있습니다.</p> <h2 >심장을 지키는 오메가-3의 방패막</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/05/연어-2-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">연어에는 DHA와 EPA 같은 고도불포화지방산이 풍부하게 함유돼 있습니다. 이러한 성분은 혈중 중성지방 수치를 낮추고, 혈압을 안정화시켜 심혈관 질환 예방에 도움이 됩니다. 특히 중장년층에게는 심장 건강 유지에 중요한 식품으로 평가받고 있습니다.</p> <h2 >두뇌 회전, 연어로 더 똑똑하게</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/05/연어효능-1024x682.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">오메가-3는 뇌세포를 활성화시키는 데에도 긍정적인 영향을 줍니다. 꾸준한 연어 섭취는 집중력 향상과 기억력 개선에 도움을 줄 수 있으며, 노년층의 인지 기능 저하를 예방하는 효과도 보고되고 있습니다. 어린이 성장기에도 두뇌 발달을 위한 식재료로 적합합니다.</p> <h2 >피부부터 뼛속까지, 항산화 영양 폭발</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/05/연어두뇌-1024x678.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">연어에는 아스타잔틴이라는 강력한 항산화제가 포함돼 있어 피부 노화를 늦추는 데 도움을 줍니다. 여기에 비타민 D와 단백질, 칼슘도 풍부해 골밀도 유지 및 면역력 강화에도 긍정적인 역할을 합니다. 탄력 있고 건강한 몸을 위한 자연식 보충제라 할 수 있습니다.</p> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/05/연어초밥-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">건강을 위한 한 끼, 연어는 선택이 아닌 필수일 수 있습니다. 단, 훈제보다는 구이나 찜처럼 가공되지 않은 방식으로 섭취하는 것이 더 좋다는 점도 기억해두시기 바랍니다. 연어 한 점에 담긴 영양, 오늘부터 꾸준히 챙겨보시는 건 어떨까요?</p>

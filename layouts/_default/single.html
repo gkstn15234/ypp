@@ -20,8 +20,8 @@
                         <div class="article-meta-info">
                             <div class="meta-left">
                                 {{ if .Params.author }}
-                                {{ if eq .Params.author "오은진" }}
-                                <a href="/authors/oh-eun-jin/" class="author-name">{{ .Params.author }}</a>
+                                {{ if eq .Params.author "김현지" }}
+                                <a href="/authors/kim-hyun-ji/" class="author-name">{{ .Params.author }}</a>
                                 {{ else }}
                                 <a href="/authors/{{ .Params.author | urlize }}/" class="author-name">{{ .Params.author }}</a>
                                 {{ end }}
@@ -106,8 +106,8 @@
                             <div class="author-details">
                                 <h5 class="author-name">{{ .Params.author }}</h5>
                                 <p class="author-bio">{{ .Params.author_bio | default "자동차 경제 전문 기자" }}</p>
-                                {{ if eq .Params.author "오은진" }}
-                                <a href="/authors/oh-eun-jin/" class="author-link">기자 페이지 보기</a>
+                                {{ if eq .Params.author "김현지" }}
+                                <a href="/authors/kim-hyun-ji/" class="author-link">기자 페이지 보기</a>
                                 {{ else }}
                                 <a href="/authors/{{ .Params.author | urlize }}/" class="author-link">기자 페이지 보기</a>
                                 {{ end }}

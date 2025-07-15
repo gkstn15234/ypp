@@ -49,7 +49,7 @@ date: 2025-01-30T10:00:00+09:00
 images: 
   - "https://example.com/high-quality-image-1600x900.jpg"
   - "https://example.com/alternative-image-1200x675.jpg"
-author: "오은진"
+author: "김현지"
 ---
 ```
 

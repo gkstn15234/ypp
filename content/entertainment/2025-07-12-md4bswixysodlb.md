@@ -3,9 +3,9 @@ title: "\"밤 11시부터 새벽 2시, 황금 수면시간의 비밀…건강을
 description: "많은 전문가들은 밤 11시부터 새벽 2시 사이에 자는 것이 건강에 가장 이롭다고 강조합니다. 이 짧은 몇 시간이 단순한 휴식 그 이상으로, 신체 회복과 면역 강화를 책임지는 핵심 시간대이기 때문입니다."
 date: 2025-07-12T23:51:32+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-rachel-claire-5864643-1024x617.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-olly-914910-1-1024x683.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-olly-935742-1-1024x683.jpg"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <p style="font-size:18px">많은 전문가들은 밤 11시부터 새벽 2시 사이에 자는 것이 건강에 가장 이롭다고 강조합니다. 이 짧은 몇 시간이 단순한 휴식 그 이상으로, 신체 회복과 면역 강화를 책임지는 핵심 시간대이기 때문입니다.</p> <h2 >간 해독의 황금시간, 밤 11시~1시</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-rachel-claire-5864643-1024x617.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">우리 몸의 해독 시스템 중 중심을 맡는 간은 밤 11시부터 새벽 1시 사이에 가장 활발히 활동합니다. 이 시간에 잠들어 있어야 간은 혈액 속 독소를 정화하고 에너지를 재생할 수 있습니다. 깨어 있거나 과도한 활동을 하면 간 기능에 부담이 가중됩니다.</p> <h2 >멜라토닌 분비, 수면의 질을 좌우합니다</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-olly-914910-1-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">밤 11시를 전후로 멜라토닌 분비가 정점을 찍으며, 이 호르몬은 깊은 잠과 생체 리듬 조절에 핵심 역할을 합니다. 늦게 잠들면 멜라토닌 분비 타이밍이 어긋나 수면의 질이 저하될 수 있습니다. 이는 다음 날의 피로 누적과 집중력 저하로 이어질 수 있습니다.</p> <h2 >성장호르몬, 이 시간대에만 쏟아집니다</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-olly-935742-1-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">성장호르몬은 면역력 유지, 근육 재생, 피부 회복에 꼭 필요한 물질로, 밤 11시~새벽 2시 사이 깊은 수면 상태일 때 가장 활발히 분비됩니다. 특히 어린이뿐 아니라 성인의 회복력에도 이 호르몬이 중요한 역할을 하므로 이 시간대 수면은 매우 중요합니다.</p> <p style="font-size:18px">밤 11시부터 새벽 2시, 이 짧지만 중요한 시간은 몸과 마음이 스스로를 회복하는 자연의 리듬입니다. 규칙적인 수면 습관은 약보다 강한 면역력을 만들어 줍니다. 오늘 밤만큼은 조금 일찍 잠자리에 드셔보는 건 어떨까요?</p>

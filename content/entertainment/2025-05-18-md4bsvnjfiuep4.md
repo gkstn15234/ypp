@@ -3,10 +3,10 @@ title: "입맛도 살리고 몸도 챙기는 5월 제철음식"
 description: "싱그러운 봄기운이 가득한 5월, 자연이 준 귀한 식재료들이 풍성하게 자라나는 시기입니다. 이때만 맛볼 수 있는 제철 음식은 입맛을 돋우는 것뿐 아니라 건강에도 큰 이로움을 줍니다."
 date: 2025-05-18T21:36:52+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 tags: ["5월제철"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/05/달래-683x1024.png", "https://ingihgoyonet.site/wp-content/uploads/2025/05/멸치볶음.png", "https://ingihgoyonet.site/wp-content/uploads/2025/05/pexels-pixabay-70746-1024x768.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/05/pexels-jerchung-2204771-1024x768.jpg"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <p style="font-size:18px">싱그러운 봄기운이 가득한 5월, 자연이 준 귀한 식재료들이 풍성하게 자라나는 시기입니다. 이때만 맛볼 수 있는 제철 음식은 입맛을 돋우는 것뿐 아니라 건강에도 큰 이로움을 줍니다.</p> <h2 >봄철 대표 채소, ‘달래’의 매력</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/05/달래-683x1024.png" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">5월의 들판에서 자란 달래는 특유의 매콤한 풍미로 입맛을 살려줍니다. 알리신 성분이 풍부해 피로 해소와 혈액 순환에 도움을 주며, 간 기능 강화에도 효과적입니다. 특히 된장국이나 무침으로 활용하면 영양도 맛도 모두 챙길 수 있습니다.</p> <h2 >고소한 바다의 선물, ‘멸치’</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/05/멸치볶음.png" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">남해안에서 갓 잡은 멸치는 5월이 가장 살이 오르고 고소한 시기입니다. 칼슘과 오메가-3가 풍부해 뼈 건강과 두뇌 발달에 좋으며, 볶음이나 국물용으로 다양하게 활용됩니다. 짭조름한 맛 덕분에 반찬으로도 인기가 높습니다.</p> <h2 >봄의 달콤한 유혹, ‘딸기’</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/05/pexels-pixabay-70746-1024x768.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">5월 딸기는 산뜻한 향과 달콤함이 극대화되는 시기입니다. 비타민 C가 풍부해 면역력 강화와 피부 미용에 효과적이며, 수분 함량이 높아 봄철 갈증 해소에도 도움이 됩니다. 생과일 그대로 먹거나 샐러드, 요거트와 함께 곁들이면 좋습니다.</p> <h2 >바다향 가득한 보양 식재료, ‘바지락’</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/05/pexels-jerchung-2204771-1024x768.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">5월의 바지락은 살이 통통하게 올라 풍미가 뛰어납니다. 철분과 아연이 풍부해 빈혈 예방에 좋으며, 간 기능 개선에도 효과가 있습니다. 바지락국, 파스타, 된장찌개 등으로 활용하면 간편하게 건강을 챙길 수 있습니다.</p> <p style="font-size:18px">제철 식재료는 우리 몸이 계절에 적응하는 데 큰 도움을 줍니다. 5월의 자연이 키워낸 건강한 음식들로 식탁을 채워보는 건 어떨까요?</p>

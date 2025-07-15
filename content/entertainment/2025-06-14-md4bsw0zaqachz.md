@@ -3,9 +3,9 @@ title: "“체리, 작지만 강력하다” 항산화부터 수면 개선까지
 description: "탱글한 식감과 상큼한 맛으로 사랑 받는 과일, 체리. 하지만 체리는 단순한 디저트용 과일이 아닙니다. 작은 열매 안에 숨은 건강 비밀은 생각보다 훨씬 강력합니다."
 date: 2025-06-14T21:26:00+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-r-khalil-250162-768009-1024x683.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-pixabay-162689-1024x680.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-janetrangdoan-1149021-1024x650.jpg"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <p style="font-size:18px">탱글한 식감과 상큼한 맛으로 사랑 받는 과일, 체리. 하지만 체리는 단순한 디저트용 과일이 아닙니다. 작은 열매 안에 숨은 건강 비밀은 생각보다 훨씬 강력합니다.</p> <h2 >체리는 천연 항산화 보물창고입니다</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-r-khalil-250162-768009-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">체리는 안토시아닌과 케르세틴, 베타카로틴 같은 강력한 항산화 성분을 다량 함유하고 있습니다. 이들은 체내 염증을 줄이고 세포의 노화를 막아주는 데 기여합니다. 특히 활성 산소로부터 세포를 보호해 뇌 건강과 면역력 유지에 효과적입니다.</p> <h2 >심장 건강을 지키는 붉은 열매</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-pixabay-162689-1024x680.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">체리 속 플라보노이드는 혈압을 안정 시키고 혈관 내 염증을 완화하는 데 도움을 줍니다. 꾸준히 섭취하면 LDL 콜레스테롤을 낮추고, 심혈관계 질환 예방에도 긍정적인 영향을 줍니다. 하루 한 줌의 체리가 혈관 건강을 위한 자연 보호막이 될 수 있습니다.</p> <h2 >수면의 질을 높이는 천연 멜라토닌 공급원</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-janetrangdoan-1149021-1024x650.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">체리는 멜라토닌을 자연스럽게 함유한 몇 안 되는 과일입니다. 이 성분은 생체리듬 조절에 관여해 수면의 질을 높여줍니다. 특히 밤잠이 부족한 중장년층에게 체리는 수면 보조 식품 이상의 역할을 할 수 있습니다.</p> <p style="font-size:18px">체리는 맛뿐 아니라 건강까지 챙길 수 있는 똑똑한 과일입니다. 일상 속 간식으로, 또는 아침 샐러드에 가볍게 곁들이는 것 만으로도 충분히 그 가치를 누릴 수 있습니다. 오늘, 체리 한 줌으로 건강한 하루를 시작해보시는 건 어떠신가요?</p>

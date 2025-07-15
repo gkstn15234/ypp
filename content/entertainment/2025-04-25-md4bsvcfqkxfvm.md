@@ -3,9 +3,9 @@ title: "파라벤, 피부 속 침투하는 방부제의 진실 우리 몸에 미
 description: "화장품과 생활용품의 라벨을 자세히 들여다보면 ‘파라벤(Paraben)’이라는 단어가 자주 보입니다. 흔히 쓰이는 이 방부제가 과연 우리 건강에 어떤 영향을 줄 수 있을까요?"
 date: 2025-04-25T00:01:19+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/04/파라벤1-1-1024x683.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/04/파라벤2-1024x683.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/04/파라벤3-1024x683.jpg"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <p style="font-size:18px">화장품과 생활용품의 라벨을 자세히 들여다보면 ‘파라벤(Paraben)’이라는 단어가 자주 보입니다. 흔히 쓰이는 이 방부제가 과연 우리 건강에 어떤 영향을 줄 수 있을까요?</p> <p style="font-size:18px">파라벤은 박테리아와 곰팡이의 증식을 막기 위해 사용하는 방부제입니다. 주로 메틸파라벤, 에틸파라벤, 부틸파라벤 등이 있으며, 화장품, 샴푸, 바디로션 등에서 흔히 사용됩니다. 가격이 저렴하고 효과가 뛰어나 많은 제품에 활용되어 왔습니다.</p> <h2 >우리가 흔히 사용하는 제품 속 파라벤</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/04/파라벤1-1-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">파라벤은 피부에 직접 닿는 제품뿐만 아니라 일부 식품이나 의약품에도 포함되어 있습니다. 화장품에서 함유량은 법적으로 제한되어 있으나, 다양한 제품을 중복 사용하다 보면 총 노출량이 늘어날 수 있습니다. 특히 어린이나 민감성 피부를 가진 분들은 주의가 필요합니다.</p> <h2 >건강에 미치는 우려와 논란</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/04/파라벤2-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">파라벤은 체내에 흡수되어 에스트로겐(여성호르몬)과 유사한 작용을 할 수 있어 내분비계 교란 물질로 분류되기도 했습니다. 이로 인해 유방암과의 연관성, 생식계통에 미치는 영향 등에 대한 연구들이 진행되어 왔습니다. 다만, 현재까지의 연구 결과는 명확한 인과관계를 입증하지는 못하고 있어 논쟁은 계속되고 있다고 합니다.</p> <h2 >파라벤을 대체할 수 있는 자연 성분</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/04/파라벤3-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">최근에는 소비자들의 우려로 인해 파라벤 프리(Paraben-Free) 제품이 늘어나고 있습니다. 천연 유래 방부제인 소르빈산 칼륨, 페닐에틸알코올, 에센셜 오일 등이 대체재로 사용되고 있으며, 피부 자극이 덜하고 환경에도 비교적 부담이 적습니다. 다만, 이들 성분은 보존력이 다소 약해 보관에 주의가 필요합니다.</p> <p style="font-size:18px">파라벤은 그간 효율적인 방부제로 널리 쓰였지만, 건강에 대한 인식이 높아지면서 그 안전성에 대한 재검토가 이어지고 있습니다. 제품을 선택할 때 성분표를 꼼꼼히 확인하는 소비자들의 현명함이 더욱 중요합니다.</p>

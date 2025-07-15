@@ -3,9 +3,9 @@ title: "매일 10분 ‘이 동작’만 해도 장이 웃습니다… 변비 �
 description: "현대인은 바쁜 일상 속에서 변비나 더부룩함 같은 장 건강 문제를 겪는 경우가 많습니다. 하지만 매일 단 10분 투자로 장을 ‘빵빵’하게 깨우는 간단한 루틴이 있다면 어떨까요?"
 date: 2025-06-07T23:11:55+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-kindelmedia-7298670-1024x577.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-cottonbro-4003345-683x1024.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-valeria-ushakova-603898-3094215-1-683x1024.jpg"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <p style="font-size:18px">현대인은 바쁜 일상 속에서 변비나 더부룩함 같은 장 건강 문제를 겪는 경우가 많습니다. 하지만 매일 단 10분 투자로 장을 ‘빵빵’하게 깨우는 간단한 루틴이 있다면 어떨까요?</p> <h2 >아침 공복, 배 마사지로 ‘장 기상 알람’ 울리기</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-kindelmedia-7298670-1024x577.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">기상 직후 따뜻한 물 한 잔과 함께 배를 시계 방향으로 마사지해 보세요. 손바닥으로 천천히 눌러주면 장의 연동운동이 촉진되어 잠자던 장이 깨어납니다. 특히 아랫배 중심의 원형 마사지가 효과적이며, 배변 활동을 유도하는 데 도움이 됩니다.</p> <h2 >무릎을 세운 채 다리 당기기 스트레칭</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-cottonbro-4003345-683x1024.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">바닥에 누운 뒤 한쪽 다리를 가슴 쪽으로 당기는 동작을 번갈아 반복해보세요. 이 동작은 장에 직접적인 압박을 주어 가스를 배출하고 변을 유도하는 데 탁월합니다. 하루 10분 정도면 장 속 노폐물 이동을 돕는 데 충분합니다.</p> <h2 >‘고양이-소’ 요가 자세, 장에 자극 주는 명불허전 동작</h2> <p style="font-size:18px">무릎을 꿇고 엎드린 상태에서 등을 위아래로 번갈아 움직이는 요가 자세는 장 주변의 근육과 신경을 자극합니다. 복부를 자연스럽게 압박하면서 장운동을 촉진해 숙변 제거에 효과적입니다. 하루 한 번만 해도 달라진 변비 상태를 느끼실 수 있습니다.</p> <h2 >호흡 운동으로 복부 압력 조절</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-valeria-ushakova-603898-3094215-1-683x1024.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">깊게 들이마시고 천천히 내쉬는 복식호흡은 복부 내압을 조절해 장의 움직임을 자연스럽게 활성화시킵니다. 호흡이 얕고 빠르면 장도 위축되기 쉬운데, 복식호흡은 자율신경을 안정시키고 배변 리듬을 회복시켜 줍니다.</p> <p style="font-size:18px">장의 건강은 하루 10분의 습관에서 시작됩니다. 화장실에서 보내는 고통스러운 시간보다, 아침 10분의 루틴이 훨씬 경제적입니다. 오늘부터 바로 시작해보세요. ‘장이 웃는 하루’, 어렵지 않습니다.</p>

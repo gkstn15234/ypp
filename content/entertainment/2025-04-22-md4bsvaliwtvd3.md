@@ -3,9 +3,9 @@ title: "매실, 한 방울의 건강 혁명! 간·소화·피로 회복까지 �
 description: "여름철이면 자연스레 생각나는 매실, 그저 새콤한 과일로만 알고 계시진 않으신가요? 매실은 그 풍부한 영양 덕분에 예로부터 ‘약이 되는 과일’로 불리며 건강에 폭넓게 활용되어 왔습니다."
 date: 2025-04-22T22:28:45+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/04/매실-1024x768.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/04/매실주스-1024x683.png", "https://ingihgoyonet.site/wp-content/uploads/2025/04/매실청담그기-1024x683.png"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <p>여름철이면 자연스레 생각나는 매실, 그저 새콤한 과일로만 알고 계시진 않으신가요? 매실은 그 풍부한 영양 덕분에 예로부터 ‘약이 되는 과일’로 불리며 건강에 폭넓게 활용되어 왔습니다.</p> <h2 >소화 기능 강화, 장을 지키는 천연 소화제</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/04/매실-1024x768.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">매실에는 유기산이 풍부하게 함유되어 있어 위액 분비를 촉진하고 소화를 돕는 데 탁월한 효과가 있습니다. 특히 소화불량이나 위산 과다로 인한 불편감 완화에 도움을 줄 수 있습니다. 꾸준히 섭취하면 장내 유익균이 늘어나 장 건강 유지에도 긍정적인 영향을 미칩니다.</p> <h2 >독소 해독과 간 기능 개선의 조력자</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/04/매실주스-1024x683.png" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">매실 속 ‘피크린산’은 체내에 쌓인 노폐물과 독소를 배출하는 데 기여합니다. 특히 과음이나 고지방식으로 지친 간 기능을 회복 시키는 데 효과적이라 예로부터 ‘해독 과일’로 불렸습니다. 간 건강이 염려될 때 매실청 한 잔이 몸을 가볍게 만들어 준다고 합니다.</p> <h2 >항산화 작용으로 피로 해소와 면역력 향상</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/04/매실청담그기-1024x683.png" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">매실에는 항산화 성분인 폴리페놀과 카로티노이드가 풍부하게 들어 있어 세포 노화를 억제하고 피로 회복에 도움을 줍니다. 활력이 떨어지는 날, 매실차 한 잔은 면역력을 끌어올리는 작은 습관이 될 수 있습니다. 또한 꾸준한 섭취는 감기나 염증성 질환 예방에도 긍정적인 영향을 줍니다.</p> <h2 >구취 제거와 체취 개선까지… 생활 속 똑똑한 활용</h2> <p style="font-size:18px">매실의 강한 유기산은 입 안 세균 억제에 도움을 주어 구취 완화에 효과적입니다. 여름철 땀이 많아지며 체취가 걱정될 때에도 매실청은 자연스러운 체내 정화를 도와줍니다. 음용뿐 아니라 양치 후 가글용으로 활용해도 신선한 입 냄새 유지에 좋습니다.</p> <p>매실은 단순한 여름 과일이 아닌, 우리 몸을 다스리는 천연의 보약입니다. 생활 속 작지만 확실한 건강 습관, 오늘부터 매실 한 잔으로 시작해보시는 건 어떨까요?</p>

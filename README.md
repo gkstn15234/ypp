@@ -1,6 +1,6 @@
-# 오토데일프릭스 - 자동차 경제 뉴스 사이트
+# 포스트업 - 자동차 경제 뉴스 사이트
 
-자동차 산업과 경제 정보를 전문적으로 다루는 오토데일프릭스 뉴스 사이트입니다.
+자동차 산업과 경제 정보를 전문적으로 다루는 포스트업 뉴스 사이트입니다.
 
 ## 🚀 Cloudflare Pages 자동 배포 설정
 
@@ -72,7 +72,7 @@ npx wrangler pages deploy public
    author: "기자명"
    date: 2024-01-01T10:00:00+09:00
    tags: ["태그1", "태그2"]
-   categories: ["automotive"] # 또는 "economy", "entertainment"
+   categories: ["health"] # 또는 "medical", "wellness"
    images: ["이미지_URL"]
    ---
    ```

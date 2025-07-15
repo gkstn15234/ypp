@@ -3,9 +3,9 @@ title: "“폭염 속 등산, 건강에는 독입니다” 더운 날씨에 등�
 description: "한여름 폭염 속 등산은 건강에 심각한 부담을 줄 수 있습니다. 가벼운 운동도 좋지만, 높은 기온과 강한 자외선 속 산행은 오히려 위험 요소가 될 수 있습니다."
 date: 2025-07-08T22:20:09+09:00
 draft: false
-categories: ["entertainment"]
+categories: ["wellness"]
 images: ["https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-ajaybhargavguduru-939725-1024x941.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-ozgomz-840667-1-1024x683.jpg", "https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-pixabay-70365-768x1024.jpg"]
-author: "kgkstn1423gmailcom"
+author: "김현지"
 ---
 
 <p style="font-size:18px">한여름 폭염 속 등산은 건강에 심각한 부담을 줄 수 있습니다. 가벼운 운동도 좋지만, 높은 기온과 강한 자외선 속 산행은 오히려 위험 요소가 될 수 있습니다.</p> <h2 >폭염 속 산행, 열사병 위험 급증</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-ajaybhargavguduru-939725-1024x941.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">여름철 기온이 30도를 넘어가는 날에는 체온 조절이 어려워져 열사병이나 열탈진의 위험이 커집니다. 등산 중 땀이 나도 시원해지지 않고 오히려 탈수로 이어질 수 있어, 심할 경우 의식저하나 경련을 유발할 수 있습니다. 특히 고령자나 만성질환자는 더욱 주의가 필요합니다.</p> <h2 >체온 상승 + 체력 소모, 이중 스트레스</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-ozgomz-840667-1-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">무더위에는 가만히 있어도 체온이 상승하기 때문에, 높은 고도에서의 등산은 심폐 기능에 큰 부담을 줍니다. 체력 소모가 심해지면서 평소보다 더 쉽게 탈진하게 되며, 가벼운 어지럼증부터 심각한 심장 부담까지 이어질 수 있습니다.</p> <h2 >자외선과 벌레, 피부와 감염의 복병</h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/07/pexels-pixabay-70365-768x1024.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">여름철 산은 자외선이 강해 자외선 차단제를 발라도 땀에 쉽게 지워지며, 화상을 입기 쉽습니다. 또한 벌이나 진드기 활동이 활발한 시기로, 물림으로 인한 알레르기 반응이나 감염 우려도 함께 존재합니다.</p> <h2 >등산보다 적절한 대안, 실내 운동이나 새벽 산책</h2> <p style="font-size:18px">건강을 위한 운동이라면 폭염 시기에는 실내 유산소 운동이나 이른 새벽 시간대의 짧은 산책으로 대체하는 것이 좋습니다. 실내는 온도가 조절되어 있어 열사병 위험이 적고, 충분한 수분 보충도 용이합니다.</p> <p style="font-size:18px">무더운 날씨에 건강을 지키기 위한 등산이 오히려 건강을 위협할 수 있다는 사실, 기억해두시기 바랍니다. 날씨에 따라 운동 방식도 유연하게 바꾸는 것이 현명한 건강 관리입니다. 안전하고 시원한 여름 보내시길 바랍니다.</p>
