@@ -1,0 +1,16 @@
+---
+title: "7월에 꼭 먹어야 할 제철 식재료! 여름을 이기는 자연의 보약"
+description: "본격적인 무더위가 시작되는 7월, 기력은 떨어지고 입맛도 잃기 쉬운 시기입니다. 이럴 때일수록 제철 식재료를 활용한 건강한 식사가 무엇보다 중요합니다. 자연이 선물하는 신선한 재료들은 몸에 활력을 불어넣어주며, 계절 질병을 예방하는 데도 큰 도움이 됩니다."
+date: 2025-06-25T18:54:46+09:00
+draft: false
+categories: ["entertainment"]
+images: [
+  "https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-livier-garcia-645743-1459331-1024x683.jpg"
+  "https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-frostroomhead-3429784-1024x683.jpg"
+  "https://ingihgoyonet.site/wp-content/uploads/2025/06/ChatGPT-Image-2025년-6월-25일-오후-06_54_21.png"
+]
+author: "kgkstn1423gmailcom"
+slug: "7%ec%9b%94%ec%97%90-%ea%bc%ad-%eb%a8%b9%ec%96%b4%ec%95%bc-%ed%95%a0-%ec%a0%9c%ec%b2%a0-%ec%8b%9d%ec%9e%ac%eb%a3%8c-%ec%97%ac%eb%a6%84%ec%9d%84-%ec%9d%b4%ea%b8%b0%eb%8a%94-%ec%9e%90%ec%97%b0%ec%9d%98"
+---
+
+<p style="font-size:18px">본격적인 무더위가 시작되는 7월, 기력은 떨어지고 입맛도 잃기 쉬운 시기입니다. 이럴 때일수록 제철 식재료를 활용한 건강한 식사가 무엇보다 중요합니다. 자연이 선물하는 신선한 재료들은 몸에 활력을 불어넣어주며, 계절 질병을 예방하는 데도 큰 도움이 됩니다.</p> <h2 >여름철 피로 해소에 딱, <strong>옥수수</strong></h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-livier-garcia-645743-1459331-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">달콤하고 고소한 옥수수는 7월이 제철입니다. 식이섬유가 풍부해 장 건강에 이롭고, 비타민 B군이 다량 함유되어 여름철 쉽게 피로해지는 몸에 에너지를 채워줍니다. 삶거나 구워 먹기만 해도 간편한 건강 간식이 됩니다.</p> <h2 >수분 보충과 열기 해소에 좋은 <strong>수박</strong></h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/pexels-frostroomhead-3429784-1024x683.jpg" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">여름철 대표 과일인 수박은 90% 이상이 수분으로 구성되어 있어 탈수 예방에 탁월합니다. 리코펜, 시트룰린 등의 성분이 풍부해 염증을 줄이고 혈압을 낮추는 효과도 기대할 수 있습니다. 더운 날 시원하게 먹기 좋습니다.</p> <h2 >입맛 살리고 건강 지키는 <strong>가지</strong></h2> <figure ><img src="https://ingihgoyonet.site/wp-content/uploads/2025/06/ChatGPT-Image-2025년-6월-25일-오후-06_54_21.png" alt="" style="aspect-ratio:16/9;object-fit:cover"/><figcaption >출처 : 온라인커뮤니티</figcaption></figure> <p style="font-size:18px">7월의 가지는 유난히 부드럽고 수분감이 가득합니다. 안토시아닌이라는 강력한 항산화 물질이 풍부해 노화 예방과 혈액 순환에 도움을 주며, 열을 식히는 데에도 효과적이라 여름철 반찬으로 안성맞춤입니다.</p> <p style="font-size:18px">7월은 땀으로 빠져나가는 영양을 다시 채워야 할 때입니다. 이 시기의 제철 식재료들은 자연이 주는 최고의 보약이라 할 수 있습니다. 맛과 건강을 모두 잡고 싶다면, 지금이 바로 제철 음식을 챙겨야 할 순간입니다.</p>

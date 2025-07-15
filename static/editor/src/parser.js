@@ -217,16 +217,13 @@ class WordPressParser {
     }
 
     /**
-     * 슬러그 생성
+     * 슬러그 생성 (Windows 파일명 길이 제한 해결)
      */
     generateSlug(title) {
-        return title
-            .toLowerCase()
-            .replace(/[^a-z0-9가-힣\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '')
-            .substring(0, 50);
+        // 간단한 숫자 ID 기반 파일명 생성
+        const timestamp = Date.now().toString(36);
+        const randomId = Math.random().toString(36).substr(2, 6);
+        return `post-${timestamp}-${randomId}`;
     }
 
     /**

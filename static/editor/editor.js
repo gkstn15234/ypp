@@ -2388,8 +2388,8 @@ ${content}
         // 실제로는 GitHub API를 통해 파일 존재 여부를 확인할 수 있음
         try {
             const date = new Date(post.pubDate);
-            const slug = post.slug || this.generateSlug(post.title);
-            const filename = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${slug}.md`;
+            const shortId = Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+            const filename = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${shortId}.md`;
             
             // 로컬 스토리지에서 최근 업로드된 파일명 확인
             const recentUploads = JSON.parse(localStorage.getItem('recentUploads') || '[]');
@@ -2466,8 +2466,8 @@ ${content}
 
         // 파일명 생성
         const date = new Date(post.pubDate);
-        const slug = post.slug || this.generateSlug(post.title);
-        const filename = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${slug}.md`;
+        const shortId = Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+        const filename = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${shortId}.md`;
 
         // 최종 콘텐츠
         const finalContent = frontMatter + '\n\n' + content;

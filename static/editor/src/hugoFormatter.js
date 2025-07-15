@@ -98,9 +98,9 @@ class HugoFormatter {
      */
     generateFilename(post) {
         const date = moment(post.date).format('YYYY-MM-DD');
-        const slug = post.slug || this.generateSlug(post.title);
+        const shortId = Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
         
-        return `${date}-${slug}.md`;
+        return `${date}-${shortId}.md`;
     }
 
     /**
@@ -255,22 +255,15 @@ class HugoFormatter {
     }
 
     /**
-     * 슬러그 생성
+     * 슬러그 생성 (Windows 파일명 길이 제한 해결)
      */
     generateSlug(title) {
         if (!title) return 'untitled';
         
-        // 한글 제목 처리
-        const koreanSlug = title
-            .replace(/[^\w\s가-힣-]/g, '')
-            .replace(/\s+/g, '-')
-            .toLowerCase()
-            .substring(0, 50);
-        
-        // 영문 슬러그 생성
-        const englishSlug = slugify(title, this.config.slugifyOptions);
-        
-        return englishSlug || koreanSlug;
+        // 간단한 숫자 ID 기반 파일명 생성
+        const timestamp = Date.now().toString(36);
+        const randomId = Math.random().toString(36).substr(2, 6);
+        return `post-${timestamp}-${randomId}`;
     }
 
     /**

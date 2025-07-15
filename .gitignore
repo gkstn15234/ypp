@@ -35,3 +35,19 @@ node_modules/
 # Temporary files
 *.tmp
 *.temp 
+
+# Migration tools (keep local only)
+static/editor/src/
+static/editor/input/
+static/editor/output/
+static/editor/logs/
+static/editor/batch-image-upload.js
+static/editor/package.json
+static/editor/package-lock.json
+static/editor/node_modules/
+static/editor/debug.js
+static/editor/env-template.txt
+static/editor/.env
+
+# Draft files
+drafts/ 
