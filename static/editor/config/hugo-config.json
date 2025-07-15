@@ -1,0 +1,154 @@
+{
+  "site": {
+    "title": "Hugo 블로그",
+    "description": "WordPress에서 마이그레이션된 Hugo 블로그",
+    "author": "오은진",
+    "baseURL": "https://your-hugo-site.com",
+    "languageCode": "ko-KR",
+    "defaultContentLanguage": "ko",
+    "timezone": "Asia/Seoul"
+  },
+  "content": {
+    "defaultSection": "posts",
+    "sections": {
+      "posts": {
+        "title": "게시물",
+        "description": "모든 게시물",
+        "layout": "posts"
+      },
+      "automotive": {
+        "title": "자동차",
+        "description": "자동차 관련 뉴스 및 정보",
+        "layout": "automotive"
+      },
+      "economy": {
+        "title": "경제",
+        "description": "경제 뉴스 및 분석",
+        "layout": "economy"
+      }
+    }
+  },
+  "frontMatter": {
+    "dateFormat": "2006-01-02T15:04:05Z07:00",
+    "defaultAuthor": "oh-eun-jin",
+    "defaultCategory": "기타",
+    "required": ["title", "date", "draft"],
+    "optional": ["description", "categories", "tags", "images", "author", "slug"]
+  },
+  "images": {
+    "maxImages": 5,
+    "formats": ["jpg", "jpeg", "png", "gif", "webp", "svg"],
+    "maxSize": "5MB",
+    "cloudflare": {
+      "deliveryURL": "https://imagedelivery.net",
+      "variants": {
+        "thumbnail": "w=150,h=150,fit=crop",
+        "medium": "w=800,h=600,fit=scale-down",
+        "large": "w=1200,h=900,fit=scale-down",
+        "public": "format=auto"
+      }
+    }
+  },
+  "categories": {
+    "automotive": {
+      "korean": "자동차",
+      "english": "automotive",
+      "description": "자동차 산업, 신차, 기술 동향",
+      "color": "#3498db"
+    },
+    "economy": {
+      "korean": "경제",
+      "english": "economy",
+      "description": "경제 뉴스, 주식, 금융 정보",
+      "color": "#2ecc71"
+    },
+    "technology": {
+      "korean": "기술",
+      "english": "technology",
+      "description": "기술 뉴스, IT, 혁신",
+      "color": "#9b59b6"
+    },
+    "lifestyle": {
+      "korean": "라이프스타일",
+      "english": "lifestyle",
+      "description": "생활, 문화, 트렌드",
+      "color": "#e74c3c"
+    }
+  },
+  "authors": {
+    "oh-eun-jin": {
+      "name": "오은진",
+      "slug": "oh-eun-jin",
+      "bio": "자동차 전문 기자",
+      "avatar": "/images/authors/oh-eun-jin.jpg",
+      "social": {
+        "twitter": "@oh_eun_jin",
+        "linkedin": "oh-eun-jin",
+        "email": "oh.eun.jin@example.com"
+      }
+    },
+    "kim-chul-su": {
+      "name": "김철수",
+      "slug": "kim-chul-su",
+      "bio": "경제 전문 기자",
+      "avatar": "/images/authors/kim-chul-su.jpg",
+      "social": {
+        "email": "kim.chul.su@example.com"
+      }
+    }
+  },
+  "migration": {
+    "wordpress": {
+      "dateFormat": "YYYY-MM-DD HH:mm:ss",
+      "supportedPostTypes": ["post"],
+      "supportedStatus": ["publish"],
+      "imageExtensions": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp"],
+      "maxFileSize": "50MB"
+    },
+    "hugo": {
+      "contentPath": "content",
+      "staticPath": "static",
+      "filenamePattern": "YYYY-MM-DD-slug.md",
+      "frontMatterFormat": "yaml"
+    },
+    "processing": {
+      "batchSize": 3,
+      "retryCount": 3,
+      "timeout": 30000,
+      "delayBetweenBatches": 2000
+    }
+  },
+  "seo": {
+    "defaultMetaDescription": "WordPress에서 마이그레이션된 Hugo 블로그 게시물",
+    "titleSeparator": " | ",
+    "maxTitleLength": 60,
+    "maxDescriptionLength": 160,
+    "keywords": ["Hugo", "블로그", "마이그레이션", "WordPress"],
+    "robots": {
+      "index": true,
+      "follow": true,
+      "noarchive": false,
+      "nosnippet": false,
+      "noimageindex": false
+    }
+  },
+  "performance": {
+    "imageOptimization": true,
+    "lazyLoading": true,
+    "minification": true,
+    "compression": true,
+    "caching": {
+      "maxAge": 86400,
+      "staleWhileRevalidate": true
+    }
+  },
+  "deployment": {
+    "platform": "cloudflare-pages",
+    "buildCommand": "hugo --minify",
+    "publishDirectory": "public",
+    "environmentVariables": {
+      "HUGO_VERSION": "0.120.0",
+      "NODE_VERSION": "18"
+    }
+  }
+} 

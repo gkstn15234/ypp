@@ -421,6 +421,8 @@ class SimpleEditor {
                     categorySelect.value = 'automotive';
                 } else if (article.category.includes('경제')) {
                     categorySelect.value = 'economy';
+                } else if (article.category.includes('엔터테인먼트')) {
+                    categorySelect.value = 'entertainment';
                 }
             }
             
@@ -890,7 +892,7 @@ ${content}
         document.getElementById('articleTitle').value = data.title || '';
         document.getElementById('description').value = data.description || '';
         document.getElementById('category').value = data.category || 'automotive';
-        document.getElementById('author').value = data.author || 'oh-eun-jin';
+        document.getElementById('author').value = data.author || '김현지';
         document.getElementById('tags').value = data.tags || '';
         this.quill.root.innerHTML = data.content || '';
         
@@ -936,7 +938,7 @@ ${content}
             const articles = [];
             
             // 기사 카테고리 폴더만 처리 (authors, about 등 제외)
-            const articleCategories = ['automotive', 'economy'];
+            const articleCategories = ['automotive', 'economy', 'entertainment'];
             
             for (const folder of folders.filter(f => f.type === 'dir' && articleCategories.includes(f.name))) {
                 const folderResponse = await fetch(folder.url);
@@ -976,7 +978,8 @@ ${content}
         // 카테고리별 한국어 이름 매핑
         const categoryMap = {
             'automotive': '자동차',
-            'economy': '경제'
+            'economy': '경제',
+            'entertainment': '엔터테인먼트'
         };
 
         // 최신 날짜순으로 정렬 (파일명의 날짜 기준)
@@ -1265,7 +1268,7 @@ ${content}
                         <h6 class="mb-1">${draft.title}</h6>
                         <p class="text-muted small mb-2">${draft.description || '요약 없음'}</p>
                         <div class="d-flex gap-2">
-                            <span class="badge ${draft.category === 'automotive' ? 'bg-primary' : 'bg-success'}">${draft.category === 'automotive' ? '자동차' : '경제'}</span>
+                            <span class="badge ${draft.category === 'automotive' ? 'bg-primary' : draft.category === 'economy' ? 'bg-success' : 'bg-warning'}">${this.getKoreanCategoryName(draft.category)}</span>
                             <span class="badge ${draft.type === 'cloud' ? 'bg-info' : 'bg-secondary'}">${draft.type === 'cloud' ? '클라우드' : '로컬'}</span>
                             <small class="text-muted">${this.formatDate(draft.timestamp)}</small>
                         </div>
@@ -2878,7 +2881,12 @@ ${content}
                 'technology': 'technology',
                 'tech': 'technology',
                 'lifestyle': 'lifestyle',
-                'life': 'lifestyle'
+                'life': 'lifestyle',
+                'entertainment': 'entertainment',
+                'movie': 'entertainment',
+                'music': 'entertainment',
+                'drama': 'entertainment',
+                'celebrity': 'entertainment'
             };
             
             for (const cat of categories) {
@@ -2931,7 +2939,8 @@ ${content}
             'politics': '정치',
             'society': '사회',
             'culture': '문화',
-            'sports': '스포츠'
+            'sports': '스포츠',
+            'entertainment': '엔터테인먼트'
         };
         
         return categoryMap[category] || '자동차';

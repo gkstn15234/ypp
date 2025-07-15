@@ -40,6 +40,9 @@ menu:
     - name: '경제'
       url: '/economy/'
       weight: 20
+    - name: '엔터테인먼트'
+      url: '/entertainment/'
+      weight: 30
 
 taxonomies:
   tag: tags

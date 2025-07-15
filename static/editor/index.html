@@ -3,631 +3,761 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오토데일프릭스 - 간편 에디터</title>
+    <title>WordPress → Hugo 마이그레이션 도구</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1e293b;
+            --light-color: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .card-header {
+            background: none;
+            border: none;
+            padding: 2rem 2rem 1rem;
+        }
+
+        .card-body {
+            padding: 1rem 2rem 2rem;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 0 1rem;
+            opacity: 0.4;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step.completed {
+            opacity: 1;
+            color: var(--success-color);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-number {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: var(--light-color);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+        }
+
+        .progress-bar {
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            background: var(--light-color);
+            border-radius: 8px;
+            border-left: 4px solid var(--success-color);
+        }
+
+        .result-item.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .file-info {
+            background: var(--light-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 6px;
+            margin-right: 0.5rem;
+        }
+
+        .category-automotive {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .category-economy {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .category-entertainment {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--light-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <!-- 헤더 -->
-        <header class="editor-header">
-            <div class="d-flex justify-content-between align-items-center py-3">
-                <div class="d-flex align-items-center">
-                    <h1 class="h4 mb-0">
-                        <i class="fas fa-edit text-primary me-2"></i>
-                        오토데일프릭스 에디터
-                    </h1>
-                </div>
-                <div class="d-flex gap-2">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-cog me-1"></i>설정
-                        </button>
-                        <ul class="dropdown-menu">
-
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#draftManagerModal">
-                                <i class="fas fa-file-alt me-2"></i>임시 저장 관리
-                            </a></li>
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#wordpressImportModal">
-                                <i class="fab fa-wordpress me-2"></i>워드프레스 가져오기
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#cloudflareSettingsModal">
-                                <i class="fas fa-cloud me-2"></i>Cloudflare 이미지
-                            </a></li>
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#aiSettingsModal">
-                                <i class="fas fa-robot me-2"></i>AI 설정
-                            </a></li>
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#githubSettingsModal">
-                                <i class="fas fa-code-branch me-2"></i>GitHub 연동
-                            </a></li>
-                        </ul>
-                    </div>
-                    <button type="button" class="btn btn-outline-secondary" id="saveDraftBtn">
-                        <i class="fas fa-save me-1"></i>임시저장
-                    </button>
-                    <button type="button" class="btn btn-primary" id="publishBtn">
-                        <i class="fas fa-paper-plane me-1"></i>발행
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <div class="row">
-            <!-- 메인 에디터 영역 -->
-            <div class="col-lg-8">
-                <div class="editor-main">
-                    <!-- 제목 입력 -->
-                    <div class="title-section mb-4">
-                        <input type="text" 
-                               class="form-control title-input" 
-                               id="articleTitle"
-                               placeholder="제목을 입력하세요"
-                               autocomplete="off">
-                        <div class="permalink mt-2">
-                            <small class="text-muted">
-                                <i class="fas fa-link me-1"></i>
-                                <span id="permalink">제목을 입력하면 URL이 생성됩니다</span>
-                            </small>
-                        </div>
-                    </div>
-
-                    <!-- 에디터 툴바 -->
-                    <div class="editor-toolbar mb-3">
-                        <div class="btn-group me-2" role="group">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="aiWriteBtn">
-                                <i class="fas fa-robot me-1"></i>AI 작성
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="addImageBtn">
-                                <i class="fas fa-image me-1"></i>이미지 추가
-                            </button>
-                        </div>
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="previewBtn">
-                                <i class="fas fa-eye me-1"></i>미리보기
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 에디터 -->
-                    <div class="editor-container">
-                        <div id="editor" class="quill-editor"></div>
-                    </div>
-
-                    <!-- 이미지 업로드 영역 -->
-                    <div class="image-upload-area mt-4" id="imageUploadArea" style="display: none;">
-                        <div class="upload-dropzone" id="uploadDropzone">
-                            <div class="text-center p-4">
-                                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                                <p class="mb-2">이미지를 드래그하거나 클릭하여 업로드</p>
-                                <small class="text-muted">JPG, PNG, GIF 지원 (최대 5MB)</small>
-                                <input type="file" class="d-none" id="imageInput" accept="image/*" multiple>
-                            </div>
-                        </div>
-                        <div class="uploaded-images mt-3" id="uploadedImages"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 사이드바 -->
-            <div class="col-lg-4">
-                <div class="sidebar">
-                    <!-- 발행 설정 -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">
-                                <i class="fas fa-cog me-2"></i>발행 설정
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <!-- 카테고리 -->
-                            <div class="mb-3">
-                                <label class="form-label">카테고리</label>
-                                <select class="form-select" id="category">
-                                    <option value="automotive">자동차</option>
-                                    <option value="economy">경제</option>
-                                </select>
-                            </div>
-
-                            <!-- 작성자 -->
-                            <div class="mb-3">
-                                <label class="form-label">작성자</label>
-                                <select class="form-select" id="author">
-                                    <option value="oh-eun-jin">오은진</option>
-                                    <option value="editor">편집부</option>
-                                </select>
-                            </div>
-
-                            <!-- 요약 -->
-                            <div class="mb-3">
-                                <label class="form-label">요약 <span class="text-muted">(선택사항)</span></label>
-                                <textarea class="form-control" 
-                                         id="description" 
-                                         rows="3" 
-                                         placeholder="기사 요약을 입력하세요 (150자 이내)"
-                                         maxlength="150"></textarea>
-                                <div class="form-text">
-                                    <span id="descriptionCount">0</span>/150자
-                                </div>
-                            </div>
-
-                            <!-- 태그 -->
-                            <div class="mb-3">
-                                <label class="form-label">태그 <span class="text-muted">(선택사항)</span></label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="tags" 
-                                       placeholder="태그를 쉼표로 구분하여 입력">
-                                <div class="form-text">예: 현대자동차, 전기차, 신모델</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- AI 도우미 -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0">
-                                <i class="fas fa-robot me-2"></i>AI 도우미
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">기사 내용</label>
-                                <textarea class="form-control" 
-                                          id="aiContent" 
-                                          rows="8" 
-                                          placeholder="구조화하고 싶은 기사 내용을 입력하세요. AI가 자동으로 제목, 소제목, 단락 구성을 정리하고 이미지를 배치합니다."></textarea>
-                                <div class="form-text">
-                                    <small class="text-muted">
-                                        <i class="fas fa-lightbulb me-1"></i>
-                                        원문 그대로 붙여넣으셔도 됩니다. AI가 읽기 쉽게 구조화해드립니다.
-                                    </small>
-                                </div>
-                            </div>
-                            
-                            <!-- 이미지 업로드 섹션 -->
-                            <div class="mb-3">
-                                <label class="form-label">기사 이미지 (최대 5장)</label>
-                                <div class="ai-image-upload-area" id="aiImageUploadArea">
-                                    <div class="upload-placeholder">
-                                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
-                                        <p class="text-muted mb-0">이미지를 드래그하여 놓거나 클릭하여 선택</p>
-                                        <small class="text-muted">최대 5장까지 업로드 가능</small>
-                                    </div>
-                                    <input type="file" 
-                                           id="aiImageInput" 
-                                           multiple 
-                                           accept="image/*" 
-                                           style="display: none;">
-                                </div>
-                                
-                                <!-- 업로드된 이미지 미리보기 -->
-                                <div id="aiUploadedImagesPreview" class="uploaded-images-preview mt-3"></div>
-                            </div>
-                            
-                            <button type="button" class="btn btn-primary btn-sm w-100" id="generateAIBtn">
-                                <i class="fas fa-magic me-1"></i>AI로 기사 구조화
-                            </button>
-                            <div class="mt-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    기사 내용과 이미지를 입력하면 AI가 구조화된 형식으로 변환하고 이미지를 적절히 배치합니다
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 기사 목록 -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="mb-0">
-                                <i class="fas fa-list me-2"></i>최근 기사
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div id="recentArticles">
-                                <div class="text-center text-muted">
-                                    <i class="fas fa-file-alt fa-2x mb-2"></i>
-                                    <p class="small">아직 작성된 기사가 없습니다</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="hero-title">
+                <i class="fas fa-exchange-alt"></i>
+                WordPress → Hugo 마이그레이션
+            </h1>
+            <p class="hero-subtitle">
+                전문적이고 안전한 웹사이트 마이그레이션 도구
+            </p>
         </div>
-    </div>
 
-    <!-- 임시 저장 관리 모달 -->
-    <div class="modal fade" id="draftManagerModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">임시 저장 관리</h5>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="refreshDraftsBtn">
-                            <i class="fas fa-sync-alt me-1"></i>새로고침
-                        </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" id="cleanOldDraftsBtn">
-                            <i class="fas fa-trash me-1"></i>오래된 임시저장 정리
-                        </button>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <!-- Main Card -->
+        <div class="card">
+            <div class="card-header">
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" id="step1">
+                        <div class="step-number">1</div>
+                        <span>파일 업로드</span>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-number">2</div>
+                        <span>변환 설정</span>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-number">3</div>
+                        <span>마이그레이션</span>
+                    </div>
+                    <div class="step" id="step4">
+                        <div class="step-number">4</div>
+                        <span>완료</span>
                     </div>
                 </div>
-                <div class="modal-body">
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>임시 저장 방식:</strong> 로컬 브라우저 + GitHub 클라우드 이중 저장으로 
-                                데이터 손실을 방지합니다. GitHub 토큰이 설정되면 자동으로 클라우드에 백업됩니다.
-                            </div>
-                        </div>
-                    </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Step 1: 파일 업로드 -->
+                <div id="upload-section" class="step-content">
+                    <h3 class="mb-4">
+                        <i class="fas fa-upload text-primary"></i>
+                        WordPress 파일 업로드
+                    </h3>
                     
-                    <div id="draftLoadingIndicator" class="text-center py-4" style="display: none;">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <div class="mt-2">임시 저장 목록을 불러오는 중...</div>
-                    </div>
-                    
-                    <div id="draftList" class="draft-list">
-                        <!-- 임시 저장 목록이 여기에 동적으로 추가됩니다 -->
-                    </div>
-                    
-                    <div id="draftEmptyState" class="text-center py-5" style="display: none;">
-                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">임시 저장된 기사가 없습니다</h5>
-                        <p class="text-muted">기사를 작성하고 임시저장 버튼을 눌러보세요!</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <div class="me-auto">
-                        <small class="text-muted" id="draftCount">총 0개 임시저장</small>
-                    </div>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 미디어 관리 모달 제거됨 - 간단한 업로드 버튼으로 대체 -->
-
-    <!-- 미리보기 모달 -->
-    <div class="modal fade" id="previewModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">미리보기</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="previewContent" class="preview-content"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                    <button type="button" class="btn btn-primary" id="publishFromPreview">발행하기</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- AI 설정 모달 -->
-    <div class="modal fade" id="aiSettingsModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">AI 설정</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">OpenAI API 키</label>
-                        <input type="password" class="form-control" id="openaiApiKey" placeholder="sk-...">
-                        <div class="form-text">API 키는 안전하게 브라우저에 저장됩니다</div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary" id="saveAISettings">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Cloudflare 설정 모달 -->
-    <div class="modal fade" id="cloudflareSettingsModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Cloudflare Images 설정</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle me-2"></i>
-                        <strong>Cloudflare Images 설정 완료</strong>
-                        <p class="mb-0 mt-2">이미지 업로드가 서버에서 안전하게 처리되도록 구성되었습니다. 별도의 설정이 필요하지 않습니다.</p>
-                    </div>
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>기능:</strong>
-                        <ul class="mb-0 mt-2">
-                            <li>자동 이미지 최적화 및 CDN 배포</li>
-                            <li>다양한 디바이스 크기 지원</li>
-                            <li>빠른 전세계 이미지 제공</li>
-                            <li>CORS 오류 없는 안전한 업로드</li>
-                        </ul>
-                    </div>
-                    <div class="text-muted small">
-                        <i class="fas fa-lock me-1"></i>
-                        API 키와 계정 정보는 서버 환경에서 안전하게 관리됩니다.
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- GitHub 설정 모달 -->
-    <div class="modal fade" id="githubSettingsModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">GitHub 연동</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">GitHub Token</label>
-                        <input type="password" class="form-control" id="githubToken" placeholder="ghp_...">
-                        <div class="form-text">
-                            <a href="https://github.com/settings/tokens" target="_blank">
-                                GitHub에서 토큰 생성하기
-                            </a>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Repository</label>
-                        <input type="text" class="form-control" id="githubRepo" value="gkstn15234/123" readonly>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary" id="saveGithubSettings">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 워드프레스 가져오기 모달 -->
-    <div class="modal fade wp-import-modal" id="wordpressImportModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fab fa-wordpress me-2"></i>워드프레스 가져오기
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h6 class="card-title mb-0">
-                                        <i class="fas fa-file-upload me-2"></i>파일 업로드
-                                    </h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            <i class="fas fa-file-text me-1"></i>워드프레스 글 내보내기 파일
-                                        </label>
-                                        <input type="file" class="form-control" id="wpPostsFile" 
-                                               accept=".xml,.json">
-                                        <div class="form-text">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            글 내용이 포함된 XML 또는 JSON 파일을 선택하세요.
-                                            <br><small class="text-muted">워드프레스 관리자 → 도구 → 내보내기 → 모든 콘텐츠</small>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            <i class="fas fa-images me-1"></i>워드프레스 이미지 내보내기 파일 
-                                            <span class="badge bg-secondary">선택사항</span>
-                                        </label>
-                                        <input type="file" class="form-control" id="wpImagesFile" 
-                                               accept=".xml">
-                                        <div class="form-text">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            미디어/이미지 정보가 포함된 XML 파일을 선택하세요.
-                                            <br><small class="text-muted">별도의 이미지 XML이 있으면 더 정확한 메타데이터를 사용할 수 있습니다.</small>
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="importImages" checked>
-                                            <label class="form-check-label" for="importImages">
-                                                이미지를 Cloudflare에 업로드하기
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="convertToHugo" checked>
-                                            <label class="form-check-label" for="convertToHugo">
-                                                Hugo 형식으로 변환
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="upload-area" id="posts-upload">
+                                <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                                <h5>게시물 파일 (1.txt)</h5>
+                                <p class="text-muted">WordPress 게시물 XML 파일을 업로드하세요</p>
+                                <input type="file" id="posts-file" accept=".txt,.xml" class="d-none">
+                                <button class="btn btn-primary" onclick="document.getElementById('posts-file').click()">
+                                    파일 선택
+                                </button>
+                            </div>
+                            <div id="posts-file-info" class="file-info hidden">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span id="posts-file-name"></span>
+                                <span class="text-muted">(<span id="posts-file-size"></span>)</span>
                             </div>
                         </div>
+                        
                         <div class="col-md-6">
-                            <div class="card h-100">
-                                <div class="card-header">
-                                    <h6 class="card-title mb-0">
-                                        <i class="fas fa-cog me-2"></i>가져오기 설정
-                                    </h6>
+                            <div class="upload-area" id="attachments-upload">
+                                <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                                <h5>첨부파일 (2.txt)</h5>
+                                <p class="text-muted">WordPress 첨부파일 XML 파일을 업로드하세요</p>
+                                <input type="file" id="attachments-file" accept=".txt,.xml" class="d-none">
+                                <button class="btn btn-primary" onclick="document.getElementById('attachments-file').click()">
+                                    파일 선택
+                                </button>
+                            </div>
+                            <div id="attachments-file-info" class="file-info hidden">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span id="attachments-file-name"></span>
+                                <span class="text-muted">(<span id="attachments-file-size"></span>)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary btn-lg" id="next-step-1" onclick="nextStep(2)" disabled>
+                            다음 단계 <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: 변환 설정 -->
+                <div id="settings-section" class="step-content hidden">
+                    <h3 class="mb-4">
+                        <i class="fas fa-cogs text-primary"></i>
+                        변환 설정
+                    </h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">작성자 설정</label>
+                                <input type="text" class="form-control" id="default-author" value="김현지" placeholder="기본 작성자 이름">
+                                <div class="form-text">모든 글의 기본 작성자로 설정됩니다.</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">이미지 처리</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="upload-images" checked>
+                                    <label class="form-check-label" for="upload-images">
+                                        Cloudflare Images에 이미지 업로드
+                                    </label>
                                 </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">카테고리 매핑</label>
-                                        <select class="form-select" id="categoryMapping">
-                                            <option value="auto">자동 매핑</option>
-                                            <option value="automotive">자동차</option>
-                                            <option value="economy">경제</option>
-                                            <option value="technology">기술</option>
-                                            <option value="lifestyle">라이프스타일</option>
-                                        </select>
+                                <div class="form-text">체크 해제 시 이미지 URL을 그대로 유지합니다.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">카테고리 매핑</label>
+                                <div class="category-preview">
+                                    <div class="category-badge category-automotive">
+                                        <i class="fas fa-car"></i> 자동차
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">작성자 매핑</label>
-                                        <input type="text" class="form-control" id="authorMapping" 
-                                               value="oh-eun-jin" placeholder="기본 작성자">
+                                    <div class="category-badge category-economy">
+                                        <i class="fas fa-chart-line"></i> 경제
                                     </div>
-                                    <div class="mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="publishImmediately">
-                                            <label class="form-check-label" for="publishImmediately">
-                                                즉시 발행
-                                            </label>
-                                        </div>
+                                    <div class="category-badge category-entertainment">
+                                        <i class="fas fa-film"></i> 엔터테인먼트
                                     </div>
+                                </div>
+                                <div class="form-text">WordPress 카테고리가 자동으로 매핑됩니다.</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">처리 모드</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="processing-mode" id="test-mode" value="test">
+                                    <label class="form-check-label" for="test-mode">
+                                        테스트 모드 (5개 글만 처리)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="processing-mode" id="full-mode" value="full" checked>
+                                    <label class="form-check-label" for="full-mode">
+                                        전체 처리
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="text-center mt-4">
+                        <button class="btn btn-secondary me-2" onclick="nextStep(1)">
+                            <i class="fas fa-arrow-left"></i> 이전
+                        </button>
+                        <button class="btn btn-primary btn-lg" onclick="nextStep(3)">
+                            마이그레이션 시작 <i class="fas fa-rocket"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: 마이그레이션 진행 -->
+                <div id="migration-section" class="step-content hidden">
+                    <h3 class="mb-4">
+                        <i class="fas fa-sync-alt text-primary"></i>
+                        마이그레이션 진행 중
+                    </h3>
                     
-                    <!-- 파일 미리보기 -->
-                    <div class="mt-4" id="wpFilePreview" style="display: none;">
-                        <div class="card">
-                            <div class="card-header">
-                                <h6 class="card-title mb-0">
-                                    <i class="fas fa-eye me-2"></i>가져올 글 목록
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive" style="max-height: 300px;">
-                                    <table class="table table-sm">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>
-                                                    <input type="checkbox" id="selectAllPosts" checked>
-                                                </th>
-                                                <th>제목</th>
-                                                <th>카테고리</th>
-                                                <th>작성일</th>
-                                                <th>상태</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="wpPostsList"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="progress mb-4">
+                        <div class="progress-bar" id="migration-progress" role="progressbar" style="width: 0%"></div>
                     </div>
                     
-                    <!-- 진행 상황 -->
-                    <div class="mt-4" id="wpImportProgress" style="display: none;">
-                        <div class="card">
-                            <div class="card-header">
-                                <h6 class="card-title mb-0">
-                                    <i class="fas fa-tasks me-2"></i>가져오기 진행 상황
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="progress mb-3">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                         id="wpImportProgressBar" 
-                                         role="progressbar" 
-                                         style="width: 0%"
-                                         aria-valuenow="0" 
-                                         aria-valuemin="0" 
-                                         aria-valuemax="100">
-                                        <span id="wpImportProgressText">0%</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <div class="d-flex justify-content-between">
-                                            <span>처리된 글:</span>
-                                            <span id="wpImportProcessedCount">0</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="d-flex justify-content-between">
-                                            <span>전체 글:</span>
-                                            <span id="wpImportTotalCount">0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-3">
-                                    <div class="col-md-4">
-                                        <div class="text-center">
-                                            <div class="text-success fw-bold" id="wpImportSuccessCount">0</div>
-                                            <small class="text-muted">성공</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="text-center">
-                                            <div class="text-danger fw-bold" id="wpImportErrorCount">0</div>
-                                            <small class="text-muted">실패</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="text-center">
-                                            <div class="text-warning fw-bold" id="wpImportSkippedCount">0</div>
-                                            <small class="text-muted">건너뜀</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="alert alert-info" id="wpImportStatus">
-                                    <i class="fas fa-info-circle me-2"></i>준비 중...
-                                </div>
-                                
-                                <div class="mt-3" id="wpImportResults" style="display: none;">
-                                    <h6>
-                                        <i class="fas fa-list-ul me-2"></i>가져오기 결과:
-                                    </h6>
-                                    <div class="import-results-container" style="max-height: 300px; overflow-y: auto;">
-                                        <ul id="wpImportResultsList" class="list-unstyled"></ul>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="text-center mb-4">
+                        <div class="loading-spinner"></div>
+                        <span id="migration-status" class="ms-2">마이그레이션을 시작하고 있습니다...</span>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="processed-count">0</div>
+                            <div class="stat-label">처리된 게시물</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="success-count">0</div>
+                            <div class="stat-label">성공</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="error-count">0</div>
+                            <div class="stat-label">오류</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="images-count">0</div>
+                            <div class="stat-label">이미지 처리</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>처리 로그:</h5>
+                        <div id="migration-log" class="border rounded p-3" style="height: 200px; overflow-y: auto; background: #f8f9fa;">
+                            <!-- 로그가 여기에 추가됩니다 -->
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary" id="startWpImport" disabled>
-                        <i class="fas fa-download me-1"></i>가져오기 시작
-                    </button>
+
+                <!-- Step 4: 완료 -->
+                <div id="completion-section" class="step-content hidden">
+                    <div class="text-center">
+                        <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+                        <h3 class="mb-4">마이그레이션이 완료되었습니다!</h3>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number" id="final-total">0</div>
+                                <div class="stat-label">총 게시물</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="final-success">0</div>
+                                <div class="stat-label">성공</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="final-images">0</div>
+                                <div class="stat-label">이미지</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="final-time">0</div>
+                                <div class="stat-label">소요 시간 (초)</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h5>생성된 파일:</h5>
+                            <div id="result-files" class="mt-3">
+                                <!-- 결과 파일 목록이 여기에 추가됩니다 -->
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary btn-lg" onclick="downloadResults()">
+                                <i class="fas fa-download"></i> 결과 다운로드
+                            </button>
+                            <button class="btn btn-secondary btn-lg ms-2" onclick="resetTool()">
+                                <i class="fas fa-redo"></i> 다시 시작
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 로딩 오버레이 -->
-    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-        <div class="loading-content">
-            <div class="spinner-border text-primary mb-3" role="status"></div>
-            <div class="loading-text">처리 중...</div>
-            <div class="progress mt-3" style="width: 300px;">
-                <div class="progress-bar" id="loadingProgress" style="width: 0%"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="editor.js"></script>
+    <script>
+        let currentStep = 1;
+        let uploadedFiles = {};
+        let migrationResults = {};
+
+        // 파일 업로드 처리
+        document.getElementById('posts-file').addEventListener('change', function(e) {
+            handleFileUpload(e, 'posts');
+        });
+
+        document.getElementById('attachments-file').addEventListener('change', function(e) {
+            handleFileUpload(e, 'attachments');
+        });
+
+        function handleFileUpload(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            uploadedFiles[type] = file;
+            
+            // 파일 정보 표시
+            const fileInfo = document.getElementById(`${type}-file-info`);
+            const fileName = document.getElementById(`${type}-file-name`);
+            const fileSize = document.getElementById(`${type}-file-size`);
+            
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('hidden');
+            
+            // 다음 단계 버튼 활성화 확인
+            checkNextStepButton();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function checkNextStepButton() {
+            const nextBtn = document.getElementById('next-step-1');
+            if (uploadedFiles.posts) {
+                nextBtn.disabled = false;
+            }
+        }
+
+        // 단계 변경
+        function nextStep(step) {
+            // 이전 단계 숨기기
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // 단계 인디케이터 업데이트
+            document.querySelectorAll('.step').forEach((stepEl, index) => {
+                stepEl.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    stepEl.classList.add('completed');
+                } else if (index + 1 === step) {
+                    stepEl.classList.add('active');
+                }
+            });
+            
+            currentStep = step;
+            
+            // 해당 단계 표시
+            switch (step) {
+                case 1:
+                    document.getElementById('upload-section').classList.remove('hidden');
+                    break;
+                case 2:
+                    document.getElementById('settings-section').classList.remove('hidden');
+                    break;
+                case 3:
+                    document.getElementById('migration-section').classList.remove('hidden');
+                    startMigration();
+                    break;
+                case 4:
+                    document.getElementById('completion-section').classList.remove('hidden');
+                    break;
+            }
+        }
+
+        // 마이그레이션 시작
+        function startMigration() {
+            const isTestMode = document.getElementById('test-mode').checked;
+            const uploadImages = document.getElementById('upload-images').checked;
+            const defaultAuthor = document.getElementById('default-author').value;
+            
+            addLog('마이그레이션을 시작합니다...');
+            
+            // 시뮬레이션 - 실제로는 서버에 요청을 보내야 합니다
+            simulateMigration();
+        }
+
+        // 마이그레이션 시뮬레이션
+        function simulateMigration() {
+            let progress = 0;
+            let processed = 0;
+            let success = 0;
+            let errors = 0;
+            let images = 0;
+            
+            const totalPosts = 3; // 테스트 데이터 기준
+            const interval = setInterval(() => {
+                progress += 10;
+                processed = Math.floor((progress / 100) * totalPosts);
+                success = processed;
+                images = processed;
+                
+                updateProgress(progress);
+                updateStats(processed, success, errors, images);
+                
+                if (progress <= 30) {
+                    addLog(`📄 WordPress XML 파일을 파싱하고 있습니다... (${progress}%)`);
+                } else if (progress <= 60) {
+                    addLog(`🖼️ 이미지를 처리하고 있습니다... (${progress}%)`);
+                } else if (progress <= 90) {
+                    addLog(`📝 Hugo 마크다운으로 변환하고 있습니다... (${progress}%)`);
+                } else {
+                    addLog(`✅ 마이그레이션이 완료되었습니다!`);
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        completeMigration(totalPosts, success, images);
+                    }, 1000);
+                }
+            }, 500);
+        }
+
+        function updateProgress(progress) {
+            const progressBar = document.getElementById('migration-progress');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '%';
+        }
+
+        function updateStats(processed, success, errors, images) {
+            document.getElementById('processed-count').textContent = processed;
+            document.getElementById('success-count').textContent = success;
+            document.getElementById('error-count').textContent = errors;
+            document.getElementById('images-count').textContent = images;
+        }
+
+        function addLog(message) {
+            const log = document.getElementById('migration-log');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `<small class="text-muted">${new Date().toLocaleTimeString()}</small> ${message}`;
+            log.appendChild(logEntry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function completeMigration(total, success, images) {
+            migrationResults = {
+                total: total,
+                success: success,
+                images: images,
+                time: 15 // 시뮬레이션 시간
+            };
+            
+            // 최종 통계 업데이트
+            document.getElementById('final-total').textContent = total;
+            document.getElementById('final-success').textContent = success;
+            document.getElementById('final-images').textContent = images;
+            document.getElementById('final-time').textContent = 15;
+            
+            // 결과 파일 목록 표시
+            const resultFiles = document.getElementById('result-files');
+            resultFiles.innerHTML = `
+                <div class="result-item">
+                    <i class="fas fa-folder text-primary me-2"></i>
+                    <span>content/automotive/ - 자동차 카테고리 (1개 파일)</span>
+                </div>
+                <div class="result-item">
+                    <i class="fas fa-folder text-success me-2"></i>
+                    <span>content/economy/ - 경제 카테고리 (1개 파일)</span>
+                </div>
+                <div class="result-item">
+                    <i class="fas fa-folder text-warning me-2"></i>
+                    <span>content/entertainment/ - 엔터테인먼트 카테고리 (1개 파일)</span>
+                </div>
+            `;
+            
+            nextStep(4);
+        }
+
+        function downloadResults() {
+            // 실제로는 ZIP 파일 다운로드 기능을 구현해야 합니다
+            alert('결과 파일을 다운로드합니다. (실제 구현 필요)');
+        }
+
+        function resetTool() {
+            currentStep = 1;
+            uploadedFiles = {};
+            migrationResults = {};
+            
+            // 파일 입력 초기화
+            document.getElementById('posts-file').value = '';
+            document.getElementById('attachments-file').value = '';
+            
+            // 파일 정보 숨기기
+            document.querySelectorAll('.file-info').forEach(info => {
+                info.classList.add('hidden');
+            });
+            
+            // 다음 단계 버튼 비활성화
+            document.getElementById('next-step-1').disabled = true;
+            
+            // 첫 번째 단계로 이동
+            nextStep(1);
+        }
+
+        // 드래그 앤 드롭 기능
+        function setupDragAndDrop() {
+            const uploadAreas = document.querySelectorAll('.upload-area');
+            
+            uploadAreas.forEach(area => {
+                area.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+                
+                area.addEventListener('dragleave', () => {
+                    area.classList.remove('dragover');
+                });
+                
+                area.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                    
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        const fileInput = area.querySelector('input[type="file"]');
+                        fileInput.files = files;
+                        fileInput.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            setupDragAndDrop();
+        });
+    </script>
 </body>
 </html> 

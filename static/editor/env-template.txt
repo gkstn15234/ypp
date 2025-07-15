@@ -1,0 +1,120 @@
+# WordPress → Hugo 마이그레이션 도구 환경 설정
+# 이 파일을 .env로 복사하고 실제 값으로 변경하세요.
+
+# =================================
+# Cloudflare Images API 설정
+# =================================
+
+# Cloudflare 계정 ID
+# Cloudflare 대시보드 → 우측 사이드바에서 확인 가능
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+
+# Cloudflare Images API 토큰
+# Cloudflare 대시보드 → My Profile → API Tokens → Create Token
+# 권한: Zone:Zone:Read, Account:Cloudflare Images:Edit
+CLOUDFLARE_IMAGES_API_TOKEN=your_cloudflare_images_api_token
+
+# Cloudflare Images 해시 (delivery URL 생성용)
+# Cloudflare 대시보드 → Images → 설정에서 확인 가능
+CLOUDFLARE_HASH=your_cloudflare_hash
+
+# =================================
+# 대량 데이터 처리 최적화 설정
+# =================================
+
+# 배치 처리 크기 (1000개 이상의 글 처리용)
+# 권장값: 10-20 (대량 처리 시)
+BATCH_SIZE=15
+
+# 배치 간 지연 시간 (밀리초)
+# 권장값: 1000-3000 (대량 처리 시 빠른 처리)
+DELAY_BETWEEN_BATCHES=1500
+
+# 최대 재시도 횟수
+# 권장값: 3-5 (안정성 확보)
+MAX_RETRIES=5
+
+# 메모리 사용량 제한 (MB)
+# 권장값: 2048-4096 (대량 데이터용)
+MAX_MEMORY_MB=4096
+
+# 처리 청크 크기 (한 번에 처리할 게시물 수)
+# 권장값: 100-200 (메모리 최적화)
+CHUNK_SIZE=150
+
+# =================================
+# 로그 설정
+# =================================
+
+# 로그 레벨 (debug, info, warn, error)
+LOG_LEVEL=info
+
+# 로그 파일 경로
+LOG_FILE=./logs/migration.log
+
+# 상세 진행 상황 표시 (true/false)
+VERBOSE_PROGRESS=true
+
+# =================================
+# 대량 처리 전용 명령어
+# =================================
+
+# 1000개 이상의 글 처리 시 사용:
+# npm run bulk-test        # 대량 테스트 모드
+# npm run bulk-migrate     # 대량 전체 마이그레이션
+# npm run bulk-upload      # 대량 이미지 업로드
+
+# =================================
+# 성능 최적화 팁
+# =================================
+
+# 1. 처음에는 테스트 모드로 실행하여 결과 확인
+# 2. 이미지가 많으면 배치 크기를 줄이고 지연 시간을 늘리기
+# 3. 메모리 부족 시 CHUNK_SIZE를 줄이기
+# 4. 네트워크 안정성을 위해 MAX_RETRIES 늘리기
+
+# =================================
+# 사용 예시
+# =================================
+
+# 1. 이 파일을 .env로 복사
+# cp env-template.txt .env
+
+# 2. 위 값들을 실제 Cloudflare 정보로 변경
+
+# 3. 대량 데이터 처리 실행
+# npm run bulk-test        # 처음 5개만 테스트
+# npm run bulk-migrate     # 전체 마이그레이션
+
+# =================================
+# Cloudflare 설정 도움말
+# =================================
+
+# 1. Cloudflare Images 활성화
+#    - Cloudflare 대시보드 → Images → 활성화
+
+# 2. API 토큰 생성
+#    - My Profile → API Tokens → Create Token
+#    - Custom token 선택
+#    - 권한 설정:
+#      * Zone:Zone:Read
+#      * Account:Cloudflare Images:Edit
+#    - Account Resources: Include - [Your Account]
+
+# 3. 계정 ID 확인
+#    - Cloudflare 대시보드 우측 사이드바
+#    - "Account ID" 복사
+
+# 4. 해시 확인
+#    - Images → 설정 → "Image Delivery URL" 에서 확인
+#    - 예: https://imagedelivery.net/[HASH]/[IMAGE_ID]/public
+
+# =================================
+# 주의사항
+# =================================
+
+# - .env 파일은 Git에 커밋하지 마세요!
+# - API 토큰은 안전한 곳에 보관하세요.
+# - 무료 계정은 월 100,000개 이미지 제한이 있습니다.
+# - 대량 이미지 처리 시 요금이 발생할 수 있습니다.
+# - 1000개 이상의 글 처리 시 시간이 오래 걸릴 수 있습니다. 
