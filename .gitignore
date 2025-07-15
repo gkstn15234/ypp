@@ -36,6 +36,19 @@ node_modules/
 *.tmp
 *.temp 
 
+# Build and deployment files
+wrangler.toml
+package.json
+package-lock.json
+_build.yml
+*.tgz
+
+# Editor and development files
+static/editor.html
+static/sw.js
+static/js/editor.js
+static/js/image-utils.js
+
 # Migration tools - keep some files local only
 static/editor/input/
 static/editor/output/
