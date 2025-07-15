@@ -1,0 +1,225 @@
+{{ define "main" }}
+<article class="amp-article">
+    <!-- Article Header -->
+    <div class="article-header">
+        <h1 class="article-title">{{ .Title }}</h1>
+        <div class="article-meta">
+            <span class="article-author">{{ .Params.author }}</span>
+            <span class="article-date">{{ .Date.Format "2006년 1월 2일" }}</span>
+            <span class="article-section">{{ .Section | title }}</span>
+        </div>
+        {{ if .Description }}
+        <div class="article-description">{{ .Description }}</div>
+        {{ end }}
+    </div>
+
+    <!-- Article Featured Image -->
+    {{ if .Params.images }}
+    <div class="article-image">
+        <amp-img 
+            src="{{ index .Params.images 0 }}" 
+            alt="{{ .Title }}"
+            width="1200"
+            height="675"
+            layout="responsive">
+        </amp-img>
+    </div>
+    {{ end }}
+
+    <!-- Article Content -->
+    <div class="article-content">
+        {{ .Content | replaceRE "<img([^>]*?)src=\"([^\"]*?)\"([^>]*?)>" "<amp-img$1src=\"$2\" layout=\"responsive\" width=\"1200\" height=\"675\"$3></amp-img>" | safeHTML }}
+    </div>
+
+    <!-- Article Tags -->
+    {{ if .Params.tags }}
+    <div class="article-tags">
+        <h3>관련 태그</h3>
+        {{ range .Params.tags }}
+        <span class="tag">#{{ . }}</span>
+        {{ end }}
+    </div>
+    {{ end }}
+
+    <!-- Social Share -->
+    <div class="social-share">
+        <h3>공유하기</h3>
+        <amp-social-share type="facebook" width="45" height="33"></amp-social-share>
+        <amp-social-share type="twitter" width="45" height="33"></amp-social-share>
+        <amp-social-share type="pinterest" width="45" height="33"></amp-social-share>
+        <amp-social-share type="linkedin" width="45" height="33"></amp-social-share>
+        <amp-social-share type="email" width="45" height="33"></amp-social-share>
+    </div>
+
+    <!-- Related Articles -->
+    {{ $related := .Site.RegularPages.Related . | first 3 }}
+    {{ if $related }}
+    <div class="related-articles">
+        <h3>관련 기사</h3>
+        {{ range $related }}
+        <div class="related-article">
+            <div class="related-image">
+                {{ if .Params.images }}
+                <amp-img 
+                    src="{{ index .Params.images 0 }}" 
+                    alt="{{ .Title }}"
+                    width="200"
+                    height="112"
+                    layout="responsive">
+                </amp-img>
+                {{ end }}
+            </div>
+            <div class="related-content">
+                <h4><a href="{{ .RelPermalink }}">{{ .Title }}</a></h4>
+                <p>{{ .Summary | plainify | truncate 100 }}</p>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+    {{ end }}
+
+    <!-- AMP Link to Regular Page -->
+    <div class="amp-link">
+        <a href="{{ .RelPermalink }}">일반 버전으로 보기</a>
+    </div>
+</article>
+
+<!-- Add AMP-specific styles -->
+<style amp-custom>
+    .amp-article {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .article-meta {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    
+    .article-meta span {
+        background: #f8f9fa;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+    }
+    
+    .article-tags {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .article-tags h3 {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        color: #007bff;
+    }
+    
+    .tag {
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        text-decoration: none;
+    }
+    
+    .social-share {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .social-share amp-social-share {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .related-articles {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .related-articles h3 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: #007bff;
+    }
+    
+    .related-article {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .related-image {
+        flex: 0 0 150px;
+    }
+    
+    .related-content {
+        flex: 1;
+    }
+    
+    .related-content h4 {
+        margin: 0 0 10px 0;
+        font-size: 1.1rem;
+        line-height: 1.3;
+    }
+    
+    .related-content h4 a {
+        color: #333;
+        text-decoration: none;
+    }
+    
+    .related-content h4 a:hover {
+        color: #007bff;
+    }
+    
+    .related-content p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .amp-link {
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .amp-link a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .amp-link a:hover {
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+        .article-meta {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .related-article {
+            flex-direction: column;
+        }
+        
+        .related-image {
+            flex: none;
+        }
+    }
+</style>
+{{ end }} 

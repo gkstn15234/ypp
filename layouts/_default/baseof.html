@@ -97,21 +97,39 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ .Permalink }}">
     
+    <!-- AMP Page Link -->
+    {{ if .IsPage }}
+    <link rel="amphtml" href="{{ .Permalink }}amp/">
+    {{ end }}
+    
     <!-- RSS Feed -->
     <link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "/index.xml" | absURL }}">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ "/images/favicon.ico" | relURL }}">
     
-    <!-- Styles -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ "/css/style.css" | relURL }}?v={{ now.Unix }}" rel="stylesheet">
+    <!-- Critical CSS (Inline) -->
+    {{ partial "critical-css.html" . }}
     
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Preload Important Resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"></noscript>
+    
+    <!-- Non-Critical CSS (Deferred) -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"></noscript>
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    
+    <link rel="preload" href="{{ "/css/style.css" | relURL }}?v={{ now.Unix }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ "/css/style.css" | relURL }}?v={{ now.Unix }}"></noscript>
+    
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
 </head>
 <body>
     {{ partial "header.html" . }}
@@ -122,9 +140,49 @@
     
     {{ partial "footer.html" . }}
     
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ "/js/news-processor.js" | relURL }}?v={{ now.Unix }}"></script>
-    <script src="{{ "/js/main.js" | relURL }}?v={{ now.Unix }}"></script>
+    <!-- Scripts (Deferred for Performance) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="{{ "/js/news-processor.js" | relURL }}?v={{ now.Unix }}"></script>
+    <script defer src="{{ "/js/main.js" | relURL }}?v={{ now.Unix }}"></script>
+    
+    <!-- Critical JavaScript (Inline) -->
+    <script>
+        // Critical JavaScript for First Paint
+        (function() {
+            // Image lazy loading polyfill
+            if ('loading' in HTMLImageElement.prototype) {
+                const images = document.querySelectorAll('img[loading="lazy"]');
+                images.forEach(img => {
+                    img.src = img.dataset.src || img.src;
+                });
+            } else {
+                // Fallback for browsers without native lazy loading
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.3/dist/lazyload.min.js';
+                script.onload = function() {
+                    new LazyLoad({
+                        elements_selector: 'img[loading="lazy"]'
+                    });
+                };
+                document.head.appendChild(script);
+            }
+            
+            // Critical performance monitoring
+            if ('performance' in window) {
+                window.addEventListener('load', function() {
+                    setTimeout(function() {
+                        const perfData = performance.getEntriesByType('navigation')[0];
+                        if (perfData) {
+                            console.log('Performance metrics:', {
+                                FCP: perfData.loadEventStart - perfData.fetchStart,
+                                LCP: perfData.loadEventEnd - perfData.fetchStart,
+                                TTI: perfData.domInteractive - perfData.fetchStart
+                            });
+                        }
+                    }, 0);
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

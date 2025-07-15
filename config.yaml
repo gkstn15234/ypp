@@ -50,10 +50,16 @@ taxonomies:
 
 outputs:
   home: ['HTML', 'RSS', 'JSON', 'SitemapGeneral', 'SitemapNews', 'SitemapAuthors', 'SitemapPages', 'SitemapLocal', 'SitemapVideo', 'PostSitemap']
-  page: ['HTML']
+  page: ['HTML', 'AMP']
   section: ['HTML', 'RSS']
 
 outputFormats:
+  AMP:
+    mediaType: 'text/html'
+    baseName: 'amp'
+    isPlainText: true
+    protocol: 'https://'
+    notAlternative: true
   SitemapGeneral:
     mediaType: 'application/xml'
     baseName: 'sitemap-general'
@@ -112,6 +118,15 @@ imaging:
   # 이미지 처리 옵션
   bgColor: "#ffffff"
   hint: photo
+  # WebP 지원 설정
+  formats: ["webp", "jpeg", "png"]
+  webp:
+    quality: 85
+    lossless: false
+  jpeg:
+    quality: 95
+  png:
+    quality: 95
 
 sitemap:
   changefreq: hourly
