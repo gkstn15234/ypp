@@ -1,0 +1,28 @@
+# Cloudflare Pages Build Configuration
+# This file configures how Cloudflare Pages builds your Hugo site
+
+build:
+  # Build command
+  command: hugo --minify --gc --baseURL $CF_PAGES_URL
+  
+  # Output directory
+  publish: public
+  
+  # Environment variables
+  env:
+    HUGO_VERSION: "0.147.9"
+    HUGO_ENV: "production"
+    HUGO_ENVIRONMENT: "production"
+    NODE_VERSION: "18"
+    
+  # Build settings
+  skip_processing: false
+  
+# Preview settings (for preview deployments)
+preview:
+  command: hugo --minify --gc --baseURL $CF_PAGES_URL --buildDrafts
+  publish: public
+  env:
+    HUGO_VERSION: "0.147.9"
+    HUGO_ENV: "development"
+    NODE_VERSION: "18" 
