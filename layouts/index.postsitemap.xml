@@ -3,12 +3,10 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
     
     <!-- Collect all automotive and economy posts -->
-    {{ $posts := slice }}
-    {{ range .Site.RegularPages }}
-        {{ if and (or (eq .Section "automotive") (eq .Section "economy")) (not .Params.private) }}
-            {{ $posts = $posts | append . }}
-        {{ end }}
-    {{ end }}
+    {{ $automotivePosts := where .Site.RegularPages "Section" "automotive" }}
+    {{ $economyPosts := where .Site.RegularPages "Section" "economy" }}
+    {{ $allPosts := $automotivePosts | append $economyPosts }}
+    {{ $posts := where $allPosts "Params.private" "ne" true }}
     
     <!-- Sort by date (newest first) -->
     {{ $posts = $posts.ByDate.Reverse }}
