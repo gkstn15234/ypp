@@ -133,8 +133,10 @@
                                 </h3>
                                 <p class="article-excerpt">{{ .Summary | truncate 150 }}</p>
                                 <div class="article-tags">
+                                    {{ if .Params.tags }}
                                     {{ range first 3 .Params.tags }}
                                     <span class="tag">#{{ . }}</span>
+                                    {{ end }}
                                     {{ end }}
                                 </div>
                             </div>
