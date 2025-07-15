@@ -7,14 +7,17 @@
                     {{ now.Format "2006년 1월 2일 월요일" }}
                 </div>
                 <div class="user-actions">
-                    <a href="#" class="user-icon">
-                        <i class="fas fa-user"></i>
+                    <a href="#" class="user-icon" aria-label="사용자 메뉴" title="사용자 메뉴">
+                        <i class="fas fa-user" aria-hidden="true"></i>
+                        <span class="sr-only">사용자 메뉴</span>
                     </a>
-                    <a href="#" class="search-icon">
-                        <i class="fas fa-search"></i>
+                    <a href="#" class="search-icon" aria-label="검색" title="검색" data-bs-toggle="modal" data-bs-target="#searchModal">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <span class="sr-only">검색</span>
                     </a>
-                    <button class="menu-toggle d-lg-none" onclick="toggleMobileMenu()">
-                        <i class="fas fa-bars"></i>
+                    <button class="menu-toggle d-lg-none" onclick="toggleMobileMenu()" aria-label="모바일 메뉴 토글" aria-expanded="false" aria-controls="mobileMenu">
+                        <i class="fas fa-bars" aria-hidden="true"></i>
+                        <span class="sr-only">모바일 메뉴 열기</span>
                     </button>
                 </div>
             </div>
@@ -100,7 +103,14 @@
 <script>
 function toggleMobileMenu() {
     const mobileMenu = document.getElementById('mobileMenu');
+    const menuToggle = document.querySelector('.menu-toggle');
+    
     mobileMenu.classList.toggle('show');
+    
+    // Update ARIA attributes for accessibility
+    const isExpanded = mobileMenu.classList.contains('show');
+    menuToggle.setAttribute('aria-expanded', isExpanded);
+    menuToggle.querySelector('.sr-only').textContent = isExpanded ? '모바일 메뉴 닫기' : '모바일 메뉴 열기';
 }
 
 // Close mobile menu when clicking outside
