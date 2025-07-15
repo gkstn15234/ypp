@@ -97,11 +97,6 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ .Permalink }}">
     
-    <!-- AMP Page Link -->
-    {{ if .IsPage }}
-    <link rel="amphtml" href="{{ .Permalink }}amp/">
-    {{ end }}
-    
     <!-- RSS Feed -->
     <link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "/index.xml" | absURL }}">
     
