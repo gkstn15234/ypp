@@ -45,11 +45,7 @@ class HugoFormatter {
         // 이미지 배열 추가
         const images = this.extractImages(post.content);
         if (images.length > 0) {
-            frontMatter.push(`images: [`);
-            images.forEach(img => {
-                frontMatter.push(`  "${img}"`);
-            });
-            frontMatter.push(`]`);
+            frontMatter.push(`images: [${images.map(img => `"${img}"`).join(', ')}]`);
         }
         
         // 작성자 매핑
