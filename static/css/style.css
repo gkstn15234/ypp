@@ -2962,12 +2962,15 @@ img {
     background: #2d3748;
     color: #a0aec0;
     margin-top: 4rem;
-    min-height: 300px;  /* Reserve space to prevent layout shift */
-    contain: layout style;
+    min-height: 400px;  /* Increased to prevent layout shift */
+    contain: layout size style;
+    will-change: auto;
 }
 
 .main-footer {
     padding: 3rem 0 2rem;
+    min-height: 200px;  /* Reserve space for main footer content */
+    contain: layout style;
 }
 
 .footer-logo {
@@ -3016,12 +3019,16 @@ img {
     border-top: 1px solid #4a5568;
     padding: 2rem 0;
     background: #1a202c;
+    min-height: 150px;  /* Reserve space for copyright and admin section */
+    contain: layout style;
 }
 
 .copyright-info {
     text-align: center;
     font-size: 0.85rem;
     line-height: 1.6;
+    min-height: 120px;  /* Reserve space for multi-line copyright text */
+    contain: layout style;
 }
 
 /* Breadcrumb */
@@ -3650,8 +3657,9 @@ img {
     margin-top: 20px;
     padding-top: 15px;
     border-top: 1px solid rgba(255,255,255,0.1);
-    min-height: 60px;  /* Reserve space for button loading */
-    contain: layout;
+    min-height: 80px;  /* Increased reserve space for button loading */
+    contain: layout size;
+    will-change: auto;
 }
 
 .admin-login-btn {
@@ -3663,4 +3671,19 @@ img {
     font-size: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
+    min-height: 36px;  /* Fixed height to prevent shift */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    contain: layout;
+}
+
+.admin-login-btn i {
+    margin-right: 5px;
+}
+
+.admin-login-btn:hover {
+    background: rgba(255,255,255,0.2) !important;
+    color: rgba(255,255,255,0.9) !important;
+    border-color: rgba(255,255,255,0.5) !important;
 }
