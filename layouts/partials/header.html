@@ -1,75 +1,35 @@
-<header class="site-header">
-    <!-- Main Header -->
-    <div class="main-header">
+<header class="header-main">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-3 col-md-4">
-                    <!-- Logo -->
-                    <a class="navbar-brand" href="{{ "/" | relURL }}">
-                        <h1 class="logo-text">포스트업</h1>
-                    </a>
-                </div>
-                <div class="col-lg-6 col-md-4">
-                    <!-- Navigation Menu -->
-                    <nav class="main-nav">
-                        <ul class="nav-menu">
-                            {{ range .Site.Menus.main }}
-                            <li class="nav-item">
-                                <a class="nav-link {{ if $.IsMenuCurrent "main" . }}active{{ end }}" href="{{ .URL }}">{{ .Name }}</a>
-                            </li>
-                            {{ end }}
-                        </ul>
-                    </nav>
-                </div>
-                <div class="col-lg-3 col-md-4">
-                    <!-- User Actions -->
-                    <div class="user-actions">
-                        <a href="#" class="search-icon" aria-label="검색" title="검색" data-bs-toggle="modal" data-bs-target="#searchModal">
-                            <i class="fas fa-search" aria-hidden="true"></i>
-                            <span class="sr-only">검색</span>
-                        </a>
-                        <button class="menu-toggle d-lg-none" onclick="toggleMobileMenu()" aria-label="모바일 메뉴 토글" aria-expanded="false" aria-controls="mobileMenu">
-                            <span class="hamburger-line"></span>
-                            <span class="hamburger-line"></span>
-                            <span class="hamburger-line"></span>
-                            <span class="sr-only">모바일 메뉴 열기</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Enhanced Mobile Menu -->
-    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
-    <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-header">
-            <h3 class="mobile-menu-title">메뉴</h3>
-            <button class="mobile-menu-close" onclick="toggleMobileMenu()" aria-label="모바일 메뉴 닫기">
-                <i class="fas fa-times"></i>
+            <!-- Brand/Logo -->
+            <a class="navbar-brand" href="{{ "/" | relURL }}">
+                <strong>{{ .Site.Title | default "포스트업" }}</strong>
+            </a>
+            
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
             </button>
-        </div>
-        <nav class="mobile-menu-nav">
-            <ul class="mobile-nav-menu">
-                {{ range .Site.Menus.main }}
-                <li class="mobile-nav-item">
-                    <a class="mobile-nav-link {{ if $.IsMenuCurrent "main" . }}active{{ end }}" href="{{ .URL }}">
-                        <i class="fas fa-{{ if eq .Name "건강" }}heartbeat{{ else if eq .Name "의료" }}user-md{{ else if eq .Name "웰니스" }}leaf{{ else }}circle{{ end }}"></i>
-                        {{ .Name }}
-                    </a>
-                </li>
-                {{ end }}
-            </ul>
-        </nav>
-        <div class="mobile-menu-footer">
-            <div class="mobile-search">
-                <button class="mobile-search-btn" data-bs-toggle="modal" data-bs-target="#searchModal">
-                    <i class="fas fa-search"></i>
-                    검색
-                </button>
+            
+            <!-- Navigation -->
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto">
+                    {{ range .Site.Menus.main }}
+                    <li class="nav-item">
+                        <a class="nav-link {{ if $.IsMenuCurrent "main" . }}active{{ end }}" href="{{ .URL }}">
+                            {{ .Name }}
+                        </a>
+                    </li>
+                    {{ end }}
+                    <li class="nav-item">
+                        <button class="btn btn-sm btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#searchModal">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
-    </div>
+    </nav>
 </header>
 
 <!-- Search Modal -->
@@ -81,75 +41,65 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form class="search-form">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="검색어를 입력하세요" id="searchInput">
-                        <button class="btn btn-primary" type="submit">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="검색어를 입력하세요">
+                    <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-function toggleMobileMenu() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-    const menuToggle = document.querySelector('.menu-toggle');
-    const body = document.body;
-    
-    const isOpen = mobileMenu.classList.contains('show');
-    
-    if (isOpen) {
-        // Close menu
-        mobileMenu.classList.remove('show');
-        mobileMenuOverlay.classList.remove('show');
-        menuToggle.classList.remove('active');
-        body.style.overflow = '';
-        menuToggle.setAttribute('aria-expanded', 'false');
-        menuToggle.querySelector('.sr-only').textContent = '모바일 메뉴 열기';
-    } else {
-        // Open menu
-        mobileMenu.classList.add('show');
-        mobileMenuOverlay.classList.add('show');
-        menuToggle.classList.add('active');
-        body.style.overflow = 'hidden';
-        menuToggle.setAttribute('aria-expanded', 'true');
-        menuToggle.querySelector('.sr-only').textContent = '모바일 메뉴 닫기';
-    }
+<style>
+.header-main {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background: white;
 }
 
-// Close mobile menu when clicking overlay
-document.addEventListener('click', function(event) {
-    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-    if (event.target === mobileMenuOverlay) {
-        toggleMobileMenu();
-    }
-});
+.navbar-brand {
+    font-size: 1.5rem;
+    color: #007bff !important;
+    text-decoration: none;
+}
 
-// Close mobile menu on window resize
-window.addEventListener('resize', function() {
-    if (window.innerWidth >= 992) {
-        const mobileMenu = document.getElementById('mobileMenu');
-        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-        const menuToggle = document.querySelector('.menu-toggle');
-        
-        mobileMenu.classList.remove('show');
-        mobileMenuOverlay.classList.remove('show');
-        menuToggle.classList.remove('active');
-        document.body.style.overflow = '';
-        menuToggle.setAttribute('aria-expanded', 'false');
-        menuToggle.querySelector('.sr-only').textContent = '모바일 메뉴 열기';
-    }
-});
+.navbar-nav .nav-link {
+    color: #333;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: color 0.3s ease;
+}
 
-// Handle mobile menu link clicks
-document.querySelectorAll('.mobile-nav-link').forEach(link => {
-    link.addEventListener('click', function() {
-        toggleMobileMenu();
-    });
-});
-</script>
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #007bff !important;
+}
+
+.btn-outline-primary {
+    border-radius: 50px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+@media (max-width: 991px) {
+    .navbar-nav {
+        text-align: center;
+        padding-top: 1rem;
+    }
+    
+    .btn-outline-primary {
+        margin: 0.5rem auto;
+    }
+}
+</style>
