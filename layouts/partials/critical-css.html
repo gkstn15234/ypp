@@ -496,12 +496,16 @@ img[loading="eager"] {
     
     .main-header .row {
         align-items: center;
+        display: flex;
+        justify-content: space-between;
     }
     
     .main-header .col-lg-3:first-child,
     .main-header .col-md-4:first-child {
         flex: 1;
         max-width: none;
+        display: flex;
+        align-items: center;
     }
     
     .main-header .col-lg-6,
@@ -513,12 +517,19 @@ img[loading="eager"] {
     .main-header .col-md-4:last-child {
         flex: 0 0 auto;
         max-width: none;
-        margin-left: auto;
+        display: flex;
+        align-items: center;
+    }
+    
+    .navbar-brand {
+        display: flex;
+        align-items: center;
     }
     
     .logo-text {
         font-size: 1.8rem;
         margin: 0;
+        line-height: 1;
     }
     
     .nav-menu {
@@ -527,19 +538,25 @@ img[loading="eager"] {
     
     .menu-toggle {
         display: flex;
+        align-items: center;
+        justify-content: center;
         margin-left: 0.5rem;
-        align-self: center;
     }
     
     .user-actions {
         gap: 0.5rem;
         justify-content: flex-end;
-        margin-left: auto;
+        display: flex;
+        align-items: center;
+        height: 100%;
     }
     
     .search-icon {
         font-size: 1.1rem;
         padding: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     .col-lg-3,
