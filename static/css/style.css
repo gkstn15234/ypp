@@ -3588,6 +3588,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
+    aspect-ratio: 16/9;
 }
 
 .side-article .article-thumb {
@@ -3596,11 +3597,13 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
+    aspect-ratio: 4/3;
 }
 
 .article-main-image {
     min-height: 300px;
     background-color: #f8f9fa;
+    aspect-ratio: 16/9;
 }
 
 .article-list-item .article-thumb {
@@ -3609,6 +3612,7 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
+    aspect-ratio: 3/2;
 }
 
 .card-img-wrapper {
@@ -3617,320 +3621,24 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
+    aspect-ratio: 16/10;
 }
 
-/* 이미지 로딩 상태 스켈레톤 효과 */
-.main-article .article-image::before,
-.side-article .article-thumb::before,
-.article-main-image::before,
-.article-list-item .article-thumb::before,
-.card-img-wrapper::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-    z-index: 1;
+/* 추가: 모든 img에 기본 aspect-ratio 적용 */
+img {
+    aspect-ratio: attr(width) / attr(height);
+    object-fit: cover;
+    contain: layout size;
 }
 
-.main-article .article-image img:not([src]),
-.side-article .article-thumb img:not([src]),
-.article-main-image img:not([src]),
-.article-list-item .article-thumb img:not([src]),
-.card-img-wrapper img:not([src]) {
-    opacity: 0;
-}
-
-@keyframes loading {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
-}
-
-/* 이미지 로드 완료 시 스켈레톤 제거 */
-.main-article .article-image:has(img[complete]):before,
-.side-article .article-thumb:has(img[complete]):before,
-.article-main-image:has(img[complete]):before,
-.article-list-item .article-thumb:has(img[complete]):before,
-.card-img-wrapper:has(img[complete]):before {
-    display: none;
-}
-
-/* 폰트 로딩 최적화 - FOUT 방지 */
-body {
-    font-display: swap;
-}
-
-/* 텍스트 콘텐츠 영역 미리 확보 */
-.main-article .article-content {
-    min-height: 120px;
-}
-
-.side-article .article-content {
-    min-height: 60px;
-}
-
-.article-list-item .article-content {
-    min-height: 80px;
-}
-
-/* 네비게이션 바 고정 크기 */
-.navbar {
-    min-height: 70px;
-}
-
-/* 카드 콘텐츠 영역 고정 */
-.card-body {
-    min-height: 100px;
-}
-
-/* 푸터 고정 크기 */
-footer {
-    min-height: 150px;
-}
-
-/* 광고/동적 콘텐츠 영역 미리 확보 */
+/* 동적 콘텐츠 공간 예약 강화 */
 .ad-container,
 .dynamic-content {
-    min-height: 200px;
+    min-height: 300px;
     background-color: #f8f9fa;
     border: 1px dashed #dee2e6;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* 검색 모달 크기 고정 */
-.modal-dialog {
-    min-height: 300px;
-}
-
-/* 로딩 상태 표시 */
-.loading-placeholder {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-    border-radius: 4px;
-}
-
-/* Zero CLS 이미지 최적화 - 기존 스타일 유지 */
-.main-article .article-image img {
-    aspect-ratio: 16/9;
-    object-fit: cover;
-}
-
-.side-article .article-thumb img {
-    aspect-ratio: 16/10;
-    object-fit: cover;
-}
-
-.article-main-image img {
-    aspect-ratio: 16/9;
-    object-fit: cover;
-}
-
-.article-list-item .article-thumb img {
-    aspect-ratio: 4/3;
-    object-fit: cover;
-}
-
-.card-img-top {
-    aspect-ratio: 16/10;
-    object-fit: cover;
-}
-
-/* 안전한 CLS 방지 - 기존 디자인 보존 */
-.main-news-image img {
-    aspect-ratio: 16/9;
-    object-fit: cover;
-}
-
-.side-news-image img,
-.right-news-image img {
-    aspect-ratio: 16/10;
-    object-fit: cover;
-}
-
-.secondary-news-image img,
-.bottom-news-image img {
-    aspect-ratio: 4/3;
-    object-fit: cover;
-}
-
-/* ===== 완전 투명한 CLS 방지 시스템 (디자인 무변경) ===== */
-
-/* 컨테이너 안정성 확보 - 눈에 보이지 않음 */
-.container {
-    contain: layout;
-}
-
-.row {
-    contain: layout;
-}
-
-.col, .col-*, [class*="col-"] {
-    contain: layout;
-}
-
-/* 이미지 컨테이너 안정성 - 기존 스타일 유지 */
-.main-article .article-image,
-.main-news-image,
-.side-article .article-thumb,
-.side-news-image,
-.right-news-image,
-.secondary-news-image,
-.bottom-news-image,
-.article-main-image,
-.article-list-item .article-thumb,
-.card-img-wrapper {
-    contain: layout;
-    overflow: hidden;
-}
-
-/* 텍스트 영역 최소 안정성 - 보이지 않는 수준 */
-.main-news-content {
-    min-height: 1px;
-}
-
-.side-news-content,
-.right-news-content {
-    min-height: 1px;
-}
-
-.secondary-news-content,
-.bottom-news-content {
-    min-height: 1px;
-}
-
-.card-body {
-    min-height: 1px;
-}
-
-/* 폰트 FOUT 방지 - 디자인 무변경 */
-body {
-    font-display: swap;
-}
-
-/* 네비게이션 안정성 */
-.navbar,
-.main-header {
-    contain: layout;
-}
-
-/* 푸터 안정성 */
-footer {
-    contain: layout;
-}
-
-/* 스크롤 최적화 - 성능만 개선 */
-* {
-    will-change: auto;
-}
-
-/* 이미지 로딩 안정성 */
-img {
-    contain: layout;
-    image-rendering: auto;
-}
-
-/* 호버 효과 최적화 */
-.main-news-article:hover,
-.side-news-card:hover,
-.right-news-card:hover,
-.card:hover {
-    will-change: transform;
-}
-
-.main-news-article:not(:hover),
-.side-news-card:not(:hover),
-.right-news-card:not(:hover),
-.card:not(:hover) {
-    will-change: auto;
-}
-
-/* 컨테이너 contain 속성으로 layout shift 방지 */
-.main-article,
-.side-article,
-.article-list-item,
-.card {
-    contain: layout style;
-}
-
-/* 이미지 로딩 시 투명도 애니메이션 */
-img[loading="lazy"] {
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-img[loading="lazy"].loaded,
-img[loading="eager"] {
-    opacity: 1;
-}
-
-/* 중요한 이미지 스타일 (loading/fetchpriority는 JavaScript에서 처리) */
-
-/* 텍스트 래핑 방지로 layout shift 줄이기 */
-.article-title,
-.card-title {
-    word-wrap: break-word;
-    hyphens: auto;
-    line-height: 1.2;
-}
-
-/* 컨테이너 크기 고정 */
-.container,
-.container-fluid {
-    contain: layout;
-}
-
-/* 반응형 이미지 최적화 */
-@media (max-width: 768px) {
-    .main-article .article-image {
-        min-height: 250px;
-    }
-    
-    .side-article .article-thumb {
-        min-height: 60px;
-    }
-    
-    .article-list-item .article-thumb {
-        min-height: 100px;
-    }
-    
-    .card-img-wrapper {
-        min-height: 150px;
-    }
-}
-
-/* CSS containment으로 리플로우 방지 */
-.row {
-    contain: layout;
-}
-
-.col, .col-*, [class*="col-"] {
-    contain: layout style;
-}
-
-/* 스크롤 성능 최적화 */
-* {
-    will-change: auto;
-}
-
-.main-article:hover,
-.side-article:hover,
-.card:hover {
-    will-change: transform;
-}
-
-.main-article:not(:hover),
-.side-article:not(:hover),
-.card:not(:hover) {
-    will-change: auto;
+    contain: layout size;
 }

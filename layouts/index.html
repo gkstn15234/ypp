@@ -12,7 +12,12 @@
                     <article class="side-news-card">
                         <div class="side-news-image">
                             {{ if .Params.images }}
+                            {{ $img := resources.Get (index .Params.images 0) }}
+                            {{ if $img }}
+                            <img src="{{ $img.RelPermalink }}" alt="{{ .Title }}" class="img-fluid" width="{{ $img.Width }}" height="{{ $img.Height }}" loading="lazy">
+                            {{ else }}
                             <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" width="300" height="200" loading="lazy">
+                            {{ end }}
                             {{ else }}
                             <div class="no-image-side">
                                 <i class="fas fa-car"></i>
@@ -39,7 +44,12 @@
                     <article class="main-news-article">
                         <div class="main-news-image">
                             {{ if $mainArticle.Params.images }}
+                            {{ $img := resources.Get (index $mainArticle.Params.images 0) }}
+                            {{ if $img }}
+                            <img src="{{ $img.RelPermalink }}" alt="{{ $mainArticle.Title }}" class="img-fluid" width="{{ $img.Width }}" height="{{ $img.Height }}" loading="eager">
+                            {{ else }}
                             <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid" width="600" height="400" loading="eager">
+                            {{ end }}
                             {{ else }}
                             <div class="no-image-main-center">
                                 <i class="fas fa-{{ if eq $mainArticle.Section "automotive" }}car{{ else if eq $mainArticle.Section "economy" }}chart-line{{ else if eq $mainArticle.Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>

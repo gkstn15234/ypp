@@ -52,17 +52,16 @@
                     {{ if .Params.images }}
                     <div class="article-main-image">
                         {{ $imagePath := index .Params.images 0 }}
-                        {{ if (strings.HasPrefix $imagePath "/images/") }}
-                            <!-- 로컬 이미지 - Google Discover 최적화 -->
-                            <img src="{{ $imagePath }}" 
+                        {{ $img := resources.Get $imagePath }}
+                        {{ if $img }}
+                            <img src="{{ $img.RelPermalink }}" 
                                  alt="{{ .Title }}" 
                                  class="img-fluid discover-optimized"
                                  loading="lazy"
-                                 width="1200" 
-                                 height="675"
+                                 width="{{ $img.Width }}" 
+                                 height="{{ $img.Height }}"
                                  data-discover="true">
                         {{ else }}
-                            <!-- 외부 이미지 -->
                             <img src="{{ $imagePath }}" 
                                  alt="{{ .Title }}" 
                                  class="img-fluid discover-optimized"
