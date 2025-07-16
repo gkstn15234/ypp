@@ -5,7 +5,7 @@ date: 2025-01-23T14:30:00+09:00
 author: "김현지"
 categories: ["엔터테인먼트"]
 tags: ["스트리밍", "건강", "웰니스", "콘텐츠", "OTT"]
-images: ["/images/streaming-health.jpg"]
+
 draft: false
 ---
 

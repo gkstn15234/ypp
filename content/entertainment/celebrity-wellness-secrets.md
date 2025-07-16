@@ -5,7 +5,7 @@ date: 2025-01-23T16:15:00+09:00
 author: "김현지"
 categories: ["엔터테인먼트"]
 tags: ["연예인", "웰니스", "건강", "뷰티", "라이프스타일"]
-images: ["/images/celebrity-wellness.jpg"]
+
 draft: false
 ---
 
