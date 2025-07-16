@@ -10,7 +10,7 @@
     <div class="container">
         <div class="row">
             <!-- Main Article Content -->
-            {{ $hideWidgets := or (eq .File.BaseNameNoExt "about") (eq .File.BaseNameNoExt "contact") (eq .File.BaseNameNoExt "editorial-guidelines") (eq .File.BaseNameNoExt "privacy") (eq .File.BaseNameNoExt "youth-protection") (eq .File.BaseNameNoExt "terms") }}
+            {{ $hideWidgets := or (eq .RelPermalink "/about/") (eq .RelPermalink "/contact/") (eq .RelPermalink "/editorial-guidelines/") (eq .RelPermalink "/privacy/") (eq .RelPermalink "/youth-protection/") (eq .RelPermalink "/terms/") }}
             <div class="col-lg-{{ if $hideWidgets }}12{{ else }}8{{ end }}">
                 <article class="main-article-content">
                     <!-- Article Header -->
