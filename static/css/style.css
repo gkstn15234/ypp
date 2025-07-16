@@ -2963,166 +2963,47 @@ img {
     border-color: var(--accent-color);
 }
 
-/* Footer - 단순하고 깔끔한 디자인 */
+/* Footer - 단순한 한 줄 디자인 */
 .site-footer {
     background: #2d3748;
     color: #a0aec0;
     margin-top: 2rem;
-    min-height: 120px;
+    padding: 1.5rem 0;
+    min-height: 60px;
     contain: layout style;
 }
 
-.main-footer {
-    padding: 2rem 0 1rem;
-    min-height: 80px;
-    contain: layout style;
-    border-bottom: 1px solid #4a5568;
-}
-
-.footer-section {
-    padding: 0;
-    margin-bottom: 0;
+.footer-content {
     contain: layout style;
 }
 
-.footer-logo {
-    height: 35px;
-    width: auto;
-    margin-bottom: 1rem;
-    filter: brightness(0) invert(1);
-    opacity: 1;
-    contain: layout style;
-}
-
-.footer-logo-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white !important;
-    margin-bottom: 1rem;
-    contain: layout style;
-}
-
-.footer-brand-description {
-    color: #a0aec0;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 1rem;
-    contain: layout style;
-}
-
-.main-footer h5 {
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    contain: layout style;
-}
-
-.footer-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.footer-links li {
-    margin-bottom: 0.5rem;
-    contain: layout style;
-}
-
-.footer-links a {
-    color: #a0aec0;
-    text-decoration: none;
-    font-weight: 400;
-    display: block;
-    padding: 0.2rem 0;
-    contain: layout style;
-}
-
-.footer-links a:hover {
-    color: white;
-}
-
-.footer-bottom {
-    background: #1a202c;
-    padding: 1rem 0;
-    min-height: 40px;
-    contain: layout style;
-}
-
-.copyright-info {
+.footer-info {
     text-align: center;
+    contain: layout style;
+}
+
+.footer-info p {
+    margin: 0;
     font-size: 0.85rem;
     line-height: 1.6;
     color: #a0aec0;
-    contain: layout style;
 }
 
-.copyright-info strong {
+.footer-info strong {
     color: white;
     font-weight: 600;
-}
-
-.footer-social {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1rem;
-    contain: layout style;
-}
-
-.social-icon {
-    width: 35px;
-    height: 35px;
-    background: #4a5568;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #a0aec0;
-    text-decoration: none;
-    contain: layout style;
-}
-
-.social-icon:hover {
-    background: #2d3748;
-    color: white;
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .site-footer {
-        min-height: 100px;
+        padding: 1rem 0;
+        min-height: 50px;
     }
     
-    .main-footer {
-        padding: 1.5rem 0 1rem;
-        min-height: 70px;
-    }
-    
-    .footer-logo-text {
-        font-size: 1.3rem;
-    }
-    
-    .main-footer h5 {
-        font-size: 0.95rem;
-    }
-    
-    .footer-links li {
-        margin-bottom: 0.4rem;
-    }
-    
-    .footer-social {
-        gap: 0.8rem;
-    }
-    
-    .social-icon {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .footer-bottom {
-        padding: 0.8rem 0;
-        min-height: 30px;
+    .footer-info p {
+        font-size: 0.8rem;
+        line-height: 1.5;
     }
 }
 
