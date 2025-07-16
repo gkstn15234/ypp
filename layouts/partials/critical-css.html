@@ -76,40 +76,50 @@ body {
 .menu-toggle {
     display: none;
     flex-direction: column;
-    justify-content: space-between;
-    width: 30px;
-    height: 20px;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
     background: none;
     border: none;
     cursor: pointer;
     padding: 8px;
-    border-radius: 4px;
+    border-radius: 8px;
     transition: background-color 0.3s ease;
+    position: relative;
 }
 
 .menu-toggle:hover {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
+.menu-toggle:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
 .hamburger-line {
     display: block;
-    width: 100%;
+    width: 24px;
     height: 3px;
     background: #333;
     border-radius: 2px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 2px 0;
+    transform-origin: center;
 }
 
 .menu-toggle.active .hamburger-line:nth-child(1) {
-    transform: rotate(45deg) translate(6px, 6px);
+    transform: translateY(7px) rotate(45deg);
 }
 
 .menu-toggle.active .hamburger-line:nth-child(2) {
     opacity: 0;
+    transform: translateX(-10px);
 }
 
 .menu-toggle.active .hamburger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
+    transform: translateY(-7px) rotate(-45deg);
 }
 
 /* Navigation Critical Styles */
@@ -541,6 +551,8 @@ img[loading="eager"] {
         align-items: center;
         justify-content: center;
         margin-left: 0.5rem;
+        min-width: 44px;
+        min-height: 44px;
     }
     
     .user-actions {
@@ -549,14 +561,23 @@ img[loading="eager"] {
         display: flex;
         align-items: center;
         height: 100%;
+        flex-shrink: 0;
     }
     
     .search-icon {
         font-size: 1.1rem;
-        padding: 0.4rem;
+        padding: 0.6rem;
         display: flex;
         align-items: center;
         justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .search-icon:hover {
+        background-color: rgba(0, 0, 0, 0.05);
     }
     
     .col-lg-3,
@@ -600,12 +621,11 @@ img[loading="eager"] {
 /* Tablet styles */
 @media (min-width: 769px) and (max-width: 991px) {
     .nav-menu {
-        gap: 1rem;
+        display: none;
     }
     
-    .nav-link {
-        font-size: 1rem;
-        padding: 0.4rem 0.8rem;
+    .menu-toggle {
+        display: flex;
     }
     
     .logo-text {
@@ -615,17 +635,28 @@ img[loading="eager"] {
     .user-actions {
         gap: 0.75rem;
     }
+    
+    .main-header .col-lg-6,
+    .main-header .col-md-4:nth-child(2) {
+        display: none;
+    }
+    
+    .main-header .row {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+    }
 }
 
 /* Desktop styles */
 @media (min-width: 992px) {
     .menu-toggle {
-        display: none;
+        display: none !important;
     }
     
     .mobile-menu,
     .mobile-menu-overlay {
-        display: none;
+        display: none !important;
     }
     
     .main-nav {
@@ -634,6 +665,12 @@ img[loading="eager"] {
     
     .nav-menu {
         display: flex;
+        gap: 2rem;
+    }
+    
+    .main-header .col-lg-6,
+    .main-header .col-md-4:nth-child(2) {
+        display: block;
     }
 }
 
