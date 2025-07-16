@@ -458,8 +458,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .side-news-image {
     position: relative;
-    height: 160px;
+    height: 160px;  /* FIXED HEIGHT */
+    width: 100%;    /* FIXED WIDTH */
     overflow: hidden;
+    contain: strict;
+    background-color: #f8f9fa;
 }
 
 .side-news-image img {
@@ -532,9 +535,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-news-image {
-    height: 300px;
+    height: 300px;  /* FIXED HEIGHT */
+    width: 100%;    /* FIXED WIDTH */
     overflow: hidden;
     position: relative;
+    contain: strict;
+    background-color: #f8f9fa;
 }
 
 .main-news-image img {
@@ -2957,20 +2963,27 @@ img {
     border-color: var(--accent-color);
 }
 
-/* Footer */
+/* Footer - ZERO CLS */
 .site-footer {
     background: #2d3748;
     color: #a0aec0;
     margin-top: 4rem;
-    min-height: 400px;  /* Increased to prevent layout shift */
-    contain: layout size style;
+    height: 500px;  /* FIXED HEIGHT - NO SHIFT */
+    contain: strict;
     will-change: auto;
+    overflow: hidden;
+    position: relative;
 }
 
 .main-footer {
     padding: 3rem 0 2rem;
-    min-height: 200px;  /* Reserve space for main footer content */
-    contain: layout style;
+    height: 280px;  /* FIXED HEIGHT */
+    contain: strict;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 .footer-logo {
@@ -3019,16 +3032,25 @@ img {
     border-top: 1px solid #4a5568;
     padding: 2rem 0;
     background: #1a202c;
-    min-height: 150px;  /* Reserve space for copyright and admin section */
-    contain: layout style;
+    height: 220px;  /* FIXED HEIGHT */
+    contain: strict;
+    overflow: hidden;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 
 .copyright-info {
     text-align: center;
     font-size: 0.85rem;
     line-height: 1.6;
-    min-height: 120px;  /* Reserve space for multi-line copyright text */
-    contain: layout style;
+    height: 160px;  /* FIXED HEIGHT */
+    contain: strict;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 /* Breadcrumb */
@@ -3590,14 +3612,16 @@ img {
 
 /* ===== 추가 CLS 최적화 (Layout Shift 방지) ===== */
 
-/* 모든 이미지 컨테이너에 명시적 크기 설정 */
+/* 모든 이미지 컨테이너에 명시적 크기 설정 - ZERO CLS */
 .main-article .article-image {
-    min-height: 400px;
+    height: 400px;  /* FIXED HEIGHT */
+    width: 100%;    /* FIXED WIDTH */
     background-color: #f8f9fa;
     display: flex;
     align-items: center;
     justify-content: center;
-    aspect-ratio: 16/9;
+    contain: strict;
+    overflow: hidden;
 }
 
 .side-article .article-thumb {
@@ -3625,41 +3649,68 @@ img {
 }
 
 .card-img-wrapper {
-    min-height: 200px;
+    height: 200px;  /* FIXED HEIGHT */
+    width: 100%;    /* FIXED WIDTH */
     background-color: #f8f9fa;
     display: flex;
     align-items: center;
     justify-content: center;
-    aspect-ratio: 16/10;
+    contain: strict;
+    overflow: hidden;
 }
 
-/* 추가: 모든 img에 기본 aspect-ratio 적용 */
+/* 추가: 모든 img에 강제 크기 적용 - ZERO CLS */
 img {
-    aspect-ratio: attr(width) / attr(height);
     object-fit: cover;
-    contain: layout size;
+    contain: strict;
+    max-width: 100%;
+    height: auto;
+    display: block;
 }
 
-/* 동적 콘텐츠 공간 예약 강화 */
+/* 이미지 컨테이너 내부 이미지 강제 크기 */
+.main-news-image img,
+.side-news-image img,
+.right-news-image img,
+.secondary-news-image img,
+.bottom-news-image img,
+.card-img-wrapper img,
+.main-article .article-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    contain: strict;
+}
+
+/* 동적 콘텐츠 공간 예약 강화 - ZERO CLS */
 .ad-container,
 .dynamic-content {
-    min-height: 300px;
+    height: 300px;  /* FIXED HEIGHT */
+    width: 100%;    /* FIXED WIDTH */
     background-color: #f8f9fa;
     border: 1px dashed #dee2e6;
     display: flex;
     align-items: center;
     justify-content: center;
-    contain: layout size;
+    contain: strict;
+    overflow: hidden;
 }
 
-/* Admin login section */
+/* Admin login section - ZERO CLS */
 .admin-login-section {
     margin-top: 20px;
     padding-top: 15px;
     border-top: 1px solid rgba(255,255,255,0.1);
-    min-height: 80px;  /* Increased reserve space for button loading */
-    contain: layout size;
+    height: 60px;  /* FIXED HEIGHT */
+    contain: strict;
     will-change: auto;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .admin-login-btn {
@@ -3670,12 +3721,14 @@ img {
     border-radius: 20px;
     font-size: 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    min-height: 36px;  /* Fixed height to prevent shift */
+    transition: none;  /* NO TRANSITIONS TO PREVENT SHIFT */
+    height: 36px;  /* FIXED HEIGHT */
+    width: 120px;  /* FIXED WIDTH */
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    contain: layout;
+    contain: strict;
+    flex-shrink: 0;
 }
 
 .admin-login-btn i {
@@ -3686,4 +3739,40 @@ img {
     background: rgba(255,255,255,0.2) !important;
     color: rgba(255,255,255,0.9) !important;
     border-color: rgba(255,255,255,0.5) !important;
+}
+
+/* ===== ZERO CLS 강제 적용 ===== */
+/* 모든 카드와 컨테이너 강제 고정 */
+.main-news-article,
+.side-news-card,
+.right-news-card,
+.secondary-news-article,
+.bottom-news-card,
+.article-card,
+.main-news-content,
+.side-news-content,
+.right-news-content,
+.secondary-news-content,
+.bottom-news-content {
+    contain: strict;
+    overflow: hidden;
+}
+
+/* 모든 텍스트 요소 고정 */
+h1, h2, h3, h4, h5, h6,
+p, span, div, a {
+    contain: layout style;
+}
+
+/* 모든 애니메이션과 트랜지션 비활성화 */
+*, *::before, *::after {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+}
+
+/* 모든 요소에 강제 containment */
+body * {
+    contain: layout;
 }
