@@ -1,6 +1,6 @@
-# 포스트업 - 자동차 경제 뉴스 사이트
+# 앤포이스 - 자동차 전문매체
 
-자동차 산업과 경제 정보를 전문적으로 다루는 포스트업 뉴스 사이트입니다.
+자동차, 전기차, 모빌리티 정보를 전문적으로 다루는 앤포이스 자동차 전문매체입니다.
 
 ## 🚀 Cloudflare Pages 자동 배포 설정
 
@@ -63,16 +63,16 @@ npx wrangler pages deploy public
 ```
 
 ### 새 기사 발행 방법
-1. `content/automotive/`, `content/economy/`, `content/entertainment/` 폴더에 새 마크다운 파일 생성
+1. `content/car/`, `content/economy/` 폴더에 새 마크다운 파일 생성
 2. 파일 헤더에 필요한 메타데이터 추가:
    ```yaml
    ---
    title: "기사 제목"
    description: "기사 요약"
-   author: "기자명"
-   date: 2024-01-01T10:00:00+09:00
-   tags: ["태그1", "태그2"]
-   categories: ["health"] # 또는 "medical", "wellness"
+   author: "김한수"
+   date: 2025-01-01T10:00:00+09:00
+   tags: ["자동차", "전기차", "모빌리티"]
+   categories: ["car"] # 또는 "economy"
    images: ["이미지_URL"]
    ---
    ```
@@ -107,28 +107,26 @@ npm run build
 ## 📁 프로젝트 구조
 ```
 ├── content/           # 콘텐츠 파일
-│   ├── automotive/    # 자동차 뉴스
-│   ├── economy/       # 경제 뉴스
-│   ├── entertainment/ # 엔터테인먼트 뉴스
-│   └── authors/       # 작성자 정보
-├── layouts/           # 템플릿 파일
-├── static/            # 정적 파일
-├── functions/         # Cloudflare Pages Functions
-├── config.yaml        # Hugo 설정
-├── _build.yml         # Cloudflare Pages 빌드 설정
-├── wrangler.toml      # Cloudflare Pages 설정
-├── _redirects         # 리다이렉트 규칙
-└── static/_headers    # HTTP 헤더 설정
+│   ├── car/          # 자동차 뉴스
+│   ├── economy/      # 경제 뉴스
+│   └── authors/      # 작성자 정보
+├── layouts/          # 템플릿 파일
+├── static/           # 정적 파일
+├── config.yaml       # Hugo 설정
+├── scraper.py        # 웹 스크래핑 도구
+├── _redirects        # 리다이렉트 규칙
+└── static/_headers   # HTTP 헤더 설정
 ```
 
 ## 🎯 주요 기능
-- 반응형 3컬럼 레이아웃
+- 반응형 레이아웃
 - 실시간 기사 업데이트
-- 카테고리별 필터링 (자동차, 경제, 엔터테인먼트)
+- 카테고리별 필터링 (자동차, 경제)
 - 작성자별 기사 분류
-- SEO 최적화
+- SEO 최적화 (구글 디스커버 대응)
 - 모바일 최적화
 - Cloudflare Pages 최적화 캐시
+- WebP 이미지 포맷 지원
 
 ## 🔧 캐시 최적화
 - **HTML 파일**: 5분 캐시, 실시간 업데이트
@@ -137,5 +135,8 @@ npm run build
 - **사이트맵**: 1시간 캐시
 
 ## 📞 문의
-- 이메일: contact@humanbigdata.com
-- 전화: 1811-9670 
+- 이메일: hangil9910@gmail.com
+- 전화: 010-7539-8504
+- 주소: 경상북도 경산시 진량읍 일연로 747
+- 발행인/편집인: 김한수
+- 언론사 등록번호: 경북,아55580 
