@@ -2966,7 +2966,7 @@ img {
 /* Footer - 단순한 한 줄 디자인 */
 .site-footer {
     background: #2d3748;
-    color: #a0aec0;
+    color: white;
     margin-top: 2rem;
     padding: 1.5rem 0;
     min-height: 60px;
@@ -2986,7 +2986,7 @@ img {
     margin: 0;
     font-size: 0.85rem;
     line-height: 1.6;
-    color: #a0aec0;
+    color: white;
 }
 
 .footer-info strong {
@@ -2995,13 +2995,13 @@ img {
 }
 
 .footer-info a {
-    color: #63b3ed;
+    color: white;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 .footer-info a:hover {
-    color: #90cdf4;
+    color: #f7fafc;
     text-decoration: underline;
 }
 
