@@ -5,6 +5,11 @@ defaultContentLanguage: 'ko'
 hasCJKLanguage: true
 timeZone: 'Asia/Seoul'
 
+# GitHub Pages 배포 설정
+publishDir: 'public'
+relativeURLs: false
+canonifyURLs: true
+
 params:
   description: '포스트업는 건강, 의료, 웰니스 정보를 전문적으로 다루는 건강 미디어입니다.'
   keywords: '건강, 의료, 웰니스, 건강관리, 건강뉴스, 의료정보, 건강정보'
