@@ -10,7 +10,8 @@
     <div class="container">
         <div class="row">
             <!-- Main Article Content -->
-            <div class="col-lg-8">
+            {{ $hideWidgets := or (eq .File.BaseNameNoExt "about") (eq .File.BaseNameNoExt "contact") (eq .File.BaseNameNoExt "editorial-guidelines") (eq .File.BaseNameNoExt "privacy") (eq .File.BaseNameNoExt "youth-protection") (eq .File.BaseNameNoExt "terms") }}
+            <div class="col-lg-{{ if $hideWidgets }}12{{ else }}8{{ end }}">
                 <article class="main-article-content">
                     <!-- Article Header -->
                     <header class="article-header">
@@ -118,6 +119,7 @@
             </div>
 
             <!-- Sidebar -->
+            {{ if not $hideWidgets }}
             <div class="col-lg-4">
                 <aside class="article-sidebar">
                     <!-- 주요 기사 위젯 -->
@@ -201,11 +203,13 @@
 
                 </aside>
             </div>
+            {{ end }}
         </div>
     </div>
 </div>
 
 <!-- Related Articles -->
+{{ if not $hideWidgets }}
 <section class="related-articles-section">
     <div class="container">
         <div class="section-header">
@@ -240,4 +244,5 @@
         </div>
     </div>
 </section>
+{{ end }}
 {{ end }}

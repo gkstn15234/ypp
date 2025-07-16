@@ -3701,3 +3701,53 @@ p, span, div, a {
 body * {
     contain: layout;
 }
+
+/* ===== 카테고리 페이지 단순 스타일 ===== */
+.taxonomy-simple {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.taxonomy-simple .taxonomy-item {
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.taxonomy-simple .taxonomy-item:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.taxonomy-simple .taxonomy-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.taxonomy-simple .taxonomy-link h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.taxonomy-simple .count {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    background: var(--border-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+    .taxonomy-simple .taxonomy-link {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
