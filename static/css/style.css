@@ -2962,6 +2962,8 @@ img {
     background: #2d3748;
     color: #a0aec0;
     margin-top: 4rem;
+    min-height: 300px;  /* Reserve space to prevent layout shift */
+    contain: layout style;
 }
 
 .main-footer {
@@ -3641,4 +3643,24 @@ img {
     align-items: center;
     justify-content: center;
     contain: layout size;
+}
+
+/* Admin login section */
+.admin-login-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    min-height: 60px;  /* Reserve space for button loading */
+    contain: layout;
+}
+
+.admin-login-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
