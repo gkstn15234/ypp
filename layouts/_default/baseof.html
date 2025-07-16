@@ -220,14 +220,7 @@
             loadScript('{{ "/js/main.js" | relURL }}');
         });
         
-        // Service Worker for caching (optional)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').catch(function() {
-                    // Service worker registration failed, but don't break the site
-                });
-            });
-        }
+
     </script>
     
     <!-- Load Google Fonts asynchronously -->
