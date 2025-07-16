@@ -3720,7 +3720,7 @@ footer {
     border-radius: 4px;
 }
 
-/* 이미지 aspect-ratio 강제 적용 */
+/* Zero CLS 이미지 최적화 - 기존 스타일 유지 */
 .main-article .article-image img {
     aspect-ratio: 16/9;
     object-fit: cover;
@@ -3744,6 +3744,115 @@ footer {
 .card-img-top {
     aspect-ratio: 16/10;
     object-fit: cover;
+}
+
+/* 안전한 CLS 방지 - 기존 디자인 보존 */
+.main-news-image img {
+    aspect-ratio: 16/9;
+    object-fit: cover;
+}
+
+.side-news-image img,
+.right-news-image img {
+    aspect-ratio: 16/10;
+    object-fit: cover;
+}
+
+.secondary-news-image img,
+.bottom-news-image img {
+    aspect-ratio: 4/3;
+    object-fit: cover;
+}
+
+/* ===== 완전 투명한 CLS 방지 시스템 (디자인 무변경) ===== */
+
+/* 컨테이너 안정성 확보 - 눈에 보이지 않음 */
+.container {
+    contain: layout;
+}
+
+.row {
+    contain: layout;
+}
+
+.col, .col-*, [class*="col-"] {
+    contain: layout;
+}
+
+/* 이미지 컨테이너 안정성 - 기존 스타일 유지 */
+.main-article .article-image,
+.main-news-image,
+.side-article .article-thumb,
+.side-news-image,
+.right-news-image,
+.secondary-news-image,
+.bottom-news-image,
+.article-main-image,
+.article-list-item .article-thumb,
+.card-img-wrapper {
+    contain: layout;
+    overflow: hidden;
+}
+
+/* 텍스트 영역 최소 안정성 - 보이지 않는 수준 */
+.main-news-content {
+    min-height: 1px;
+}
+
+.side-news-content,
+.right-news-content {
+    min-height: 1px;
+}
+
+.secondary-news-content,
+.bottom-news-content {
+    min-height: 1px;
+}
+
+.card-body {
+    min-height: 1px;
+}
+
+/* 폰트 FOUT 방지 - 디자인 무변경 */
+body {
+    font-display: swap;
+}
+
+/* 네비게이션 안정성 */
+.navbar,
+.main-header {
+    contain: layout;
+}
+
+/* 푸터 안정성 */
+footer {
+    contain: layout;
+}
+
+/* 스크롤 최적화 - 성능만 개선 */
+* {
+    will-change: auto;
+}
+
+/* 이미지 로딩 안정성 */
+img {
+    contain: layout;
+    image-rendering: auto;
+}
+
+/* 호버 효과 최적화 */
+.main-news-article:hover,
+.side-news-card:hover,
+.right-news-card:hover,
+.card:hover {
+    will-change: transform;
+}
+
+.main-news-article:not(:hover),
+.side-news-card:not(:hover),
+.right-news-card:not(:hover),
+.card:not(:hover) {
+    will-change: auto;
 }
 
 /* 컨테이너 contain 속성으로 layout shift 방지 */

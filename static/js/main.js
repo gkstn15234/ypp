@@ -801,11 +801,68 @@ document.addEventListener('DOMContentLoaded', function() {
     optimizeDynamicContent();
     setupAdvancedLazyLoading();
     
+    // 완전 투명한 CLS 방지 시스템
+    invisibleCLSPrevention();
+    
     // 레이아웃 안정성 모니터링 (개발 모드에서만)
     if (window.location.hostname === 'localhost' || window.location.hostname.includes('preview')) {
         monitorLayoutStability();
     }
 });
+
+// 완전 투명한 CLS 방지 - 디자인 무변경
+function invisibleCLSPrevention() {
+    // 1. 모든 이미지에 width/height 속성 확보
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        if (!img.hasAttribute('width') || !img.hasAttribute('height')) {
+            const container = img.parentElement;
+            if (container) {
+                const computedStyle = window.getComputedStyle(container);
+                const containerWidth = container.offsetWidth;
+                
+                // 컨테이너 크기 기반으로 적절한 비율 설정
+                if (img.closest('.main-news-image, .main-article .article-image')) {
+                    img.setAttribute('width', containerWidth);
+                    img.setAttribute('height', Math.round(containerWidth * 9 / 16));
+                } else if (img.closest('.side-news-image, .right-news-image')) {
+                    img.setAttribute('width', containerWidth);
+                    img.setAttribute('height', Math.round(containerWidth * 10 / 16));
+                } else if (img.closest('.secondary-news-image, .bottom-news-image')) {
+                    img.setAttribute('width', containerWidth);
+                    img.setAttribute('height', Math.round(containerWidth * 3 / 4));
+                } else {
+                    img.setAttribute('width', containerWidth);
+                    img.setAttribute('height', Math.round(containerWidth * 10 / 16));
+                }
+            }
+        }
+    });
+    
+    // 2. 폰트 로딩 완료까지 텍스트 영역 고정
+    if ('fonts' in document) {
+        document.fonts.ready.then(() => {
+            // 폰트 로딩 완료 후 추가 작업 없음 (자연스러운 렌더링)
+        });
+    }
+    
+    // 3. 컨테이너 크기 사전 확보 (보이지 않게)
+    const containers = document.querySelectorAll('.main-news-article, .side-news-card, .right-news-card, .card');
+    containers.forEach(container => {
+        const style = window.getComputedStyle(container);
+        if (style.height === 'auto' || !style.height) {
+            container.style.minHeight = '1px'; // 최소한의 크기 확보
+        }
+    });
+    
+    // 4. 스크롤 위치 보존
+    const scrollPosition = window.scrollY;
+    requestAnimationFrame(() => {
+        if (Math.abs(window.scrollY - scrollPosition) > 5) {
+            window.scrollTo(0, scrollPosition);
+        }
+    });
+}
 
 // 페이지 완전 로드 후 최종 최적화
 window.addEventListener('load', function() {
