@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeNewsletter();
     initializeClickableCards();
     initializeEnhancedUpNext();
+    // 접근성 향상
+    initializeAccessibility();
 });
 
 // Reading Progress Bar
@@ -384,11 +386,76 @@ setTimeout(() => {
     // Additional performance optimizations can go here
 }, 1000);
 
-// Accessibility: Skip to content
-function addSkipToContent() {
+// 접근성 향상
+function initializeAccessibility() {
+    // 네비게이션 토글 버튼 접근성
+    initializeNavbarToggle();
+    
+    // 모달 접근성
+    initializeModalAccessibility();
+    
+    // 키보드 네비게이션
+    initializeKeyboardNavigation();
+}
+
+// 네비게이션 토글 버튼 접근성
+function initializeNavbarToggle() {
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navbarCollapse = document.querySelector('#mainNav');
+    
+    if (navbarToggler && navbarCollapse) {
+        // Bootstrap collapse 이벤트 리스너
+        navbarCollapse.addEventListener('shown.bs.collapse', function() {
+            navbarToggler.setAttribute('aria-expanded', 'true');
+        });
+        
+        navbarCollapse.addEventListener('hidden.bs.collapse', function() {
+            navbarToggler.setAttribute('aria-expanded', 'false');
+        });
+        
+        // 초기 상태 설정
+        const isExpanded = navbarCollapse.classList.contains('show');
+        navbarToggler.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+    }
+}
+
+// 모달 접근성
+function initializeModalAccessibility() {
+    const searchModal = document.querySelector('#searchModal');
+    const searchInput = document.querySelector('#searchInput');
+    
+    if (searchModal && searchInput) {
+        // 모달이 열릴 때 검색 입력 필드에 포커스
+        searchModal.addEventListener('shown.bs.modal', function() {
+            searchInput.focus();
+        });
+        
+        // ESC 키로 모달 닫기 (Bootstrap에서 기본 제공하지만 명시적으로 추가)
+        searchModal.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = bootstrap.Modal.getInstance(searchModal);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        });
+    }
+}
+
+// 키보드 네비게이션 개선
+function initializeKeyboardNavigation() {
+    // Skip to content 링크 추가
+    addSkipToContentLink();
+    
+    // 탭 트랩핑 (모달에서)
+    addModalTabTrapping();
+}
+
+// Skip to content 링크
+function addSkipToContentLink() {
     const skipLink = document.createElement('a');
     skipLink.className = 'skip-to-content';
-    skipLink.href = '#main';
+    skipLink.href = '#main-content';
     skipLink.textContent = '본문으로 건너뛰기';
     skipLink.style.cssText = `
         position: absolute;
@@ -396,10 +463,12 @@ function addSkipToContent() {
         left: 6px;
         background: #000;
         color: #fff;
-        padding: 8px;
+        padding: 8px 12px;
         text-decoration: none;
         z-index: 9999;
         border-radius: 4px;
+        font-weight: bold;
+        transition: top 0.3s ease;
     `;
     
     skipLink.addEventListener('focus', function() {
@@ -411,27 +480,62 @@ function addSkipToContent() {
     });
     
     document.body.insertBefore(skipLink, document.body.firstChild);
+    
+    // 메인 콘텐츠에 id 추가 (없는 경우)
+    const mainContent = document.querySelector('main, .main-content, #main');
+    if (mainContent && !mainContent.id) {
+        mainContent.id = 'main-content';
+    }
 }
 
-addSkipToContent();
-
-// Global error handling
-window.addEventListener('error', function(e) {
-    // In production, you might want to send this to an error tracking service
-    // TODO: Implement error tracking (e.g., Sentry, LogRocket)
-});
-
-// Service Worker Registration (for PWA features)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
-            .then(function(registration) {
-                // Service worker registered successfully
-            })
-            .catch(function(registrationError) {
-                // Service worker registration failed
-            });
+// 모달 내 탭 트랩핑
+function addModalTabTrapping() {
+    const modals = document.querySelectorAll('.modal');
+    
+    modals.forEach(modal => {
+        modal.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                trapTabKey(e, modal);
+            }
+        });
     });
+}
+
+// 탭 키 트랩핑 함수
+function trapTabKey(e, modal) {
+    const focusableElements = modal.querySelectorAll(
+        'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])'
+    );
+    
+    const firstTabStop = focusableElements[0];
+    const lastTabStop = focusableElements[focusableElements.length - 1];
+    
+    if (e.shiftKey) {
+        if (document.activeElement === firstTabStop) {
+            e.preventDefault();
+            lastTabStop.focus();
+        }
+    } else {
+        if (document.activeElement === lastTabStop) {
+            e.preventDefault();
+            firstTabStop.focus();
+        }
+    }
+}
+
+// 접근성 알림 (스크린 리더용)
+function announceToScreenReader(message) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.className = 'sr-only';
+    announcement.textContent = message;
+    
+    document.body.appendChild(announcement);
+    
+    setTimeout(() => {
+        document.body.removeChild(announcement);
+    }, 1000);
 }
 
 // Enhanced Up Next Article Recommendation

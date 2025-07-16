@@ -24,6 +24,96 @@
     --border-color: #2d3748;
 }
 
+/* ===== 접근성 개선 CSS ===== */
+
+/* 스크린 리더 전용 텍스트 */
+.visually-hidden,
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Skip to content 링크 */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #000;
+    color: #fff;
+    padding: 8px 12px;
+    text-decoration: none;
+    z-index: 9999;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: top 0.3s ease;
+}
+
+.skip-to-content:focus {
+    top: 6px;
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* 포커스 표시 개선 */
+*:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+/* 버튼과 링크의 포커스 스타일 */
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #000000;
+        --text-color: #000000;
+        --background-color: #ffffff;
+        --border-color: #000000;
+    }
+}
+
+/* 움직임 줄이기 선호 시 애니메이션 비활성화 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* 다크모드 접근성 */
+@media (prefers-color-scheme: dark) {
+    [data-theme="auto"] {
+        --primary-color: #63b3ed;
+        --secondary-color: #4299e1;
+        --text-color: #f7fafc;
+        --text-muted: #a0aec0;
+        --background-color: #1a202c;
+        --border-color: #2d3748;
+    }
+}
+
+/* ===== 접근성 개선 CSS 끝 ===== */
+
 /* Base Styles */
 * {
     box-sizing: border-box;
