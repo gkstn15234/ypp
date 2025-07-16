@@ -2994,6 +2994,17 @@ img {
     font-weight: 600;
 }
 
+.footer-info a {
+    color: #63b3ed;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-info a:hover {
+    color: #90cdf4;
+    text-decoration: underline;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .site-footer {
