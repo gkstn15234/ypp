@@ -1,11 +1,11 @@
 ---
 title: "넷플릭스부터 유튜브까지, 건강 콘텐츠가 스트리밍을 점령하다"
 description: "스트리밍 플랫폼에서 폭발적으로 증가하는 건강 관련 콘텐츠의 트렌드를 분석합니다."
-date: 2024-12-25T14:30:00+09:00
+date: 2025-01-23T14:30:00+09:00
 author: "김현지"
 categories: ["엔터테인먼트"]
 tags: ["스트리밍", "건강", "웰니스", "콘텐츠", "OTT"]
-image: "/images/streaming-health.jpg"
+images: ["/images/streaming-health.jpg"]
 draft: false
 ---
 

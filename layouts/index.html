@@ -20,7 +20,7 @@
                             {{ end }}
                             {{ else }}
                             <div class="no-image-side">
-                                <i class="fas fa-car"></i>
+                                <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
                             </div>
                             {{ end }}
                             <span class="news-category-tag">{{ .Section | title }}</span>

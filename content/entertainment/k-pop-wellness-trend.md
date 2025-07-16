@@ -1,11 +1,11 @@
 ---
 title: "K-pop 아이돌들이 주도하는 새로운 웰니스 트렌드"
 description: "K-pop 스타들의 건강한 라이프스타일이 전 세계 팬들에게 미치는 영향을 살펴봅니다."
-date: 2024-12-25T10:00:00+09:00
+date: 2025-01-23T10:00:00+09:00
 author: "김현지"
 categories: ["엔터테인먼트"]
 tags: ["K-pop", "웰니스", "건강", "라이프스타일", "아이돌"]
-image: "/images/kpop-wellness.jpg"
+images: ["/images/kpop-wellness.jpg"]
 draft: false
 ---
 

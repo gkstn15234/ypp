@@ -1,11 +1,11 @@
 ---
 title: "스타들의 비밀 웰니스 루틴 대공개! 당신도 따라할 수 있는 셀럽 건강법"
 description: "국내외 유명 연예인들의 건강 관리 비법과 웰니스 루틴을 파헤쳐봅니다."
-date: 2024-12-25T16:15:00+09:00
+date: 2025-01-23T16:15:00+09:00
 author: "김현지"
 categories: ["엔터테인먼트"]
 tags: ["연예인", "웰니스", "건강", "뷰티", "라이프스타일"]
-image: "/images/celebrity-wellness.jpg"
+images: ["/images/celebrity-wellness.jpg"]
 draft: false
 ---
 
