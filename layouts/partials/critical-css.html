@@ -82,7 +82,13 @@ body {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.menu-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .hamburger-line {
@@ -488,8 +494,31 @@ img[loading="eager"] {
         padding: 0.75rem 0;
     }
     
+    .main-header .row {
+        align-items: center;
+    }
+    
+    .main-header .col-lg-3:first-child,
+    .main-header .col-md-4:first-child {
+        flex: 1;
+        max-width: none;
+    }
+    
+    .main-header .col-lg-6,
+    .main-header .col-md-4:nth-child(2) {
+        display: none;
+    }
+    
+    .main-header .col-lg-3:last-child,
+    .main-header .col-md-4:last-child {
+        flex: 0 0 auto;
+        max-width: none;
+        margin-left: auto;
+    }
+    
     .logo-text {
         font-size: 1.8rem;
+        margin: 0;
     }
     
     .nav-menu {
@@ -498,10 +527,14 @@ img[loading="eager"] {
     
     .menu-toggle {
         display: flex;
+        margin-left: 0.5rem;
+        align-self: center;
     }
     
     .user-actions {
         gap: 0.5rem;
+        justify-content: flex-end;
+        margin-left: auto;
     }
     
     .search-icon {
