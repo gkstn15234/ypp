@@ -38,18 +38,17 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ "/images/favicon.ico" | relURL }}">
     
+    <!-- DNS Prefetch for performance -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     
-    <!-- CSS -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ "/css/style.css" | relURL }}" rel="stylesheet">
-    
-    <!-- Custom CSS for modern design -->
+    <!-- Critical CSS (Inline for faster rendering) -->
     <style>
         :root {
             --primary-color: #007bff;
@@ -60,7 +59,7 @@
             --info-color: #17a2b8;
             --light-color: #f8f9fa;
             --dark-color: #343a40;
-            --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
         
         * {
@@ -69,11 +68,17 @@
             box-sizing: border-box;
         }
         
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+        
         body {
             font-family: var(--font-family);
             line-height: 1.6;
             color: var(--dark-color);
             background-color: #ffffff;
+            font-display: swap;
         }
         
         .main-wrapper {
@@ -84,13 +89,35 @@
         
         main {
             flex: 1;
-            padding: 2rem 0;
+            padding: 1rem 0;
+        }
+        
+        /* Critical header styles */
+        .header-main {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            background: white;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            color: #000000 !important;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        /* Image optimization */
+        img {
+            max-width: 100%;
+            height: auto;
         }
         
         /* Loading animation */
         .loading {
             opacity: 0;
-            animation: fadeIn 0.5s ease-in-out forwards;
+            animation: fadeIn 0.3s ease-in-out forwards;
         }
         
         @keyframes fadeIn {
@@ -99,23 +126,32 @@
             }
         }
         
-        /* Responsive images */
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-        
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-        
         /* Focus styles for accessibility */
         *:focus {
             outline: 2px solid var(--primary-color);
             outline-offset: 2px;
         }
+        
+        /* Hide non-critical content initially */
+        .defer-load {
+            display: none;
+        }
     </style>
+    
+    <!-- Preload critical font -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Load minimal Bootstrap CSS asynchronously -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"></noscript>
+    
+    <!-- Load Font Awesome asynchronously -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    
+    <!-- Load custom CSS asynchronously -->
+    <link rel="preload" href="{{ "/css/style.css" | relURL }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{{ "/css/style.css" | relURL }}"></noscript>
 </head>
 <body>
     <div class="main-wrapper">
@@ -128,37 +164,83 @@
         {{ partial "footer.html" . }}
     </div>
     
-    <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ "/js/main.js" | relURL }}"></script>
-    
-    <!-- Performance and UX improvements -->
+    <!-- JavaScript loaded after page content -->
     <script>
-        // Simple loading animation
+        // Critical JavaScript for immediate functionality
         document.addEventListener('DOMContentLoaded', function() {
             const main = document.querySelector('main');
             if (main) {
                 main.classList.add('loading');
             }
+            
+            // Show deferred content
+            setTimeout(() => {
+                document.querySelectorAll('.defer-load').forEach(el => {
+                    el.style.display = 'block';
+                });
+            }, 100);
         });
         
-        // Lazy loading for images
+        // Efficient lazy loading for images
         if ('IntersectionObserver' in window) {
             const imageObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const img = entry.target;
-                        img.src = img.dataset.src;
-                        img.classList.remove('lazy');
-                        imageObserver.unobserve(img);
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.classList.remove('lazy');
+                            imageObserver.unobserve(img);
+                        }
                     }
                 });
+            }, {
+                rootMargin: '50px 0px',
+                threshold: 0.01
             });
             
             document.querySelectorAll('img[data-src]').forEach(img => {
                 imageObserver.observe(img);
             });
         }
+        
+        // Load non-critical scripts asynchronously
+        function loadScript(src) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            document.head.appendChild(script);
+        }
+        
+        // Load Bootstrap JS after page load
+        window.addEventListener('load', function() {
+            loadScript('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js');
+            
+            // Load main.js if it exists
+            loadScript('{{ "/js/main.js" | relURL }}');
+        });
+        
+        // Service Worker for caching (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').catch(function() {
+                    // Service worker registration failed, but don't break the site
+                });
+            });
+        }
+    </script>
+    
+    <!-- Load Google Fonts asynchronously -->
+    <script>
+        // Load Google Fonts without blocking render
+        const fontLink = document.createElement('link');
+        fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap';
+        fontLink.rel = 'stylesheet';
+        fontLink.media = 'print';
+        fontLink.onload = function() {
+            this.media = 'all';
+        };
+        document.head.appendChild(fontLink);
     </script>
 </body>
 </html>
