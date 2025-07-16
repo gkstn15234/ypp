@@ -4,6 +4,7 @@ description: "올해 주목받는 건강 식단 트렌드와 영양 전문가들
 author: "김현지"
 date: 2025-01-23T13:30:00+09:00
 tags: ["건강식단", "영양", "다이어트", "건강트렌드"]
+images: ["https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=600&fit=crop"]
 
 ---
 

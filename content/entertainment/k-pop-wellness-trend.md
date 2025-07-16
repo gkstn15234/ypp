@@ -5,6 +5,7 @@ date: 2025-01-23T10:00:00+09:00
 author: "김현지"
 categories: ["엔터테인먼트"]
 tags: ["K-pop", "웰니스", "건강", "라이프스타일", "아이돌"]
+images: ["https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop"]
 
 draft: false
 ---

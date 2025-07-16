@@ -1,168 +1,221 @@
 {{ define "main" }}
-<!-- Main Content -->
 <main class="main-content">
     <div class="container">
-        {{ $allArticles := shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "ne" "authors") }}
-        <div class="row">
-            <!-- Left Column - Side Articles -->
-            <div class="col-lg-3">
-                <div class="left-articles">
-                    {{ $leftArticles := first 4 (after 3 $allArticles) }}
-                    {{ range $leftArticles }}
-                    <article class="side-news-card">
-                        <div class="side-news-image">
-                            {{ if .Params.images }}
-                            <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
-                            {{ else }}
-                            <div class="no-image-side">
-                                <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
-                            </div>
-                            {{ end }}
-                            <span class="news-category-tag">{{ .Section | title }}</span>
-                        </div>
-                        <div class="side-news-content">
-                            <h3 class="side-news-title">
-                                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                            </h3>
-                            <p class="side-news-excerpt">{{ .Summary | plainify | truncate 80 }}</p>
-                        </div>
-                    </article>
-                    {{ end }}
-                </div>
-            </div>
-
-            <!-- Center Column - Main Article -->
-            <div class="col-lg-6">
-                <div class="main-news-section">
+        {{ $allArticles := shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "health" "entertainment" "economy")) }}
+        
+        <!-- 메인 헤드라인 섹션 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="main-headline">
                     {{ $mainArticle := index $allArticles 0 }}
                     {{ if $mainArticle }}
-                    <article class="main-news-article">
-                        <div class="main-news-image">
-                            {{ if $mainArticle.Params.images }}
-                            <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid">
-                            {{ else }}
-                            <div class="no-image-main-center">
-                                <i class="fas fa-{{ if eq $mainArticle.Section "health" }}heartbeat{{ else if eq $mainArticle.Section "economy" }}chart-line{{ else if eq $mainArticle.Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
-                            </div>
-                            {{ end }}
-                        </div>
-                        <div class="main-news-content">
-                            <span class="main-category-badge">속보</span>
-                            <h1 class="main-news-title">
-                                <a href="{{ $mainArticle.RelPermalink }}">{{ $mainArticle.Title }}</a>
-                            </h1>
-                        </div>
-                    </article>
-                    {{ end }}
-                    
-                    <!-- Secondary Articles -->
-                    {{ $secondaryArticles := first 2 (after 1 $allArticles) }}
-                    {{ range $secondaryArticles }}
-                    <article class="secondary-news-article">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="secondary-news-image">
-                                    {{ if .Params.images }}
-                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
-                                    {{ else }}
-                                    <div class="no-image-secondary">
-                                        <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
-                                    </div>
-                                    {{ end }}
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="secondary-news-content">
-                                    <span class="secondary-category-badge">{{ .Section | title }}</span>
-                                    <h2 class="secondary-news-title">
-                                        <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                    <div class="card border-0 shadow-sm">
+                        <div class="row g-0">
+                                                         <div class="col-md-6">
+                                 <div class="main-article-image">
+                                     {{ if $mainArticle.Params.images }}
+                                     <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid w-100 h-100 object-fit-cover">
+                                     {{ else }}
+                                     <div class="no-image-main d-flex align-items-center justify-content-center">
+                                         <i class="fas fa-{{ if eq $mainArticle.Section "health" }}heartbeat{{ else if eq $mainArticle.Section "economy" }}chart-line{{ else if eq $mainArticle.Section "entertainment" }}star{{ else }}newspaper{{ end }} fa-3x text-muted"></i>
+                                     </div>
+                                     {{ end }}
+                                 </div>
+                             </div>
+                            <div class="col-md-6">
+                                <div class="card-body h-100 d-flex flex-column">
+                                    <span class="badge bg-danger mb-2">속보</span>
+                                    <h2 class="card-title mb-3">
+                                        <a href="{{ $mainArticle.RelPermalink }}" class="text-decoration-none text-dark">{{ $mainArticle.Title }}</a>
                                     </h2>
-                                    <p class="secondary-news-excerpt">{{ .Summary | plainify | truncate 150 }}</p>
-                                    <div class="secondary-news-meta">
-                                        <span class="secondary-news-date">{{ .Date.Format "01월 02일" }}</span>
-                                        {{ if .Params.author }}
-                                        {{ if eq .Params.author "김현지" }}
-                                        <a href="/authors/kim-hyun-ji/" class="secondary-news-author">{{ .Params.author }}</a>
-                                        {{ else }}
-                                        <a href="/authors/{{ .Params.author | urlize }}/" class="secondary-news-author">{{ .Params.author }}</a>
-                                        {{ end }}
-                                        {{ end }}
+                                    <p class="card-text text-muted mb-3">{{ $mainArticle.Summary | plainify | truncate 200 }}</p>
+                                    <div class="mt-auto">
+                                        <small class="text-muted">{{ $mainArticle.Date.Format "2006년 01월 02일" }}</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </article>
-                    {{ end }}
-                </div>
-            </div>
-
-            <!-- Right Column - Right Articles -->
-            <div class="col-lg-3">
-                <div class="right-articles">
-                    {{ $rightArticles := first 4 (after 7 $allArticles) }}
-                    {{ if $rightArticles }}
-                    {{ range $rightArticles }}
-                    <article class="right-news-card">
-                        <div class="right-news-image">
-                            {{ if .Params.images }}
-                            <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
-                            {{ else }}
-                            <div class="no-image-right">
-                                <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
-                            </div>
-                            {{ end }}
-                            <span class="right-category-tag">{{ .Section | title }}</span>
-                        </div>
-                        <div class="right-news-content">
-                            <h3 class="right-news-title">
-                                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                            </h3>
-                            <p class="right-news-excerpt">{{ .Summary | plainify | truncate 80 }}</p>
-                        </div>
-                    </article>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-        </div>
-
-        <!-- Latest News Section -->
-        <div class="row mt-3">
-            <div class="col-12">
-                <div class="bottom-news-section">
-                    <h2 class="section-title">최신 뉴스</h2>
-                    <div class="row">
-                        {{ $bottomArticles := first 8 (after 11 $allArticles) }}
-                        {{ if $bottomArticles }}
-                        {{ range $bottomArticles }}
-                        <div class="col-lg-3 col-md-6 mb-4">
-                            <article class="bottom-news-card">
-                                <div class="bottom-news-image">
-                                    {{ if .Params.images }}
-                                    <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
-                                    {{ else }}
-                                    <div class="no-image-bottom">
-                                        <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
-                                    </div>
-                                    {{ end }}
-                                </div>
-                                <div class="bottom-news-content">
-                                    <span class="bottom-category">{{ .Section | title }}</span>
-                                    <h5 class="bottom-news-title">
-                                        <a href="{{ .RelPermalink }}">{{ .Title | truncate 50 }}</a>
-                                    </h5>
-                                    <div class="bottom-news-meta">
-                                        <span class="bottom-news-date">{{ .Date.Format "01월 02일" }}</span>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        {{ end }}
-                        {{ end }}
                     </div>
+                    {{ end }}
                 </div>
             </div>
         </div>
+
+        <!-- 주요 뉴스 카드 섹션 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="section-title mb-3">주요 뉴스</h3>
+                <div class="row">
+                    {{ $featuredArticles := first 6 (after 1 $allArticles) }}
+                    {{ range $featuredArticles }}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                                                         <div class="card-img-top position-relative">
+                                 {{ if .Params.images }}
+                                 <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid w-100 h-100 object-fit-cover">
+                                 {{ else }}
+                                 <div class="no-image-card d-flex align-items-center justify-content-center">
+                                     <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }} fa-2x text-muted"></i>
+                                 </div>
+                                 {{ end }}
+                                 <span class="badge bg-{{ if eq .Section "health" }}success{{ else if eq .Section "economy" }}warning{{ else if eq .Section "entertainment" }}danger{{ else }}secondary{{ end }} position-absolute top-0 start-0 m-2">{{ .Section | title }}</span>
+                             </div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">
+                                    <a href="{{ .RelPermalink }}" class="text-decoration-none text-dark">{{ .Title | truncate 60 }}</a>
+                                </h5>
+                                <p class="card-text text-muted mb-3">{{ .Summary | plainify | truncate 100 }}</p>
+                                <div class="mt-auto">
+                                    <small class="text-muted">{{ .Date.Format "01월 02일" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+
+                 <!-- 최신 뉴스 목록 -->
+         <div class="row">
+             <div class="col-12">
+                 <h3 class="section-title mb-3">최신 뉴스</h3>
+                 
+                 <!-- 모바일 카드 뷰 -->
+                 <div class="row d-md-none">
+                     {{ $latestArticles := first 10 (shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "health" "entertainment" "economy"))) }}
+                     {{ range $latestArticles }}
+                     <div class="col-12 col-sm-6 mb-3">
+                         <div class="card h-100 border-0 shadow-sm">
+                             <div class="card-img-top position-relative">
+                                 {{ if .Params.images }}
+                                 <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid w-100 h-100 object-fit-cover">
+                                 {{ else }}
+                                 <div class="no-image-card d-flex align-items-center justify-content-center">
+                                     <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }} fa-2x text-muted"></i>
+                                 </div>
+                                 {{ end }}
+                                 <span class="badge bg-{{ if eq .Section "health" }}success{{ else if eq .Section "economy" }}warning{{ else if eq .Section "entertainment" }}danger{{ else }}secondary{{ end }} position-absolute top-0 start-0 m-2">{{ .Section | title }}</span>
+                             </div>
+                             <div class="card-body d-flex flex-column">
+                                 <h5 class="card-title">
+                                     <a href="{{ .RelPermalink }}" class="text-decoration-none text-dark">{{ .Title | truncate 60 }}</a>
+                                 </h5>
+                                 <p class="card-text text-muted mb-3">{{ .Summary | plainify | truncate 80 }}</p>
+                                 <div class="mt-auto">
+                                     <small class="text-muted">{{ .Date.Format "01월 02일" }}</small>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     {{ end }}
+                 </div>
+                 
+                 <!-- PC 리스트 뷰 -->
+                 <div class="list-group d-none d-md-block">
+                     {{ $latestArticles := first 10 (shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "health" "entertainment" "economy"))) }}
+                     {{ range $latestArticles }}
+                     <div class="list-group-item list-group-item-action border-0 border-bottom">
+                         <div class="row align-items-center">
+                             <div class="col-md-4">
+                                 <div class="latest-news-thumbnail-pc">
+                                     {{ if .Params.images }}
+                                     <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid w-100 h-100 object-fit-cover rounded">
+                                     {{ else }}
+                                     <div class="no-image-latest-pc d-flex align-items-center justify-content-center">
+                                         <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }} fa-3x text-{{ if eq .Section "health" }}success{{ else if eq .Section "economy" }}warning{{ else if eq .Section "entertainment" }}danger{{ else }}secondary{{ end }}"></i>
+                                     </div>
+                                     {{ end }}
+                                 </div>
+                             </div>
+                             <div class="col-md-6">
+                                 <h6 class="mb-1">
+                                     <a href="{{ .RelPermalink }}" class="text-decoration-none text-dark">{{ .Title }}</a>
+                                 </h6>
+                                 <p class="mb-1 text-muted">{{ .Summary | plainify | truncate 120 }}</p>
+                             </div>
+                             <div class="col-md-2 text-end">
+                                 <small class="text-muted">{{ .Date.Format "01월 02일" }}</small>
+                                 <br>
+                                 <span class="badge bg-{{ if eq .Section "health" }}success{{ else if eq .Section "economy" }}warning{{ else if eq .Section "entertainment" }}danger{{ else }}secondary{{ end }}">{{ .Section | title }}</span>
+                             </div>
+                         </div>
+                     </div>
+                     {{ end }}
+                 </div>
+             </div>
+         </div>
     </div>
 </main>
+
+<style>
+.main-article-image,
+.no-image-card,
+.no-image-main {
+    height: 250px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.main-article-image img,
+.card-img-top img {
+    object-fit: cover;
+    border-radius: 0.375rem;
+}
+
+.no-image-card {
+    height: 200px;
+}
+
+.latest-news-thumbnail,
+.no-image-latest {
+    height: 80px;
+    width: 100%;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.latest-news-thumbnail-pc,
+.no-image-latest-pc {
+    height: 120px;
+    width: 100%;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.latest-news-thumbnail img,
+.latest-news-thumbnail-pc img {
+    object-fit: cover;
+}
+
+.section-title {
+    font-weight: bold;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+}
+
+.news-icon {
+    padding: 1rem;
+}
+
+.latest-news-thumbnail:hover,
+.latest-news-thumbnail-pc:hover {
+    border-color: #007bff;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease-in-out;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+</style>
 {{ end }}
