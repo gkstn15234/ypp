@@ -2,7 +2,7 @@
 <!-- Main Content -->
 <main class="main-content" id="main-content">
     <div class="container">
-        {{ $allArticles := shuffle (where .Site.RegularPages ".Section" "in" (slice "automotive" "economy" "entertainment")) }}
+        {{ $allArticles := shuffle (where .Site.RegularPages ".Section" "in" (slice "health" "economy" "entertainment")) }}
         <div class="row">
             <!-- Left Column - Side Articles -->
             <div class="col-lg-3">
@@ -52,7 +52,7 @@
                             {{ end }}
                             {{ else }}
                             <div class="no-image-main-center">
-                                <i class="fas fa-{{ if eq $mainArticle.Section "automotive" }}car{{ else if eq $mainArticle.Section "economy" }}chart-line{{ else if eq $mainArticle.Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
+                                <i class="fas fa-{{ if eq $mainArticle.Section "health" }}heartbeat{{ else if eq $mainArticle.Section "economy" }}chart-line{{ else if eq $mainArticle.Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
                             </div>
                             {{ end }}
                         </div>
@@ -75,7 +75,7 @@
                                     <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" width="200" height="150" loading="lazy">
                                     {{ else }}
                                     <div class="no-image-secondary">
-                                        <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
+                                        <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
                                     </div>
                                     {{ end }}
                                 </div>
@@ -116,7 +116,7 @@
                             <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" width="300" height="200" loading="lazy">
                             {{ else }}
                             <div class="no-image-right">
-                                <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
+                                <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
                             </div>
                             {{ end }}
                             <span class="right-category-tag">{{ .Section | title }}</span>
@@ -148,7 +148,7 @@
                                     <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" width="280" height="180" loading="lazy">
                                     {{ else }}
                                     <div class="no-image-bottom">
-                                        <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
+                                        <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
                                     </div>
                                     {{ end }}
                                 </div>

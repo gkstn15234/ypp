@@ -146,9 +146,9 @@
 
                     <!-- 최신 자동차 뉴스 위젯 -->
                     <div class="sidebar-widget">
-                        <h4 class="widget-title">최신 자동차 뉴스</h4>
+                        <h4 class="widget-title">최신 건강 뉴스</h4>
                         <div class="widget-content">
-                            {{ range first 4 (where .Site.RegularPages.ByDate.Reverse ".Section" "automotive") }}
+                            {{ range first 4 (where .Site.RegularPages.ByDate.Reverse ".Section" "health") }}
                             {{ if ne .Permalink $.Permalink }}
                             <article class="sidebar-news-item">
                                 <div class="sidebar-news-thumb">
@@ -156,7 +156,7 @@
                                     <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid" width="120" height="80" loading="lazy">
                                     {{ else }}
                                     <div class="no-image">
-                                        <i class="fas fa-car"></i>
+                                        <i class="fas fa-heartbeat"></i>
                                     </div>
                                     {{ end }}
                                 </div>

@@ -41,7 +41,7 @@
                             <img src="{{ index $featured.Params.images 0 }}" alt="{{ $featured.Title }}" class="img-fluid">
                             {{ else }}
                             <div class="no-image-large">
-                                <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
+                                                                    <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }}"></i>
                             </div>
                             {{ end }}
                         </div>
@@ -104,7 +104,7 @@
                                 <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid">
                                 {{ else }}
                                 <div class="no-image">
-                                    <i class="fas fa-{{ if eq .Section "automotive" }}car{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
+                                                                            <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }}"></i>
                                 </div>
                                 {{ end }}
                             </div>
