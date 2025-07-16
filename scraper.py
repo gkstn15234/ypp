@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 import time
 import random
+import sys
 
 def clean_filename(title):
     """제목을 파일명으로 사용할 수 있도록 정리"""
@@ -47,15 +48,98 @@ def extract_content_from_url(url):
             if img_src and 'wp-content/uploads' in img_src:
                 images.append(img_src)
         
-        # 텍스트 내용 추출
+        # 텍스트 내용 및 이미지 추출 (순서 유지)
         paragraphs = []
-        for elem in content_elem.find_all(['p', 'h2', 'h3', 'h4', 'h5']):
-            text = elem.get_text().strip()
-            if text and not text.startswith('(adsbygoogle'):
-                if elem.name.startswith('h'):
-                    paragraphs.append(f"\n## {text}\n")
+        for elem in content_elem.children:
+            if hasattr(elem, 'name') and elem.name:
+                if elem.name == 'figure':
+                    # 이미지 figure 처리
+                    img_tag = elem.find('img')
+                    if img_tag:
+                        img_src = img_tag.get('src')
+                        img_alt = img_tag.get('alt', '')
+                        if img_src:
+                            # 상대 경로를 절대 경로로 변환
+                            if img_src.startswith('//'):
+                                img_src = 'https:' + img_src
+                            elif img_src.startswith('/'):
+                                img_src = 'https://www.reportera.co.kr' + img_src
+                            elif not img_src.startswith('http'):
+                                img_src = 'https://www.reportera.co.kr/' + img_src
+                            
+                            # 캡션 추출
+                            caption_elem = elem.find('figcaption')
+                            caption = caption_elem.get_text().strip() if caption_elem else img_alt
+                            
+                            # 마크다운 이미지 형식으로 추가
+                            paragraphs.append(f"![{img_alt}]({img_src})")
+                            if caption:
+                                paragraphs.append(f"*{caption}*")
+                
+                elif elem.name == 'p':
+                    # p 태그 내의 이미지 확인
+                    img_tag = elem.find('img')
+                    if img_tag:
+                        img_src = img_tag.get('src')
+                        img_alt = img_tag.get('alt', '')
+                        if img_src:
+                            # 상대 경로를 절대 경로로 변환
+                            if img_src.startswith('//'):
+                                img_src = 'https:' + img_src
+                            elif img_src.startswith('/'):
+                                img_src = 'https://www.reportera.co.kr' + img_src
+                            elif not img_src.startswith('http'):
+                                img_src = 'https://www.reportera.co.kr/' + img_src
+                            
+                            paragraphs.append(f"![{img_alt}]({img_src})")
+                    
+                    # <br> 태그를 줄바꿈으로 변환
+                    for br in elem.find_all('br'):
+                        br.replace_with('\n')
+                    
+                    # 텍스트 내용도 추가
+                    text = elem.get_text().strip()
+                    if text and not text.startswith('(adsbygoogle'):
+                        # 사진 출처 텍스트를 이미지 캡션으로 변환
+                        if text.startswith('*사진 =') or text.startswith('사진 ='):
+                            paragraphs.append(f"*{text}*")
+                        else:
+                            paragraphs.append(text)
+                
+                elif elem.name in ['h2', 'h3', 'h4', 'h5']:
+                    # <br> 태그를 줄바꿈으로 변환
+                    for br in elem.find_all('br'):
+                        br.replace_with('\n')
+                    text = elem.get_text().strip()
+                    if text and not text.startswith('(adsbygoogle'):
+                        paragraphs.append(f"\n## {text}\n")
+                
                 else:
-                    paragraphs.append(text)
+                    # 다른 요소에서도 이미지 찾기
+                    for img in elem.find_all('img'):
+                        img_src = img.get('src')
+                        img_alt = img.get('alt', '')
+                        if img_src:
+                            # 상대 경로를 절대 경로로 변환
+                            if img_src.startswith('//'):
+                                img_src = 'https:' + img_src
+                            elif img_src.startswith('/'):
+                                img_src = 'https://www.reportera.co.kr' + img_src
+                            elif not img_src.startswith('http'):
+                                img_src = 'https://www.reportera.co.kr/' + img_src
+                            
+                            paragraphs.append(f"![{img_alt}]({img_src})")
+                    
+                    # <br> 태그를 줄바꿈으로 변환
+                    for br in elem.find_all('br'):
+                        br.replace_with('\n')
+                    text = elem.get_text().strip()
+                    if text and not text.startswith('(adsbygoogle'):
+                        # 사진 출처 텍스트를 이미지 캡션으로 변환
+                        if text.startswith('*사진 =') or text.startswith('사진 ='):
+                            paragraphs.append(f"*{text}*")
+                        else:
+                            paragraphs.append(text)
         
         content = '\n\n'.join(paragraphs)
         
@@ -79,11 +163,11 @@ def create_markdown_file(article_data, output_dir):
     filename = clean_filename(article_data['title'])
     filepath = os.path.join(output_dir, f"{filename}.md")
     
-    # 중복 파일명 처리
-    counter = 1
-    while os.path.exists(filepath):
-        filepath = os.path.join(output_dir, f"{filename}-{counter}.md")
-        counter += 1
+    # 기존 파일이 있으면 덮어쓰기 (테스트를 위해)
+    # counter = 1
+    # while os.path.exists(filepath):
+    #     filepath = os.path.join(output_dir, f"{filename}-{counter}.md")
+    #     counter += 1
     
     # 현재 날짜 사용
     current_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+09:00")
@@ -93,8 +177,8 @@ def create_markdown_file(article_data, output_dir):
 title: "{article_data['title']}"
 description: "{article_data['description']}"
 date: {current_date}
-author: "김현지"
-categories: ["엔터테인먼트"]
+author: "김한수"
+categories: ["자동차"]
 tags: ["뉴스", "이슈", "트렌드"]
 """
     
@@ -118,38 +202,73 @@ draft: false
     print(f"Created: {filepath}")
 
 def main():
-    # 사이트맵 XML 데이터 (제공된 데이터에서 URL 추출)
-    sitemap_data = """https://www.reportera.co.kr/sports/worried-about-the-trade-in-baseball/ 2025-06-25T09:00:00+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/Worried-about-the-trade-in-baseball.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/롯데-이정훈-2.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/한화-중견수-3.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/KBO리그-4.jpg https://www.reportera.co.kr/news/kf-21-rolls-royce-engine/ 2025-06-25T10:00:00+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/kf-21-Rolls-Royce-Engine.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/kf-21-3.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/kf-21-1-1.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/kf-21-2.jpg https://www.reportera.co.kr/news/samsung-electronics-foundry/ 2025-06-25T08:00:00+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/samsung-electronics-foundry.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/삼성-3.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/TSMC.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/삼성-2-1.jpg https://www.reportera.co.kr/news/differences-in-wall-mounted-air-conditioner-performance/ 2025-06-25T06:00:00+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/Differences-in-wall-mounted-air-conditioner-performance.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/에어컨-2.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/에어컨-3.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/창문.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/에어컨화재.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/에어컨-1.jpg https://www.reportera.co.kr/news/relaxation-of-qualifications-for-local-housing-associations/ 2025-06-25T04:00:00+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/Relaxation-of-qualifications-for-local-housing-associations.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/지역주택조합-2.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/재건축-1.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/부동산-7.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/아파트-7.jpg https://www.reportera.co.kr/sports/a-change-in-football-regulations/ 2025-06-25T05:00:00+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/goal-keeper-001.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/한국프로축구연맹-이사회-2.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/축구-경기-4.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/골키퍼-3.jpg https://www.reportera.co.kr/sports/an-increase-in-the-national-soccer-teams-allowance/ 2025-06-25T01:37:22+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/an-increase-in-the-national-soccer-teams-allowance.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/축구-남자-대표팀-2-1.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/축구-여자-대표팀-4-1.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/축구-팀-훈련-4.jpg https://www.reportera.co.kr/car/hyundai-exports-from-the-u-s/ 2025-06-25T05:00:00+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/Hyundai-Motor-exports-from-the-U.S.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/수출.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/캐나다.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/현대차-아반떼.jpg https://www.reportera.co.kr/car/hyundai-motor-byd-battery/ 2025-06-25T01:00:00+00:00 https://www.reportera.co.kr/wp-content/uploads/2025/06/Hyundai-Motor-BYD-Battery.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/BYD-1.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/beijing-hyundai-elexio.jpg https://www.reportera.co.kr/wp-content/uploads/2025/06/beijing-hyundai-elexio-1.jpg"""
+    if len(sys.argv) != 2:
+        print("Usage: python scraper.py <sitemap_url>")
+        sys.exit(1)
     
-    # URL 추출
+    sitemap_url = sys.argv[1]
+    
+    # 사이트맵 XML 다운로드
+    try:
+        print(f"Downloading sitemap from: {sitemap_url}")
+        response = requests.get(sitemap_url)
+        response.raise_for_status()
+        sitemap_content = response.text
+        print(f"Downloaded {len(sitemap_content)} bytes")
+    except requests.exceptions.RequestException as e:
+        print(f"Error downloading sitemap: {e}")
+        sys.exit(1)
+    
+    # XML 파싱하여 URL 추출
     urls = []
-    lines = sitemap_data.strip().split('\n')
-    for line in lines:
-        if line.strip():
-            parts = line.split()
-            for part in parts:
-                if part.startswith('https://www.reportera.co.kr/') and not part.endswith('.jpg'):
-                    urls.append(part)
+    try:
+        from xml.etree import ElementTree as ET
+        root = ET.fromstring(sitemap_content)
+        
+        # XML 네임스페이스 처리
+        namespaces = {'': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+        
+        for url_elem in root.findall('.//url', namespaces):
+            loc_elem = url_elem.find('loc', namespaces)
+            if loc_elem is not None:
+                url = loc_elem.text
+                if url and url.startswith('https://www.reportera.co.kr/') and not url.endswith('.xml'):
+                    urls.append(url)
+    except Exception as e:
+        print(f"Error parsing XML: {e}")
+        # 대안: 간단한 텍스트 파싱
+        lines = sitemap_content.split('\n')
+        for line in lines:
+            if '<loc>' in line and '</loc>' in line:
+                start = line.find('<loc>') + 5
+                end = line.find('</loc>')
+                if start > 4 and end > start:
+                    url = line[start:end]
+                    if url.startswith('https://www.reportera.co.kr/') and not url.endswith('.xml'):
+                        urls.append(url)
     
     # 중복 제거
     urls = list(set(urls))
     
     # 출력 디렉토리 설정
-    output_dir = 'content/entertainment'
+    output_dir = 'content/car'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
     print(f"Found {len(urls)} URLs to process")
     
-    # 각 URL에서 기사 추출 (처음 5개만 처리)
+    # 모든 URL 처리
     processed = 0
-    for url in urls[:5]:  # 처음 5개만 처리
-        print(f"Processing: {url}")
+    for i, url in enumerate(urls):
+        print(f"Processing {i+1}/{len(urls)}: {url}")
         article_data = extract_content_from_url(url)
         
         if article_data:
             create_markdown_file(article_data, output_dir)
             processed += 1
+            print(f"Successfully processed: {article_data['title']}")
+        else:
+            print(f"Failed to process: {url}")
             
         # 서버 부하 방지를 위한 대기
         time.sleep(random.uniform(1, 3))

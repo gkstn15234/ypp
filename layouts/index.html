@@ -1,7 +1,7 @@
 {{ define "main" }}
 <main class="main-content">
     <div class="container">
-        {{ $allArticles := shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "health" "entertainment" "economy")) }}
+        {{ $allArticles := shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "car" "economy")) }}
         
         <!-- 메인 헤드라인 섹션 -->
         <div class="row mb-4">
@@ -17,7 +17,7 @@
                                      <img src="{{ index $mainArticle.Params.images 0 }}" alt="{{ $mainArticle.Title }}" class="img-fluid w-100 h-100 object-fit-cover">
                                      {{ else }}
                                      <div class="no-image-main d-flex align-items-center justify-content-center">
-                                         <i class="fas fa-{{ if eq $mainArticle.Section "health" }}heartbeat{{ else if eq $mainArticle.Section "economy" }}chart-line{{ else if eq $mainArticle.Section "entertainment" }}star{{ else }}newspaper{{ end }} fa-3x text-muted"></i>
+                                         <i class="fas fa-{{ if eq $mainArticle.Section "car" }}star{{ else if eq $mainArticle.Section "economy" }}chart-line{{ else }}newspaper{{ end }} fa-3x text-muted"></i>
                                      </div>
                                      {{ end }}
                                  </div>
@@ -55,10 +55,10 @@
                                  <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid w-100 h-100 object-fit-cover">
                                  {{ else }}
                                  <div class="no-image-card d-flex align-items-center justify-content-center">
-                                     <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }} fa-2x text-muted"></i>
+                                     <i class="fas fa-{{ if eq .Section "car" }}star{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }} fa-2x text-muted"></i>
                                  </div>
                                  {{ end }}
-                                 <span class="badge bg-{{ if eq .Section "health" }}success{{ else if eq .Section "economy" }}warning{{ else if eq .Section "entertainment" }}danger{{ else }}secondary{{ end }} position-absolute top-0 start-0 m-2">{{ .Section | title }}</span>
+                                 <span class="badge bg-{{ if eq .Section "car" }}danger{{ else if eq .Section "economy" }}warning{{ else }}secondary{{ end }} position-absolute top-0 start-0 m-2">{{ .Section | title }}</span>
                              </div>
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">
@@ -83,7 +83,7 @@
                  
                  <!-- 모바일 카드 뷰 -->
                  <div class="row d-md-none">
-                     {{ $latestArticles := first 10 (shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "health" "entertainment" "economy"))) }}
+                     {{ $latestArticles := first 10 (shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "car" "economy"))) }}
                      {{ range $latestArticles }}
                      <div class="col-12 col-sm-6 mb-3">
                          <div class="card h-100 border-0 shadow-sm">
@@ -92,10 +92,10 @@
                                  <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid w-100 h-100 object-fit-cover">
                                  {{ else }}
                                  <div class="no-image-card d-flex align-items-center justify-content-center">
-                                     <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }} fa-2x text-muted"></i>
+                                     <i class="fas fa-{{ if eq .Section "car" }}star{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }} fa-2x text-muted"></i>
                                  </div>
                                  {{ end }}
-                                 <span class="badge bg-{{ if eq .Section "health" }}success{{ else if eq .Section "economy" }}warning{{ else if eq .Section "entertainment" }}danger{{ else }}secondary{{ end }} position-absolute top-0 start-0 m-2">{{ .Section | title }}</span>
+                                 <span class="badge bg-{{ if eq .Section "car" }}danger{{ else if eq .Section "economy" }}warning{{ else }}secondary{{ end }} position-absolute top-0 start-0 m-2">{{ .Section | title }}</span>
                              </div>
                              <div class="card-body d-flex flex-column">
                                  <h5 class="card-title">
@@ -113,7 +113,7 @@
                  
                  <!-- PC 리스트 뷰 -->
                  <div class="list-group d-none d-md-block">
-                     {{ $latestArticles := first 10 (shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "health" "entertainment" "economy"))) }}
+                     {{ $latestArticles := first 10 (shuffle (where .Site.RegularPages.ByDate.Reverse ".Section" "in" (slice "car" "economy"))) }}
                      {{ range $latestArticles }}
                      <div class="list-group-item list-group-item-action border-0 border-bottom">
                          <div class="row align-items-center">
@@ -123,7 +123,7 @@
                                      <img src="{{ index .Params.images 0 }}" alt="{{ .Title }}" class="img-fluid w-100 h-100 object-fit-cover rounded">
                                      {{ else }}
                                      <div class="no-image-latest-pc d-flex align-items-center justify-content-center">
-                                         <i class="fas fa-{{ if eq .Section "health" }}heartbeat{{ else if eq .Section "economy" }}chart-line{{ else if eq .Section "entertainment" }}star{{ else }}newspaper{{ end }} fa-3x text-{{ if eq .Section "health" }}success{{ else if eq .Section "economy" }}warning{{ else if eq .Section "entertainment" }}danger{{ else }}secondary{{ end }}"></i>
+                                         <i class="fas fa-{{ if eq .Section "car" }}star{{ else if eq .Section "economy" }}chart-line{{ else }}newspaper{{ end }} fa-3x text-{{ if eq .Section "car" }}danger{{ else if eq .Section "economy" }}warning{{ else }}secondary{{ end }}"></i>
                                      </div>
                                      {{ end }}
                                  </div>
@@ -137,7 +137,7 @@
                              <div class="col-md-2 text-end">
                                  <small class="text-muted">{{ .Date.Format "01월 02일" }}</small>
                                  <br>
-                                 <span class="badge bg-{{ if eq .Section "health" }}success{{ else if eq .Section "economy" }}warning{{ else if eq .Section "entertainment" }}danger{{ else }}secondary{{ end }}">{{ .Section | title }}</span>
+                                 <span class="badge bg-{{ if eq .Section "car" }}danger{{ else if eq .Section "economy" }}warning{{ else }}secondary{{ end }}">{{ .Section | title }}</span>
                              </div>
                          </div>
                      </div>

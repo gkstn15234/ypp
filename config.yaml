@@ -38,15 +38,12 @@ params:
 
 menu:
   main:
-    - name: '건강'
-      url: '/health/'
-      weight: 10
     - name: '의료'
       url: '/economy/'
-      weight: 20
+      weight: 10
     - name: '웰니스'
-      url: '/entertainment/'
-      weight: 30
+      url: '/car/'
+      weight: 20
 
 taxonomies:
   tag: tags
