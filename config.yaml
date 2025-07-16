@@ -1,6 +1,6 @@
 baseURL: ''
 languageCode: 'ko-kr'
-title: '포스트업 - 건강한 삶의 새로운 기준'
+title: '앤포이스 - 자동차 전문매체'
 defaultContentLanguage: 'ko'
 hasCJKLanguage: true
 timeZone: 'Asia/Seoul'
@@ -11,10 +11,10 @@ relativeURLs: false
 canonifyURLs: true
 
 params:
-  description: '포스트업는 건강, 의료, 웰니스 정보를 전문적으로 다루는 건강 미디어입니다.'
-  keywords: '건강, 의료, 웰니스, 건강관리, 건강뉴스, 의료정보, 건강정보'
-  author: '포스트업'
-  company: '포스트업'
+  description: '앤포이스는 자동차, 전기차, 모빌리티 정보를 전문적으로 다루는 자동차 전문매체입니다.'
+  keywords: '자동차, 전기차, 모빌리티, 자동차뉴스, 신차정보, 자동차리뷰, 자동차산업'
+  author: '앤포이스'
+  company: '앤포이스'
   address: '경상북도 경산시 진량읍 일연로 747'
   phone: '010-7539-8504'
   email: 'hangil9910@gmail.com'
@@ -38,12 +38,9 @@ params:
 
 menu:
   main:
-    - name: '의료'
-      url: '/economy/'
-      weight: 10
-    - name: '웰니스'
+    - name: '자동차'
       url: '/car/'
-      weight: 20
+      weight: 10
 
 taxonomies:
   tag: tags
