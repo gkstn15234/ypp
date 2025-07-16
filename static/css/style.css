@@ -2963,12 +2963,12 @@ img {
     border-color: var(--accent-color);
 }
 
-/* Footer - ZERO CLS */
+/* Footer - ZERO CLS (Admin removed) */
 .site-footer {
     background: #2d3748;
     color: #a0aec0;
     margin-top: 4rem;
-    height: 500px;  /* FIXED HEIGHT - NO SHIFT */
+    height: 400px;  /* REDUCED HEIGHT - Admin removed */
     contain: strict;
     will-change: auto;
     overflow: hidden;
@@ -3032,7 +3032,7 @@ img {
     border-top: 1px solid #4a5568;
     padding: 2rem 0;
     background: #1a202c;
-    height: 220px;  /* FIXED HEIGHT */
+    height: 120px;  /* REDUCED HEIGHT - Admin removed */
     contain: strict;
     overflow: hidden;
     position: absolute;
@@ -3045,7 +3045,7 @@ img {
     text-align: center;
     font-size: 0.85rem;
     line-height: 1.6;
-    height: 160px;  /* FIXED HEIGHT */
+    height: 80px;  /* REDUCED HEIGHT - Admin removed */
     contain: strict;
     overflow: hidden;
     display: flex;
@@ -3699,47 +3699,7 @@ img {
     overflow: hidden;
 }
 
-/* Admin login section - ZERO CLS */
-.admin-login-section {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    height: 60px;  /* FIXED HEIGHT */
-    contain: strict;
-    will-change: auto;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
-.admin-login-btn {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.7);
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: none;  /* NO TRANSITIONS TO PREVENT SHIFT */
-    height: 36px;  /* FIXED HEIGHT */
-    width: 120px;  /* FIXED WIDTH */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    contain: strict;
-    flex-shrink: 0;
-}
-
-.admin-login-btn i {
-    margin-right: 5px;
-}
-
-.admin-login-btn:hover {
-    background: rgba(255,255,255,0.2) !important;
-    color: rgba(255,255,255,0.9) !important;
-    border-color: rgba(255,255,255,0.5) !important;
-}
 
 /* ===== ZERO CLS 강제 적용 ===== */
 /* 모든 카드와 컨테이너 강제 고정 */
