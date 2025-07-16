@@ -611,3 +611,225 @@ function hideEnhancedUpNext() {
         }, 300); // Wait for animation to complete
     }
 }
+
+// ===== CLS 최적화: 이미지 로딩 상태 관리 =====
+
+// 이미지 로딩 완료 감지 및 스켈레톤 제거
+function optimizeImageLoading() {
+    const images = document.querySelectorAll('img[loading="lazy"], img[loading="eager"]');
+    
+    images.forEach(img => {
+        // 이미지가 이미 로드된 경우
+        if (img.complete && img.naturalHeight !== 0) {
+            img.classList.add('loaded');
+            removeSkeletonLoader(img);
+        } else {
+            // 이미지 로드 이벤트 리스너
+            img.addEventListener('load', function() {
+                this.classList.add('loaded');
+                removeSkeletonLoader(this);
+            });
+            
+            // 이미지 로드 실패 시 처리
+            img.addEventListener('error', function() {
+                this.classList.add('error');
+                removeSkeletonLoader(this);
+                showImagePlaceholder(this);
+            });
+        }
+    });
+}
+
+// 스켈레톤 로더 제거
+function removeSkeletonLoader(img) {
+    const container = img.closest('.article-image, .article-thumb, .article-main-image, .card-img-wrapper');
+    if (container) {
+        const skeleton = container.querySelector('::before');
+        if (skeleton) {
+            container.style.setProperty('--skeleton-display', 'none');
+        }
+    }
+}
+
+// 이미지 플레이스홀더 표시
+function showImagePlaceholder(img) {
+    const placeholder = document.createElement('div');
+    placeholder.className = 'image-placeholder';
+    placeholder.innerHTML = '<i class="fas fa-image"></i>';
+    placeholder.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #6c757d;
+    `;
+    
+    const container = img.parentElement;
+    if (container) {
+        container.appendChild(placeholder);
+        img.style.opacity = '0';
+    }
+}
+
+// 폰트 로딩 최적화
+function optimizeFontLoading() {
+    // 폰트 로딩 상태 감지
+    if ('fonts' in document) {
+        document.fonts.ready.then(() => {
+            document.body.classList.add('fonts-loaded');
+        });
+        
+        // 주요 폰트 미리 로드
+        const fontFace = new FontFace('Noto Sans KR', 'url(https://fonts.gstatic.com/s/notosanskr/v27/PbykFmXiEBPT4ITbgNA5Cgm20xz64px_1hVWr0wuPNGmlQNMEfD4.woff2)');
+        fontFace.load().then(() => {
+            document.fonts.add(fontFace);
+            document.body.classList.add('primary-font-loaded');
+        }).catch(() => {
+            // 폰트 로딩 실패 시 웹 폰트 대신 시스템 폰트 사용
+            document.body.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+        });
+    }
+}
+
+// 레이아웃 안정성 모니터링
+function monitorLayoutStability() {
+    if ('PerformanceObserver' in window) {
+        const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                if (entry.entryType === 'layout-shift' && !entry.hadRecentInput) {
+                    console.log('Layout shift detected:', entry.value);
+                    
+                    // 큰 레이아웃 시프트가 감지되면 최적화 실행
+                    if (entry.value > 0.1) {
+                        optimizeLayout();
+                    }
+                }
+            }
+        });
+        
+        observer.observe({ type: 'layout-shift', buffered: true });
+    }
+}
+
+// 레이아웃 최적화 실행
+function optimizeLayout() {
+    // 모든 이미지 컨테이너에 고정 크기 적용
+    const containers = document.querySelectorAll('.article-image, .article-thumb, .card-img-wrapper');
+    containers.forEach(container => {
+        if (!container.style.minHeight) {
+            const img = container.querySelector('img');
+            if (img) {
+                const rect = container.getBoundingClientRect();
+                if (rect.height > 0) {
+                    container.style.minHeight = rect.height + 'px';
+                }
+            }
+        }
+    });
+    
+    // 텍스트 컨테이너 최적화
+    const textContainers = document.querySelectorAll('.article-content, .card-body');
+    textContainers.forEach(container => {
+        const rect = container.getBoundingClientRect();
+        if (rect.height > 0 && !container.style.minHeight) {
+            container.style.minHeight = rect.height + 'px';
+        }
+    });
+}
+
+// 동적 콘텐츠 로딩 최적화
+function optimizeDynamicContent() {
+    // 광고나 동적 콘텐츠 영역에 플레이스홀더 적용
+    const dynamicElements = document.querySelectorAll('.ad-container, .dynamic-content, [data-dynamic]');
+    dynamicElements.forEach(element => {
+        if (!element.style.minHeight) {
+            element.style.minHeight = '200px';
+            element.style.backgroundColor = '#f8f9fa';
+            element.style.border = '1px dashed #dee2e6';
+        }
+    });
+}
+
+// Intersection Observer를 이용한 지연 로딩 최적화
+function setupAdvancedLazyLoading() {
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    
+                    // 이미지 소스 설정 전 컨테이너 크기 고정
+                    const container = img.closest('.article-image, .article-thumb, .card-img-wrapper');
+                    if (container && !container.style.minHeight) {
+                        const rect = container.getBoundingClientRect();
+                        if (rect.height > 0) {
+                            container.style.minHeight = rect.height + 'px';
+                        }
+                    }
+                    
+                    // 이미지 소스 설정
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                    }
+                    
+                    observer.unobserve(img);
+                }
+            });
+        }, {
+            rootMargin: '50px 0px',
+            threshold: 0.01
+        });
+        
+        // 지연 로딩 이미지 관찰 시작
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+}
+
+// 페이지 로드 시 CLS 최적화 실행
+document.addEventListener('DOMContentLoaded', function() {
+    optimizeImageLoading();
+    optimizeFontLoading();
+    optimizeDynamicContent();
+    setupAdvancedLazyLoading();
+    
+    // 레이아웃 안정성 모니터링 (개발 모드에서만)
+    if (window.location.hostname === 'localhost' || window.location.hostname.includes('preview')) {
+        monitorLayoutStability();
+    }
+});
+
+// 페이지 완전 로드 후 최종 최적화
+window.addEventListener('load', function() {
+    // 모든 이미지 로딩 상태 재확인
+    setTimeout(() => {
+        optimizeImageLoading();
+        optimizeLayout();
+    }, 100);
+});
+
+// 리사이즈 시 레이아웃 재최적화
+window.addEventListener('resize', debounce(function() {
+    optimizeLayout();
+}, 250));
+
+// 디바운스 함수
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}

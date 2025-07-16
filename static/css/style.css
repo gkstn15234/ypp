@@ -3578,3 +3578,250 @@ img {
         --border-color: #000000;
     }
 }
+
+/* ===== 추가 CLS 최적화 (Layout Shift 방지) ===== */
+
+/* 모든 이미지 컨테이너에 명시적 크기 설정 */
+.main-article .article-image {
+    min-height: 400px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.side-article .article-thumb {
+    min-height: 80px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.article-main-image {
+    min-height: 300px;
+    background-color: #f8f9fa;
+}
+
+.article-list-item .article-thumb {
+    min-height: 120px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-img-wrapper {
+    min-height: 200px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 이미지 로딩 상태 스켈레톤 효과 */
+.main-article .article-image::before,
+.side-article .article-thumb::before,
+.article-main-image::before,
+.article-list-item .article-thumb::before,
+.card-img-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    z-index: 1;
+}
+
+.main-article .article-image img:not([src]),
+.side-article .article-thumb img:not([src]),
+.article-main-image img:not([src]),
+.article-list-item .article-thumb img:not([src]),
+.card-img-wrapper img:not([src]) {
+    opacity: 0;
+}
+
+@keyframes loading {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* 이미지 로드 완료 시 스켈레톤 제거 */
+.main-article .article-image:has(img[complete]):before,
+.side-article .article-thumb:has(img[complete]):before,
+.article-main-image:has(img[complete]):before,
+.article-list-item .article-thumb:has(img[complete]):before,
+.card-img-wrapper:has(img[complete]):before {
+    display: none;
+}
+
+/* 폰트 로딩 최적화 - FOUT 방지 */
+body {
+    font-display: swap;
+}
+
+/* 텍스트 콘텐츠 영역 미리 확보 */
+.main-article .article-content {
+    min-height: 120px;
+}
+
+.side-article .article-content {
+    min-height: 60px;
+}
+
+.article-list-item .article-content {
+    min-height: 80px;
+}
+
+/* 네비게이션 바 고정 크기 */
+.navbar {
+    min-height: 70px;
+}
+
+/* 카드 콘텐츠 영역 고정 */
+.card-body {
+    min-height: 100px;
+}
+
+/* 푸터 고정 크기 */
+footer {
+    min-height: 150px;
+}
+
+/* 광고/동적 콘텐츠 영역 미리 확보 */
+.ad-container,
+.dynamic-content {
+    min-height: 200px;
+    background-color: #f8f9fa;
+    border: 1px dashed #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 검색 모달 크기 고정 */
+.modal-dialog {
+    min-height: 300px;
+}
+
+/* 로딩 상태 표시 */
+.loading-placeholder {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+/* 이미지 aspect-ratio 강제 적용 */
+.main-article .article-image img {
+    aspect-ratio: 16/9;
+    object-fit: cover;
+}
+
+.side-article .article-thumb img {
+    aspect-ratio: 16/10;
+    object-fit: cover;
+}
+
+.article-main-image img {
+    aspect-ratio: 16/9;
+    object-fit: cover;
+}
+
+.article-list-item .article-thumb img {
+    aspect-ratio: 4/3;
+    object-fit: cover;
+}
+
+.card-img-top {
+    aspect-ratio: 16/10;
+    object-fit: cover;
+}
+
+/* 컨테이너 contain 속성으로 layout shift 방지 */
+.main-article,
+.side-article,
+.article-list-item,
+.card {
+    contain: layout style;
+}
+
+/* 이미지 로딩 시 투명도 애니메이션 */
+img[loading="lazy"] {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+img[loading="lazy"].loaded,
+img[loading="eager"] {
+    opacity: 1;
+}
+
+/* 중요한 이미지 스타일 (loading/fetchpriority는 JavaScript에서 처리) */
+
+/* 텍스트 래핑 방지로 layout shift 줄이기 */
+.article-title,
+.card-title {
+    word-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.2;
+}
+
+/* 컨테이너 크기 고정 */
+.container,
+.container-fluid {
+    contain: layout;
+}
+
+/* 반응형 이미지 최적화 */
+@media (max-width: 768px) {
+    .main-article .article-image {
+        min-height: 250px;
+    }
+    
+    .side-article .article-thumb {
+        min-height: 60px;
+    }
+    
+    .article-list-item .article-thumb {
+        min-height: 100px;
+    }
+    
+    .card-img-wrapper {
+        min-height: 150px;
+    }
+}
+
+/* CSS containment으로 리플로우 방지 */
+.row {
+    contain: layout;
+}
+
+.col, .col-*, [class*="col-"] {
+    contain: layout style;
+}
+
+/* 스크롤 성능 최적화 */
+* {
+    will-change: auto;
+}
+
+.main-article:hover,
+.side-article:hover,
+.card:hover {
+    will-change: transform;
+}
+
+.main-article:not(:hover),
+.side-article:not(:hover),
+.card:not(:hover) {
+    will-change: auto;
+}
