@@ -98,7 +98,8 @@ def extract_content_from_url(url):
         # 파일명 생성
         article_slug = clean_filename(title)
         
-        # 이미지 처리
+        # 이미지 처리 및 썸네일 설정
+        thumbnail_image = None
         for i, img in enumerate(content_elem.find_all('img')):
             img_src = img.get('src') or img.get('data-src')
             if img_src:
@@ -117,6 +118,10 @@ def extract_content_from_url(url):
                     # Hugo에서 사용할 이미지 경로
                     hugo_img_path = f"/images/car/{img_filename}"
                     img['src'] = hugo_img_path
+                    
+                    # 첫 번째 이미지를 썸네일로 설정
+                    if thumbnail_image is None:
+                        thumbnail_image = hugo_img_path
                     
                     # 불필요한 속성 제거
                     for attr in ['data-src', 'srcset', 'sizes']:
@@ -149,7 +154,8 @@ def extract_content_from_url(url):
             'title': title,
             'description': description,
             'content': content,
-            'url': url
+            'url': url,
+            'thumbnail': thumbnail_image
         }
     
     except Exception as e:
@@ -171,7 +177,14 @@ description: "{article_data['description']}"
 date: {current_date}
 author: "김한수"
 categories: ["자동차"]
-tags: ["자동차", "뉴스"]
+tags: ["자동차", "뉴스"]"""
+    
+    # 썸네일 이미지가 있으면 추가
+    if article_data.get('thumbnail'):
+        markdown_content += f"""
+images: ["{article_data['thumbnail']}"]"""
+    
+    markdown_content += f"""
 draft: false
 ---
 
