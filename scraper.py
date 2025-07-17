@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import xml.etree.ElementTree as ET
 import re
 import os
+from urllib.parse import urljoin, urlparse
 from datetime import datetime
 import time
 import random
@@ -15,142 +16,139 @@ def clean_filename(title):
     filename = re.sub(r'[-\s]+', '-', filename)
     return filename.strip('-').lower()
 
+def download_image(img_url, save_path):
+    """이미지 다운로드"""
+    try:
+        response = requests.get(img_url, timeout=10)
+        response.raise_for_status()
+        
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        
+        with open(save_path, 'wb') as f:
+            f.write(response.content)
+        
+        return True
+    except Exception as e:
+        print(f"이미지 다운로드 실패 {img_url}: {e}")
+        return False
+
 def extract_content_from_url(url):
     """URL에서 기사 내용 추출"""
     try:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.content, 'html.parser')
+        base_url = f"{urlparse(url).scheme}://{urlparse(url).netloc}"
         
-        # 제목 추출
-        title_elem = soup.find('h1', class_='entry-title')
-        if not title_elem:
+        # 제목 추출 (여러 가능한 선택자 시도)
+        title = None
+        title_selectors = [
+            'h1.entry-title',
+            'h1.post-title', 
+            'h1.title',
+            'h1',
+            '.entry-title',
+            '.post-title',
+            '.title',
+            'title'
+        ]
+        
+        for selector in title_selectors:
+            title_elem = soup.select_one(selector)
+            if title_elem:
+                title = title_elem.get_text().strip()
+                break
+        
+        if not title:
+            print(f"제목을 찾을 수 없습니다: {url}")
             return None
-        title = title_elem.get_text().strip()
         
-        # 내용 추출
-        content_elem = soup.find('div', class_='entry-content')
+        # 내용 추출 (여러 가능한 선택자 시도)
+        content_elem = None
+        content_selectors = [
+            'div.entry-content',
+            'div.post-content',
+            'div.content',
+            '.entry-content',
+            '.post-content',
+            '.content',
+            'article',
+            '.article-content',
+            '.main-content',
+            '#content'
+        ]
+        
+        for selector in content_selectors:
+            content_elem = soup.select_one(selector)
+            if content_elem:
+                break
+        
         if not content_elem:
+            print(f"본문 내용을 찾을 수 없습니다: {url}")
             return None
         
-        # 광고 제거
-        for ad in content_elem.find_all('div', class_='repoad'):
+        # 광고 및 불필요한 요소 제거
+        for unwanted in content_elem.find_all(['div'], class_=['repoad', 'ad', 'advertisement']):
+            unwanted.decompose()
+        
+        # 파일명 생성
+        article_slug = clean_filename(title)
+        
+        # 이미지 처리
+        for i, img in enumerate(content_elem.find_all('img')):
+            img_src = img.get('src') or img.get('data-src')
+            if img_src:
+                # 절대 URL로 변환
+                full_img_url = urljoin(base_url, img_src)
+                
+                # 이미지 파일명 생성
+                img_extension = os.path.splitext(urlparse(full_img_url).path)[1] or '.jpg'
+                img_filename = f"{article_slug}-{i+1}{img_extension}"
+                
+                # 이미지 저장 경로
+                img_save_path = os.path.join('static', 'images', 'car', img_filename)
+                
+                # 이미지 다운로드
+                if download_image(full_img_url, img_save_path):
+                    # Hugo에서 사용할 이미지 경로
+                    hugo_img_path = f"/images/car/{img_filename}"
+                    img['src'] = hugo_img_path
+                    
+                    # 불필요한 속성 제거
+                    for attr in ['data-src', 'srcset', 'sizes']:
+                        if img.get(attr):
+                            del img[attr]
+        
+        # 불필요한 태그 제거
+        for tag in content_elem(['script', 'style', 'nav', 'footer', 'header']):
+            tag.decompose()
+        
+        # 불필요한 출처 정보 제거
+        for figcaption in content_elem.find_all('figcaption'):
+            caption_text = figcaption.get_text()
+            # "출처-온라인커뮤니티" 등의 출처 정보 제거
+            if '출처-' in caption_text or '/ 출처' in caption_text:
+                figcaption.decompose()
+        
+        # 광고 관련 코드 제거
+        for ad in content_elem.find_all(['ins', 'div'], class_=['adsbygoogle', 'code-block']):
             ad.decompose()
         
-        # 이미지 추출
-        images = []
-        for img in content_elem.find_all('img'):
-            img_src = img.get('src')
-            if img_src and 'wp-content/uploads' in img_src:
-                images.append(img_src)
+        # HTML 내용을 문자열로 변환
+        content = str(content_elem)
         
-        # 텍스트 내용 및 이미지 추출 (순서 유지)
-        paragraphs = []
-        for elem in content_elem.children:
-            if hasattr(elem, 'name') and elem.name:
-                if elem.name == 'figure':
-                    # 이미지 figure 처리
-                    img_tag = elem.find('img')
-                    if img_tag:
-                        img_src = img_tag.get('src')
-                        img_alt = img_tag.get('alt', '')
-                        if img_src:
-                            # 상대 경로를 절대 경로로 변환
-                            if img_src.startswith('//'):
-                                img_src = 'https:' + img_src
-                            elif img_src.startswith('/'):
-                                img_src = 'https://www.reportera.co.kr' + img_src
-                            elif not img_src.startswith('http'):
-                                img_src = 'https://www.reportera.co.kr/' + img_src
-                            
-                            # 캡션 추출
-                            caption_elem = elem.find('figcaption')
-                            caption = caption_elem.get_text().strip() if caption_elem else img_alt
-                            
-                            # 마크다운 이미지 형식으로 추가
-                            paragraphs.append(f"![{img_alt}]({img_src})")
-                            if caption:
-                                paragraphs.append(f"*{caption}*")
-                
-                elif elem.name == 'p':
-                    # p 태그 내의 이미지 확인
-                    img_tag = elem.find('img')
-                    if img_tag:
-                        img_src = img_tag.get('src')
-                        img_alt = img_tag.get('alt', '')
-                        if img_src:
-                            # 상대 경로를 절대 경로로 변환
-                            if img_src.startswith('//'):
-                                img_src = 'https:' + img_src
-                            elif img_src.startswith('/'):
-                                img_src = 'https://www.reportera.co.kr' + img_src
-                            elif not img_src.startswith('http'):
-                                img_src = 'https://www.reportera.co.kr/' + img_src
-                            
-                            paragraphs.append(f"![{img_alt}]({img_src})")
-                    
-                    # <br> 태그를 줄바꿈으로 변환
-                    for br in elem.find_all('br'):
-                        br.replace_with('\n')
-                    
-                    # 텍스트 내용도 추가
-                    text = elem.get_text().strip()
-                    if text and not text.startswith('(adsbygoogle'):
-                        # 사진 출처 텍스트를 이미지 캡션으로 변환
-                        if text.startswith('*사진 =') or text.startswith('사진 ='):
-                            paragraphs.append(f"*{text}*")
-                        else:
-                            paragraphs.append(text)
-                
-                elif elem.name in ['h2', 'h3', 'h4', 'h5']:
-                    # <br> 태그를 줄바꿈으로 변환
-                    for br in elem.find_all('br'):
-                        br.replace_with('\n')
-                    text = elem.get_text().strip()
-                    if text and not text.startswith('(adsbygoogle'):
-                        paragraphs.append(f"\n## {text}\n")
-                
-                else:
-                    # 다른 요소에서도 이미지 찾기
-                    for img in elem.find_all('img'):
-                        img_src = img.get('src')
-                        img_alt = img.get('alt', '')
-                        if img_src:
-                            # 상대 경로를 절대 경로로 변환
-                            if img_src.startswith('//'):
-                                img_src = 'https:' + img_src
-                            elif img_src.startswith('/'):
-                                img_src = 'https://www.reportera.co.kr' + img_src
-                            elif not img_src.startswith('http'):
-                                img_src = 'https://www.reportera.co.kr/' + img_src
-                            
-                            paragraphs.append(f"![{img_alt}]({img_src})")
-                    
-                    # <br> 태그를 줄바꿈으로 변환
-                    for br in elem.find_all('br'):
-                        br.replace_with('\n')
-                    text = elem.get_text().strip()
-                    if text and not text.startswith('(adsbygoogle'):
-                        # 사진 출처 텍스트를 이미지 캡션으로 변환
-                        if text.startswith('*사진 =') or text.startswith('사진 ='):
-                            paragraphs.append(f"*{text}*")
-                        else:
-                            paragraphs.append(text)
-        
-        content = '\n\n'.join(paragraphs)
-        
-        # 요약문 생성 (첫 번째 문단에서)
-        description = paragraphs[0][:100] + "..." if paragraphs else ""
+        # 요약문 생성 (첫 번째 텍스트에서)
+        text_content = content_elem.get_text().strip()
+        description = text_content[:100] + "..." if text_content else ""
         
         return {
             'title': title,
             'description': description,
             'content': content,
-            'images': images,
             'url': url
         }
     
@@ -163,14 +161,8 @@ def create_markdown_file(article_data, output_dir):
     filename = clean_filename(article_data['title'])
     filepath = os.path.join(output_dir, f"{filename}.md")
     
-    # 기존 파일이 있으면 덮어쓰기 (테스트를 위해)
-    # counter = 1
-    # while os.path.exists(filepath):
-    #     filepath = os.path.join(output_dir, f"{filename}-{counter}.md")
-    #     counter += 1
-    
     # 현재 날짜 사용
-    current_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S+09:00")
+    current_date = datetime.now().strftime("%Y-%m-%d")
     
     # 마크다운 내용 생성
     markdown_content = f"""---
@@ -179,18 +171,9 @@ description: "{article_data['description']}"
 date: {current_date}
 author: "김한수"
 categories: ["자동차"]
-tags: ["뉴스", "이슈", "트렌드"]
-"""
-    
-    # 이미지가 있으면 첫 번째 이미지를 썸네일로 사용
-    if article_data['images']:
-        markdown_content += f'images: ["{article_data["images"][0]}"]\n'
-    
-    markdown_content += f"""
+tags: ["자동차", "뉴스"]
 draft: false
 ---
-
-# {article_data['title']}
 
 {article_data['content']}
 """
@@ -222,17 +205,16 @@ def main():
     # XML 파싱하여 URL 추출
     urls = []
     try:
-        from xml.etree import ElementTree as ET
         root = ET.fromstring(sitemap_content)
         
         # XML 네임스페이스 처리
-        namespaces = {'': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
+        namespaces = {'ns': 'http://www.sitemaps.org/schemas/sitemap/0.9'}
         
-        for url_elem in root.findall('.//url', namespaces):
-            loc_elem = url_elem.find('loc', namespaces)
+        for url_elem in root.findall('.//ns:url', namespaces):
+            loc_elem = url_elem.find('ns:loc', namespaces)
             if loc_elem is not None:
                 url = loc_elem.text
-                if url and url.startswith('https://www.reportera.co.kr/') and not url.endswith('.xml'):
+                if url and not url.endswith('.xml'):
                     urls.append(url)
     except Exception as e:
         print(f"Error parsing XML: {e}")
@@ -244,7 +226,7 @@ def main():
                 end = line.find('</loc>')
                 if start > 4 and end > start:
                     url = line[start:end]
-                    if url.startswith('https://www.reportera.co.kr/') and not url.endswith('.xml'):
+                    if not url.endswith('.xml'):
                         urls.append(url)
     
     # 중복 제거
@@ -255,12 +237,19 @@ def main():
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     
+    # 이미지 디렉토리 생성
+    img_dir = 'static/images/car'
+    if not os.path.exists(img_dir):
+        os.makedirs(img_dir)
+    
     print(f"Found {len(urls)} URLs to process")
     
-    # 모든 URL 처리
+    # 5개 URL만 처리
     processed = 0
-    for i, url in enumerate(urls):
-        print(f"Processing {i+1}/{len(urls)}: {url}")
+    max_articles = 5
+    
+    for i, url in enumerate(urls[:max_articles]):
+        print(f"Processing {i+1}/{max_articles}: {url}")
         article_data = extract_content_from_url(url)
         
         if article_data:
